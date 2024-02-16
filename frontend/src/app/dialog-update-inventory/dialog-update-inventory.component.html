@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Aggiorna Inventario</h1>
+<div mat-dialog-content>
+  <!-- <mat-checkbox [(ngModel)]="resetToNull">Nessun valore</mat-checkbox> -->
+  <form [formGroup]="form" class="form">
+    <mat-form-field appearance="fill">
+      <mat-label>Nuova quantità</mat-label>
+      <input type="number" matInput formControlName="newQuantity" cdkTrapFocusAutoCapture cdkTrapFocus
+        (keyup.enter)="onConfirm()" />
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close (click)="onDismiss()">Annulla</button>
+  <button mat-button mat-dialog-close (click)="onConfirm()">Conferma</button>
+</div>

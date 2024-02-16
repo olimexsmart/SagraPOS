@@ -1,0 +1,37 @@
+/* TODO how to share CSS classes between components? */
+.flexSpacer {
+    flex: 1 1 auto;
+}
+
+.mainInfo {
+    padding: 1em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 1em;
+
+}
+
+.mainInfoCard {
+    min-width: 10em;
+    min-height: 6em;
+}
+
+.table-all {
+    margin: 1em;
+    /* max-height: 100%; */
+    overflow: auto;
+}
+
+.container {
+    max-height: calc(100vh - 64px) !important;
+    display: flex;
+    flex-direction: column; 
+    /* What if the toolbar has a different size? */
+}
+
+@media(max-width: 599px) {
+    .container {
+        max-height: calc(100vh - 56px) !important;
+    }
+}

@@ -1,0 +1,9 @@
+<!-- TODO temporary fix for moble, it doesn't fit everything in the taskbar -->
+<ng-container *ngIf="!mobileQuery.matches"> 
+    <button *ngIf="!modeActive" mat-stroked-button color="accent" (click)="toggleMode()" class="modeSelect">
+        Inventario Off
+    </button>
+    <button *ngIf="modeActive" mat-raised-button color="accent" (click)="toggleMode()" class="modeSelect">
+        Inventario On
+    </button>
+</ng-container>

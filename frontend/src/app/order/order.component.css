@@ -1,0 +1,43 @@
+.orderContainer {
+    width: 30vw;
+    min-width: 30vw;
+    display: flex;
+    /* width: 100%; */
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+}
+
+@media(max-width: 599px) {
+    .orderContainer {
+        width: 100vw;
+        min-width: 100vw;
+        display: flex;
+        /* width: 100%; */
+        flex-direction: column;
+        /* justify-content: center; */
+        align-items: center;
+    }
+}
+
+.fabStyle {
+    margin-top: 1em;
+}
+
+.receiptLine {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.receiptCategory {
+    width: 80%;
+    margin-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    font-size: x-large;
+    font-family: monospace;
+}

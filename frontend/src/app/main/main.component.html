@@ -1,0 +1,51 @@
+<!-- TOOLBAR -->
+<mat-toolbar color="primary">
+  <span>{{title}}</span>
+  <span class="flexSpacer"></span>
+  <app-inventory-mode #inventoryMode></app-inventory-mode>
+  <app-printer-selector #printerSelector></app-printer-selector>
+  <!-- <button mat-icon-button>
+    <mat-icon>settings</mat-icon>
+  </button> -->
+  <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
+    <mat-icon>info</mat-icon>
+  </button>
+  <button mat-icon-button (click)="sidenav.toggle()" [matBadge]="order.getEntriesNumber()" matBadgePosition="after"
+    matBadgeColor="accent" matBadgeSize="small">
+    <mat-icon>receipt</mat-icon>
+  </button>
+</mat-toolbar>
+<!-- FOOD CARDS -->
+<mat-sidenav-container fullscreen class="sidenav-container">
+  <mat-sidenav #sidenav position="end" class="sidenav-lateral" [mode]="mobileQuery.matches ? 'over' : 'side'"
+    [fixedInViewport]="true" fixedTopGap="64">
+    <app-order #order [selectedPrinter]="printerSelector.getSelectedPrinter()" [categories]="categories"
+      [menu]="menuEntries" (orderConfirmed)="shouldCloseOrderCheck()"></app-order>
+  </mat-sidenav>
+  <!-- TABS -->
+  <mat-tab-group class="makeTabGroupSticky">
+    <!-- Add a tab for each category -->
+    <mat-tab *ngFor="let c of categories" label="{{c.name}}">
+      <div class="content">
+        <ng-container *ngFor="let m of menuEntries">
+          <div *ngIf="m.categoryID==c.id" [matBadge]="badgeCount[m.id]" matBadgePosition="after" matBadgeColor="accent">
+            <!-- CARDS -->
+            <!-- Loop on each MenuEntry and add it if it's the right category -->
+            <mat-card class="mat-elevation-z4 entryCard" matRipple
+              [matRippleAnimation]="{ enterDuration: 500, exitDuration: 1000 }"
+              (click)="inventoryMode.isActive() ? inventoryMode.updateInventory(m.id) : order.addEntry(m)">
+              <img mat-card-image class="cardImageStandardize" src="{{baseUrl}}GetImage?id={{m.id}}" alt="{{m.name}}">
+              <mat-card-header>
+                <mat-card-title class="cardHead">{{m.name}}</mat-card-title>
+                <span class="flexSpacer"></span>
+                <mat-chip-set>
+                  <mat-chip>{{m.price}}€</mat-chip>
+                </mat-chip-set>
+              </mat-card-header>
+            </mat-card>
+          </div>
+        </ng-container>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-sidenav-container>
