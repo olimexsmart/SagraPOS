@@ -1,8 +1,8 @@
-import { InfoOrderEntry, InfoOrders } from "@Interfaces/info-orders"
+import { InfoOrderEntryDTO, InfoOrdersDTO } from "@Interfaces/info-orders-dto"
 import * as db from "./dbController";
 
-export function GatherInfo(): InfoOrders {
-    const iod: InfoOrders = {
+export function GatherInfo(): InfoOrdersDTO {
+    const iod: InfoOrdersDTO = {
         ordersTotal: db.GetOrdersTotal(),
         numOrders: db.GetOrdersNumber(),
         infoOrderEntries: []
@@ -14,7 +14,7 @@ export function GatherInfo(): InfoOrders {
         for (const me of menuEntries) {
             const quantitySold = db.GetOrdersTotalQuantityByEntry(me.id);
             const totalSold = quantitySold * me.price
-            const ioe: InfoOrderEntry = {
+            const ioe: InfoOrderEntryDTO = {
                 menuEntryName: me.name,
                 quantitySold: quantitySold,
                 totalSold: totalSold,

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { InfoOrders } from '../interfaces/info-orders';
+import { InfoOrdersDTO } from '../interfaces/info-orders-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +10,8 @@ export class InfoService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  getInfoOrder(): Observable<InfoOrders> {
-    return this.http.get<InfoOrders>(this.baseUrl + `GetInfoOrders`)
+  getInfoOrder(): Observable<InfoOrdersDTO> {
+    return this.http.get<InfoOrdersDTO>(this.baseUrl + `GetInfoOrders`)
   }
 
   resetInfoOrder(pin: number): Observable<any> {

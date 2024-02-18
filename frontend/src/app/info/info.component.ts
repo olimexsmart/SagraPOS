@@ -1,7 +1,7 @@
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Component, ViewChild } from '@angular/core';
-import { InfoOrders } from '../interfaces/info-orders';
+import { InfoOrdersDTO } from '../interfaces/info-orders-dto';
 import { InfoService } from '../services/info.service';
 import { ConfirmDialogModel, DialogPinComponent } from '../dialog-pin/dialog-pin.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,7 +15,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class InfoComponent {
   displayedColumns: string[] = ['menuEntryName', 'quantitySold', 'totalSold', 'totalSoldPercentage', 'totalPercentage'];
-  infoOrders: InfoOrders;
+  infoOrders: InfoOrdersDTO;
   tableDataSource;
   @ViewChild(MatSort) sort: MatSort = null!;
   printerID: number = 0;

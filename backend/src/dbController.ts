@@ -116,6 +116,19 @@ export function ResetOrdersLog(): void {
     tr()
 }
 
+export function InsertOrdersLog(orderLog: di.OrdersLog, orderLogItems: di.OrderLogItem[]): void {
+    const tr = db.transaction((orderLog: di.OrdersLog, orderLogItems: di.OrderLogItem[]) => {
+        const info = db.prepare('INSERT INTO OrdersLog (Total, Time, Valid) VALUES (@total, @time, 1)').run(orderLog)
+        for (const oli of orderLogItems) {
+            oli.orderID = info.lastInsertRowid
+            db.prepare('INSERT INTO OrderLogItems (OrderID, MenuEntryID, Quantity, Valid)'
+                + 'VALUES (@orderID, @menuEntryID, @quantity, 1)').run(oli)
+        }
+    })
+
+    tr(orderLog, orderLogItems)
+}
+
 /*
  * SETTING
  */

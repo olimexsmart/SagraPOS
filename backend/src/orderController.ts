@@ -1,6 +1,7 @@
 import { OrderEntryDTO } from "@Interfaces/order-entry-dto"
 import * as db from "./dbController";
 import { PrintEntry } from "./printerController";
+import { OrderLogItem } from "./dbInterfaces";
 
 // TODO init function that gets some setting from DB
 const maxItems = 99;
@@ -13,6 +14,7 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
     const printCategories = db.GetPrintCategories()
     let total = 0
     const orderToPrint = new Map<string, PrintEntry[]>()
+    const orderLogItems: OrderLogItem[] = []
     for (const o of order) {
         const f = menuEntries.filter(x => x.id === o.menuEntryID)
         if (f === undefined)
@@ -25,8 +27,13 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
         total += menuEntry.price * o.quantity
         // TODO Get sequence number of this item
         const sequence = 0
-        // TODO insert into logs
         // TODO update inventory
+        // Fill log entry object
+        orderLogItems.push({
+            menuEntryID: o.menuEntryID,
+            orderID: 0,
+            quantity: o.quantity
+        })
         // Fill print entry object
         const printEntry: PrintEntry = {
             name: menuEntry.name,
@@ -41,6 +48,12 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
             orderToPrint.set(printCat.name, [printEntry])
         }
     }
+    // Update logs
+    db.InsertOrdersLog({
+        time: new Date().toISOString(),
+        total: total
+    }, orderLogItems)
+
     // Return the data structure just filled to the caller
     return orderToPrint
 }
