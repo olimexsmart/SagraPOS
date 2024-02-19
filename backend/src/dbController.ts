@@ -35,7 +35,7 @@ export function GetMenuEntryDTOs(): MenuEntryDTO[] {
 }
 
 export function GetMenuEntries(): di.MenuEntry[] {
-    const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price FROM MenuEntries').all();
+    const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price, Inventory FROM MenuEntries').all();
     return menuEntries.map((menuEntry: any): di.MenuEntry => ({
         id: menuEntry.ID,
         categoryID: menuEntry.CategoryID,

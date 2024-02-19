@@ -27,7 +27,9 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
         total += menuEntry.price * o.quantity
         // TODO Get sequence number of this item
         const sequence = 0
-        // TODO update inventory
+        // Update inventory
+        if (menuEntry.inventory != null)  // Also checks for undefined
+            db.UpdateInventory(o.menuEntryID, menuEntry.inventory - o.quantity)
         // Fill log entry object
         orderLogItems.push({
             menuEntryID: o.menuEntryID,
