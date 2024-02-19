@@ -1,5 +1,11 @@
 import { PrinterTypes, ThermalPrinter } from "node-thermal-printer";
 
+export interface OrderToPrint {
+    total: number,
+    // Print category name -> PrintEntry
+    entries: Map<string, PrintEntry[]>
+}
+
 export interface PrintEntry {
     name: string,
     quantityOrdered: number,
@@ -8,7 +14,7 @@ export interface PrintEntry {
 
 // TODO init function that loads all printers (but can be called to refresh after data has been modified)
 
-export function confirmPrint(printerID: number, toPrint: Map<string, PrintEntry[]>) {
+export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
 
     printerConsole(toPrint)
 
@@ -30,7 +36,7 @@ export function confirmPrint(printerID: number, toPrint: Map<string, PrintEntry[
     // })
 }
 
-function printerConsole(toPrint: Map<string, PrintEntry[]>) {
-    console.log(toPrint);
-    
+function printerConsole(toPrint: OrderToPrint) {
+    console.log('Total: ' + toPrint.total);
+    console.log(toPrint.entries);
 }

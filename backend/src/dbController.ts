@@ -108,6 +108,11 @@ export function GetOrdersTotalQuantityByEntry(menuEntryID: number): number {
     return db.prepare('SELECT SUM(Quantity) AS out FROM OrderLogItems WHERE Valid = 1 AND MenuEntryID = ?').get(menuEntryID)?.out ?? 0
 }
 
+export function GetSequenceNumberByEntry(menuEntryID: number): number {
+    return db.prepare('SELECT COUNT(DISTINCT orderID) AS out FROM OrderLogItems'
+        + ' WHERE menuentryid = ? AND valid = 1').get(menuEntryID)?.out ?? 0
+}
+
 export function ResetOrdersLog(): void {
     const tr = db.transaction(() => {
         db.prepare('UPDATE OrdersLog SET Valid = 0').run()

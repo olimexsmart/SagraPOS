@@ -1,6 +1,6 @@
 import { OrderEntryDTO } from "@Interfaces/order-entry-dto"
 import * as db from "./dbController";
-import { PrintEntry } from "./printerController";
+import { OrderToPrint, PrintEntry } from "./printerController";
 import { OrderLogItem } from "./dbInterfaces";
 
 // TODO init function that gets some setting from DB
@@ -8,12 +8,12 @@ const maxItems = 99;
 
 
 
-export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> {
+export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
     // Get complete information about each order entry
     const menuEntries = db.GetMenuEntries()
     const printCategories = db.GetPrintCategories()
     let total = 0
-    const orderToPrint = new Map<string, PrintEntry[]>()
+    const printEntries = new Map<string, PrintEntry[]>()
     const orderLogItems: OrderLogItem[] = []
     for (const o of order) {
         const f = menuEntries.filter(x => x.id === o.menuEntryID)
@@ -25,8 +25,8 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
             throw new RangeError(`Quantity of menu entry with id ${o.menuEntryID} is over maximum allowed ${o.quantity} > ${maxItems}`)
         // Total
         total += menuEntry.price * o.quantity
-        // TODO Get sequence number of this item
-        const sequence = 0
+        // Sequence number of this item
+        const sequence = db.GetSequenceNumberByEntry(o.menuEntryID)
         // Update inventory
         if (menuEntry.inventory != null)  // Also checks for undefined
             db.UpdateInventory(o.menuEntryID, menuEntry.inventory - o.quantity)
@@ -44,10 +44,10 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
         }
         // Add print entity to the data structure for the printer
         const printCat = printCategories.filter(x => x.id == menuEntry.printCategoryID)[0]
-        if (orderToPrint.has(printCat.name))
-            orderToPrint.get(printCat.name)?.push(printEntry)
+        if (printEntries.has(printCat.name))
+            printEntries.get(printCat.name)?.push(printEntry)
         else {
-            orderToPrint.set(printCat.name, [printEntry])
+            printEntries.set(printCat.name, [printEntry])
         }
     }
     // Update logs
@@ -55,7 +55,9 @@ export function confirmOrder(order: OrderEntryDTO[]): Map<string, PrintEntry[]> 
         time: new Date().toISOString(),
         total: total
     }, orderLogItems)
-
-    // Return the data structure just filled to the caller
-    return orderToPrint
+    // Return to the caller that will then print
+    return {
+        total: total,
+        entries: printEntries
+    }
 }
