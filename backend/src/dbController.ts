@@ -46,8 +46,7 @@ export function GetMenuEntries(): di.MenuEntry[] {
     }));
 }
 
-
-export function GetImage(id: number) {
+export function GetImage(id: number): Buffer {
     return db.prepare('SELECT Image FROM MenuEntries WHERE ID = ?').get(id)?.Image
 }
 
@@ -141,16 +140,29 @@ export function GetMasterPin(): number | undefined {
     return db.prepare('SELECT ValueInt FROM Settings WHERE Key = ?').get('PIN').ValueInt
 }
 
+export function GetAllSettings() {
+    // TODO for frontend settings page (check if json can handle decently Buffers)
+}
+
+export function GetSettingValuesByKey(key: string): di.SettingValues {
+    const s = db.prepare('SELECT ValueString, ValueNum, ValueBlob FROM Settings WHERE Key = ?').get(key)
+    return {
+        valueNum: s.ValueNum,
+        valueBlob: s.ValueBlob,
+        valueString: s.ValueString
+    }
+}
+
 /*
  * PRINTERS
  */
 export function GetPrinters(): Printer[] {
-    const printers = db.prepare('SELECT * FROM Printers').all();
+    const printers = db.prepare('SELECT * FROM Printers').all()
     return printers.map((printer: any): Printer => ({
         id: printer.ID,
         name: printer.Name,
         ip: printer.IP,
         port: printer.Port,
         hidden: printer.Hidden === 1 // Convert integer to boolean 
-    }));
+    }))
 }

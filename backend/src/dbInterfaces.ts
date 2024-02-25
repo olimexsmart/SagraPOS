@@ -17,3 +17,9 @@ export interface OrderLogItem {
     menuEntryID: number,
     quantity: number,
 }
+
+export interface SettingValues {
+    valueNum: number,
+    valueString: string,
+    valueBlob: Buffer
+}

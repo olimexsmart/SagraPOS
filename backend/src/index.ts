@@ -5,12 +5,13 @@ import * as db from "./dbController";
 import { GatherInfo } from "./infoController";
 import { CheckMasterPin } from "./settingsController";
 import { confirmOrder } from "./orderController";
-import { confirmPrint } from "./printerController";
+import * as pc from "./printerController";
 
 
 const app: Express = express();
 const port = 3000;
 db.initDB()
+pc.reloadPrintersAndData()
 
 console.log(__dirname)
 app.use(express.static(path.join(__dirname, 'angular')))
@@ -22,10 +23,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send('Something broke!');
 });
 
-// TODO
 app.post('/ConfirmOrder', (req: Request, res: Response) => {
   const toPrint = confirmOrder(req.body)
-  confirmPrint(parseInt(req.query.printerID as string), toPrint)
+  pc.confirmPrint(parseInt(req.query.printerID as string), toPrint)
   res.send();
 });
 
