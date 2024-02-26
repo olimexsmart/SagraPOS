@@ -1,4 +1,4 @@
-import { PrinterTypes, ThermalPrinter } from "node-thermal-printer";
+import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer";
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
 
@@ -52,7 +52,8 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     // Connect to printer using the saved ip
     let printer = new ThermalPrinter({
         type: PrinterTypes.EPSON,
-        interface: `tcp://${pInfo.ip}:${pInfo.port}`
+        interface: `tcp://${pInfo.ip}:${pInfo.port}`,
+        characterSet: CharacterSet.PC852_LATIN2,
     });
     // Print 
     for (const [key, value] of toPrint.entries) {
@@ -81,16 +82,11 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
         printer.cut()
     }
 
-
-    // printer.alignCenter();
-    // printer.println("Hello world");
-    // // await printer.printImage('./assets/olaii-logo-black.png')
-    // printer.cut();
-
-
+    // Confirm print
     printer.execute().then(() => {
         console.log("Print done!");
     }).catch((e) => {
+        // TODO this should propagate to frontend
         console.error("Print failed:", e);
     })
 }
