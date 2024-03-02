@@ -1,10 +1,12 @@
 import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer";
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
+import sharp from "sharp";
 
 
 const CONSOLE_PRINTER_ID = 100
 const PRINT_LOGO = 'PrintLogo'
+const PRINT_LOGO_HEIGHT = 'PrintLogoHeight'
 const TEXT_OVER_LOGO = 'OverLogoText'
 const TEXT_UNDER_LOGO = 'UnderLogoText'
 let printersInfo: Map<number, Printer>
@@ -33,6 +35,7 @@ export function reloadPrintersAndData() { // TODO call this from printer CRUD AP
     }, new Map<number, Printer>())
     // Cache receipt settings
     logo = db.GetSettingValuesByKey(PRINT_LOGO).valueBlob
+    resizeImageToHeight(logo, db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT).valueNum).then(x => logo = x)
     textOverLogo = db.GetSettingValuesByKey(TEXT_OVER_LOGO).valueString
     textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO).valueString
 }
@@ -86,13 +89,6 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     }
     // Order final recap
     for (const [key, value] of toPrint.entries) {
-        // Print Category
-        // printer.setTextSize(0, 0)
-        // printer.SetStyles(PrintStyle.Italic | PrintStyle.Bold)
-        // printer.CenterAlign()
-        // printer.PrintLine("------ " + categoryNames[category.Key].ToUpper() + " ------")
-        // printer.PrintLine("")
-        // Now all entries
         printer.setTextSize(1, 1)
         for (const v of value) {
             let pad = 14 // TODO should be configurable per-printer
@@ -128,25 +124,13 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     if (textOverLogo != null)
         printer.println(textOverLogo)
     // Logo
-    // if (logo != null)
-    //     printer.printImageBuffer(logo)
+    if (logo != null)
+        printer.printImageBuffer(logo)
     // Under logo text
     printer.bold(false)
     printer.println("")
     if (textUnderLogo != null)
         printer.println(textUnderLogo)
-
-
-    // printer.add(new Buffer([0x1b, 0x74, 19]));
-    //     // Print the Euro currency sign by sending code 164 to the printer.
-    //     let t = []
-    //     for(let i = 100; i<255; i++) t.push(i)
-    //     printer.add(new Buffer(t));
-    //     printer.newLine();
-    //     printer.newLine();
-
-
-
     printer.cut()
 
 
@@ -163,6 +147,23 @@ function printEuroSign(printer: ThermalPrinter) {
     printer.add(new Buffer([0x1b, 0x74, 19]));
     printer.add(new Buffer([213]))
 }
+
+async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): Promise<Buffer> {
+    try {
+      const resizedImageBuffer: Buffer = await sharp(imageBuffer)
+        .resize({
+          height: targetHeight,
+          withoutEnlargement: true, // Ensures the image is not enlarged
+          fit: 'cover' // Ensures the resized image covers the specified dimensions
+        })
+        .toBuffer();
+  
+      return resizedImageBuffer;
+    } catch (error) {
+      console.error('Error resizing image:', error);
+      throw error; // Rethrow or handle the error as needed
+    }
+  }
 
 function printerConsole(toPrint: OrderToPrint) {
     console.log('Total: ' + toPrint.total)
