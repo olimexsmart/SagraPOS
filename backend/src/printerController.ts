@@ -21,13 +21,14 @@ export interface OrderToPrint {
 export interface PrintEntry {
     name: string,
     quantityOrdered: number,
-    sequence: number
+    sequence: number,
+    entryPrice: number
 };
 
 export function reloadPrintersAndData() { // TODO call this from printer CRUD API
     // Cache printers
     printersInfo = db.GetPrinters().reduce((map, printer) => {
-        map.set(printer.id, printer);
+        map.set(printer.id, printer)
         return map;
     }, new Map<number, Printer>())
     // Cache receipt settings
@@ -53,9 +54,11 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     let printer = new ThermalPrinter({
         type: PrinterTypes.EPSON,
         interface: `tcp://${pInfo.ip}:${pInfo.port}`,
-        characterSet: CharacterSet.PC852_LATIN2,
-    });
-    // Print 
+        characterSet: CharacterSet.PC858_EURO,
+        // Replace the Euro sign in strings by code 164.
+
+    })
+    // Order main body
     for (const [key, value] of toPrint.entries) {
         // Title with category name
         printer.setTextSize(0, 0)
@@ -69,29 +72,99 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
             printer.println('')
             printer.bold(true)
             printer.setTextSize(2, 2)
-            let extraSpace = v.name.toUpperCase().padEnd(12)
+            let pad = 12 // TODO should be configurable per-printer
             if (v.quantityOrdered > 10)
-                extraSpace = v.name.toUpperCase().padEnd(11)
-            printer.println(`${extraSpace}x${v.quantityOrdered}`)
+                pad--
+            printer.println(`${v.name.toUpperCase().padEnd(pad)}x${v.quantityOrdered}`)
             // Prenotation number
-            // TODO make this settings-configurable
+            // TODO make this settings-configurable so that it can be hidden
             printer.bold(false)
             printer.setTextSize(0, 0)
             printer.println(`PRENOTAZIONE ${v.sequence}`)
         }
         printer.cut()
     }
+    // Order final recap
+    for (const [key, value] of toPrint.entries) {
+        // Print Category
+        // printer.setTextSize(0, 0)
+        // printer.SetStyles(PrintStyle.Italic | PrintStyle.Bold)
+        // printer.CenterAlign()
+        // printer.PrintLine("------ " + categoryNames[category.Key].ToUpper() + " ------")
+        // printer.PrintLine("")
+        // Now all entries
+        printer.setTextSize(1, 1)
+        for (const v of value) {
+            let pad = 14 // TODO should be configurable per-printer
+            if (v.quantityOrdered > 10)
+                pad--
+            if (v.entryPrice > 10)
+                pad--
+            if (v.entryPrice > 100)
+                pad--
+            printer.print(`${v.quantityOrdered} ${v.name.toUpperCase().padEnd(pad)}`)
+            printEuroSign(printer)
+            printer.println(v.entryPrice.toFixed(2))
+        }
+    }
+    // Order total
+    printer.println("")
+    printer.setTextSize(2, 3)
+    printer.bold(true)
+    let pad = 9 // TODO should be configurable per-printer
+    if (toPrint.total > 10)
+        pad--
+    if (toPrint.total > 100)
+        pad--
+    const totalPrompt = "TOTALE:" // TODO text configurable in settings 
+    printer.print(`${totalPrompt.padEnd(pad)}`)
+    printEuroSign(printer)
+    printer.println(toPrint.total.toFixed(2))
+    // Over logo text
+    printer.setTextSize(0, 0)
+    printer.alignCenter()
+    printer.bold(true)
+    printer.println("")
+    if (textOverLogo != null)
+        printer.println(textOverLogo)
+    // Logo
+    // if (logo != null)
+    //     printer.printImageBuffer(logo)
+    // Under logo text
+    printer.bold(false)
+    printer.println("")
+    if (textUnderLogo != null)
+        printer.println(textUnderLogo)
+
+
+    // printer.add(new Buffer([0x1b, 0x74, 19]));
+    //     // Print the Euro currency sign by sending code 164 to the printer.
+    //     let t = []
+    //     for(let i = 100; i<255; i++) t.push(i)
+    //     printer.add(new Buffer(t));
+    //     printer.newLine();
+    //     printer.newLine();
+
+
+
+    printer.cut()
+
 
     // Confirm print
     printer.execute().then(() => {
-        console.log("Print done!");
+        console.log("Print done!")
     }).catch((e) => {
         // TODO this should propagate to frontend
-        console.error("Print failed:", e);
+        console.error("Print failed:", e)
     })
 }
 
+function printEuroSign(printer: ThermalPrinter) {
+    printer.add(new Buffer([0x1b, 0x74, 19]));
+    printer.add(new Buffer([213]))
+}
+
 function printerConsole(toPrint: OrderToPrint) {
-    console.log('Total: ' + toPrint.total);
-    console.log(toPrint.entries);
+    console.log('Total: ' + toPrint.total)
+    console.log(toPrint.entries)
 }

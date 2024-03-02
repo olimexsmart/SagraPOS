@@ -24,7 +24,8 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
         if (o.quantity > maxItems)
             throw new RangeError(`Quantity of menu entry with id ${o.menuEntryID} is over maximum allowed ${o.quantity} > ${maxItems}`)
         // Total
-        total += menuEntry.price * o.quantity
+        const entryPrice = menuEntry.price * o.quantity
+        total += entryPrice
         // Sequence number of this item
         const sequence = db.GetSequenceNumberByEntry(o.menuEntryID)
         // Update inventory
@@ -40,7 +41,8 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
         const printEntry: PrintEntry = {
             name: menuEntry.name,
             quantityOrdered: o.quantity,
-            sequence: sequence
+            sequence: sequence,
+            entryPrice: entryPrice
         }
         // Add print entity to the data structure for the printer
         const printCat = printCategories.filter(x => x.id == menuEntry.printCategoryID)[0]
