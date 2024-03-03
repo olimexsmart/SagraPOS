@@ -25,15 +25,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.post('/ConfirmOrder', (req: Request, res: Response) => {
   const toPrint = confirmOrder(req.body)
-  pc.confirmPrint(parseInt(req.query.printerID as string), toPrint)
+  pc.printOrder(parseInt(req.query.printerID as string), toPrint)
   res.send();
 });
 
-// TODO
+
 app.get('/PrintInfo', (req: Request, res: Response) => {
-  res.send({
-    printerID: req.query.printerID,
-  })
+  pc.printInfo(parseInt(req.query.printerID as string), GatherInfo())
+  res.send()
 });
 
 app.get('/GetEntries', (req: Request, res: Response) => {

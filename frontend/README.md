@@ -3,7 +3,7 @@
 - [ ] Printing name and display name separate
 - [ ] Create tables if not existent
 - [ ] Fix electron packaging script
-- [ ] Complete printing APIs
+- [x] Complete printing APIs
 - [ ] Follow as much TODOs in code as possible
 # TODO Improvements
 #### Printing
@@ -42,6 +42,7 @@
 - [ ] Build pipeline + release on commit tag
 - [ ] Test Linux packaging
 - [ ] Test macOS packaging
+- [ ] License file
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time

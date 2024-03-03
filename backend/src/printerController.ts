@@ -1,4 +1,5 @@
 import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer";
+import { InfoOrderEntryDTO, InfoOrdersDTO } from "@Interfaces/info-orders-dto"
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
 import sharp from "sharp";
@@ -13,6 +14,11 @@ let printersInfo: Map<number, Printer>
 let logo: Buffer
 let textOverLogo: string
 let textUnderLogo: string
+
+interface RequestedPrinter {
+    printerInfo: Printer,
+    printer: ThermalPrinter
+}
 
 export interface OrderToPrint {
     total: number,
@@ -40,27 +46,14 @@ export function reloadPrintersAndData() { // TODO call this from printer CRUD AP
     textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO).valueString
 }
 
-export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
-    // TODO distinguish different printer models
-    // TODO each printer model will have its printing class
+export function printOrder(printerID: number, toPrint: OrderToPrint) {
     if (printerID == CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
-        printerConsole(toPrint)
+        consolePrintOrder(toPrint)
         return
     }
-    // Check if printer is present and try to reload printers if not (maybe there was a recent change)
-    if (!printersInfo.has(printerID)) {
-        throw new RangeError(`Printer with ID: ${printerID} is not present in the database`) // TODO catch in API and set status code 404
-    }
-    // Get printer 
-    const pInfo = printersInfo.get(printerID)!
-    // Connect to printer using the saved ip
-    let printer = new ThermalPrinter({
-        type: PrinterTypes.EPSON,
-        interface: `tcp://${pInfo.ip}:${pInfo.port}`,
-        characterSet: CharacterSet.PC858_EURO,
-        // Replace the Euro sign in strings by code 164.
-
-    })
+    // Get printer and connection
+    const reqPrinter = GetPrinterAndConnection(printerID)
+    const printer = reqPrinter.printer
     // Order main body
     for (const [key, value] of toPrint.entries) {
         // Title with category name
@@ -87,7 +80,7 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
         }
         printer.cut()
     }
-    // Order final recap
+    // Order final recap // TODO configurable if wanted
     for (const [key, value] of toPrint.entries) {
         printer.setTextSize(1, 1)
         for (const v of value) {
@@ -98,9 +91,10 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
                 pad--
             if (v.entryPrice > 100)
                 pad--
-            printer.print(`${v.quantityOrdered} ${v.name.toUpperCase().padEnd(pad)}`)
-            printEuroSign(printer)
-            printer.println(v.entryPrice.toFixed(2))
+            printLineWithEuroSign(
+                printer,
+                `${v.quantityOrdered} ${v.name.toUpperCase().padEnd(pad)}`,
+                v.entryPrice.toFixed(2))
         }
     }
     // Order total
@@ -113,9 +107,7 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     if (toPrint.total > 100)
         pad--
     const totalPrompt = "TOTALE:" // TODO text configurable in settings 
-    printer.print(`${totalPrompt.padEnd(pad)}`)
-    printEuroSign(printer)
-    printer.println(toPrint.total.toFixed(2))
+    printLineWithEuroSign(printer, totalPrompt.padEnd(pad), toPrint.total.toFixed(2))
     // Over logo text
     printer.setTextSize(0, 0)
     printer.alignCenter()
@@ -143,29 +135,100 @@ export function confirmPrint(printerID: number, toPrint: OrderToPrint) {
     })
 }
 
-function printEuroSign(printer: ThermalPrinter) {
-    printer.add(new Buffer([0x1b, 0x74, 19]));
-    printer.add(new Buffer([213]))
+// TODO layout is very basic could be nicer to look at
+export function printInfo(printerID: number, toPrint: InfoOrdersDTO) {
+    if (printerID == CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
+        consolePrintInfo(toPrint)
+        return
+    }
+    // Get printer and connection
+    const reqPrinter = GetPrinterAndConnection(printerID)
+    const printer = reqPrinter.printer
+    // Header
+    printer.alignLeft()
+    printer.setTextSize(0, 0)
+    printer.bold(true)
+    printer.println(`Numero totale ordini: ${toPrint.numOrders}`) // TODO these string should be configurable
+    printLineWithEuroSign(printer, 'Totale vendite: ', toPrint.ordersTotal.toFixed(2))
+    printLineWithEuroSign(printer, 'Spesa media: ', (toPrint.ordersTotal / toPrint.numOrders).toFixed(2))
+    printer.println('')
+    // Details of each entry
+    for (const entry of toPrint.infoOrderEntries) {
+        printer.bold(true)
+        printer.println(entry.menuEntryName.toUpperCase())
+        printer.bold(false)
+        printer.println(`Vendute: ${entry.quantitySold}`)
+        printer.println(`Percentuale vendite: ${(entry.totalPercentage * 100).toFixed(1)}%`)
+        printLineWithEuroSign(printer, 'Entrate: ', entry.totalSold.toFixed(2))
+        printer.println(`Percentuale entrate: ${(entry.totalSoldPercentage * 100).toFixed(1)}%`)
+        printer.println('')
+    }
+    printer.cut()
+
+    // Confirm print
+    printer.execute().then(() => {
+        console.log("Print done!")
+    }).catch((e) => {
+        // TODO this should propagate to frontend
+        console.error("Print failed:", e)
+    })
+}
+
+/*
+ * PRIVATE 
+ */
+function GetPrinterAndConnection(printerID: number): RequestedPrinter {
+    // TODO distinguish different printer models
+    // TODO each printer model will have its printing class
+    // Check if printer is present and try to reload printers if not (maybe there was a recent change)
+    if (!printersInfo.has(printerID)) {
+        throw new RangeError(`Printer with ID: ${printerID} is not present in the database`) // TODO catch in API and set status code 404
+    }
+    // Get printer 
+    const pInfo = printersInfo.get(printerID)!
+    // Connect to printer using the saved ip
+    let printer = new ThermalPrinter({
+        type: PrinterTypes.EPSON,
+        interface: `tcp://${pInfo.ip}:${pInfo.port}`,
+        characterSet: CharacterSet.PC858_EURO
+    })
+    // 
+    return {
+        printer: printer,
+        printerInfo: pInfo
+    }
+}
+
+function printLineWithEuroSign(printer: ThermalPrinter, textBefore: string, textAfter: string) {
+    printer.print(textBefore)
+    printer.add(Buffer.from([0x1b, 0x74, 19]));
+    printer.add(Buffer.from([213]))
+    printer.println(textAfter)
 }
 
 async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): Promise<Buffer> {
     try {
-      const resizedImageBuffer: Buffer = await sharp(imageBuffer)
-        .resize({
-          height: targetHeight,
-          withoutEnlargement: true, // Ensures the image is not enlarged
-          fit: 'cover' // Ensures the resized image covers the specified dimensions
-        })
-        .toBuffer();
-  
-      return resizedImageBuffer;
+        const resizedImageBuffer: Buffer = await sharp(imageBuffer)
+            .resize({
+                height: targetHeight,
+                withoutEnlargement: true, // Ensures the image is not enlarged
+                fit: 'cover' // Ensures the resized image covers the specified dimensions
+            })
+            .toBuffer();
+        return resizedImageBuffer;
     } catch (error) {
-      console.error('Error resizing image:', error);
-      throw error; // Rethrow or handle the error as needed
+        console.error('Error resizing image:', error);
+        throw error; // Rethrow or handle the error as needed
     }
-  }
+}
 
-function printerConsole(toPrint: OrderToPrint) {
+function consolePrintOrder(toPrint: OrderToPrint) {
     console.log('Total: ' + toPrint.total)
     console.log(toPrint.entries)
+}
+
+function consolePrintInfo(toPrint: InfoOrdersDTO) {
+    console.log('Total number of orders: ' + toPrint.numOrders)
+    console.log('Total of all orders: ' + toPrint.ordersTotal)
+    console.log(toPrint.infoOrderEntries);
 }
