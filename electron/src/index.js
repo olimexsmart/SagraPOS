@@ -22,6 +22,7 @@ const createWindow = () => {
   });
   // and load the index.html of the app.
   // mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  // TODO bind F5 to avoid refresh or force to refresh this URL
   mainWindow.loadURL('http://localhost:3000');
 
   // Open the DevTools.
@@ -55,7 +56,7 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-require('./dist/index')
+require('./dist/backend/src/index')
 
 
 
