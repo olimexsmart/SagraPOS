@@ -2,11 +2,15 @@
 <mat-toolbar color="primary">
   <span>{{title}}</span>
   <span class="flexSpacer"></span>
+  <!-- TODO move into settings page -->
+  <button mat-icon-button (click)="uploadDB()">
+    <mat-icon>upload</mat-icon>
+  </button>
+  <button mat-icon-button (click)="downloadDB()">
+    <mat-icon>download</mat-icon>
+  </button>
   <app-inventory-mode #inventoryMode></app-inventory-mode>
   <app-printer-selector #printerSelector></app-printer-selector>
-  <!-- <button mat-icon-button>
-    <mat-icon>settings</mat-icon>
-  </button> -->
   <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
     <mat-icon>info</mat-icon>
   </button>

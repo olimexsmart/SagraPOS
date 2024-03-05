@@ -7,6 +7,7 @@ import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
+import { SwapDBService } from '../services/swap-db.service';
 
 @Component({
   selector: 'app-main',
@@ -25,6 +26,7 @@ export class MainComponent {
     @Inject('BASE_URL') public baseUrl: string,
     private menuService: MenuService,
     private inventoryService: InventoryService,
+    private swapDBService: SwapDBService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -54,5 +56,13 @@ export class MainComponent {
   shouldCloseOrderCheck() {
     if (this.mobileQuery.matches)
       this.sidenav.close()
+  }
+
+  downloadDB() {
+    this.swapDBService.downloadFile()
+  }
+
+  uploadDB() {
+    
   }
 }

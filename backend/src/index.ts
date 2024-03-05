@@ -109,6 +109,14 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
   res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
 })
 
+/*
+ * DB SWAP
+ */
+app.get('/DownloadDB', function(req, res){
+  const file = `${__dirname}/../SagraPOS.sqlite3`;
+  res.download(file); // Set disposition and send it.
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
