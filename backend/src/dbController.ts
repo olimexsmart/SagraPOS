@@ -9,7 +9,7 @@ import { MenuCategory } from "@Interfaces/menu-categories"
 let db: any = undefined
 
 export function initDB() {
-    db = new Database('SagraPOS.sqlite3');
+    db = new Database('SagraPOS.sqlite3', { verbose: console.log });
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON')
     // db.prepare('CREATE TABLE IF NOT EXISTS testTable (' +
@@ -23,14 +23,14 @@ export function initDB() {
 /*
  * MENU
  */
-// TODO rename also API
 export function GetMenuEntryDTOs(): MenuEntryDTO[] {
-    const menuEntries = db.prepare('SELECT ID, CategoryID, Name, Price FROM MenuEntries').all();
+    const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price FROM MenuEntries').all();
     return menuEntries.map((menuEntry: any): MenuEntryDTO => ({
         id: menuEntry.ID,
         name: menuEntry.Name,
         price: menuEntry.Price,
         categoryID: menuEntry.CategoryID,
+        printCategoryID: menuEntry.PrintCategoryID
     }));
 }
 
@@ -46,8 +46,12 @@ export function GetMenuEntries(): di.MenuEntry[] {
     }));
 }
 
-export function GetImage(id: number): Buffer {
-    return db.prepare('SELECT Image FROM MenuEntries WHERE ID = ?').get(id)?.Image
+export function GetImage(menuEntryID: number): Buffer {
+    return db.prepare('SELECT Image FROM MenuEntries WHERE ID = ?').get(menuEntryID)?.Image
+}
+
+export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
+    return db.prepare('UPDATE MenuEntries SET Image = ? WHERE ID = ?').run(newImage, menuEntryID).changes
 }
 
 export function GetCategories(): MenuCategory[] {
@@ -66,6 +70,30 @@ export function GetPrintCategories(): MenuCategory[] {
     }));
 }
 
+export function InsertMenuEntry(newEntry: MenuEntryDTO): number {
+    return db.prepare('INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, Price, Inventory)'
+        + ' VALUES (@categoryID, @printCategoryID, @name, @price, NULL)').run(newEntry).lastInsertRowid
+}
+
+export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
+    if (!updatedEntry.id) {
+        throw new Error("UpdateMenuEntry called without a valid 'id'. Are you trying to update the void?");
+    }
+    return db.prepare('UPDATE MenuEntries SET CategoryID = @categoryID, PrintCategoryID = @printCategoryID, Name = @name, Price = @price WHERE ID = @id')
+        .run(updatedEntry).changes;
+}
+
+export function DeleteMenuEntry(entryId: number): number {
+    if (!entryId) {
+        throw new Error("DeleteMenuEntry called without a valid 'id'. Are you trying to make the database lose weight by deleting random chunks of it?");
+    }
+    return db.prepare('DELETE FROM MenuEntries WHERE ID = ?').run(entryId).changes;
+}
+
+
+/*
+ * INVENTORY
+ */
 export function GetInventory(): Inventory {
     const res = db.prepare('SELECT ID, Inventory FROM MenuEntries').all()
     /*
@@ -126,7 +154,7 @@ export function InsertOrdersLog(orderLog: di.OrdersLog, orderLogItems: di.OrderL
         for (const oli of orderLogItems) {
             oli.orderID = info.lastInsertRowid
             db.prepare('INSERT INTO OrderLogItems (OrderID, MenuEntryID, Quantity, Valid)'
-                + 'VALUES (@orderID, @menuEntryID, @quantity, 1)').run(oli)
+                + ' VALUES (@orderID, @menuEntryID, @quantity, 1)').run(oli)
         }
     })
 

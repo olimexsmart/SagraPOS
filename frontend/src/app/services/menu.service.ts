@@ -16,6 +16,6 @@ export class MenuService {
   }
 
   getMenuEntries(): Observable<MenuEntryDTO[]> {
-    return this.http.get<MenuEntryDTO[]>(this.baseUrl + `GetEntries`)
+    return this.http.get<MenuEntryDTO[]>(this.baseUrl + `GetMenuEntryDTOs`)
   }
 }
