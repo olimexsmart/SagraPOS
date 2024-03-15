@@ -1,10 +1,11 @@
 export interface MenuEntry {
     id: number,
-    categoryID: number,
-    printCategoryID: number,
+    categoryID: number | null,
+    printCategoryID: number | null,
     name: string,
+    printingName: string | null
     price: number,
-    inventory: number
+    inventory: number | null
 }
 
 export interface OrdersLog {

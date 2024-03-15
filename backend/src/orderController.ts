@@ -40,6 +40,7 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
         // Fill print entry object
         const printEntry: PrintEntry = {
             name: menuEntry.name,
+            printingName: menuEntry.printingName,
             quantityOrdered: o.quantity,
             sequence: sequence,
             entryPrice: entryPrice

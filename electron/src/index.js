@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -22,12 +22,14 @@ const createWindow = () => {
   });
   // and load the index.html of the app.
   // mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  // TODO bind F5 to avoid refresh or force to refresh this URL
   mainWindow.loadURL('http://localhost:3000');
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // Open the DevTools
+  // mainWindow.webContents.openDevTools();
 };
+
+// Hide default menu
+Menu.setApplicationMenu(null)
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -74,17 +76,17 @@ function handleSquirrelEvent() {
   const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
   const exeName = path.basename(process.execPath);
 
-  const spawn = function(command, args) {
+  const spawn = function (command, args) {
     let spawnedProcess, error;
 
     try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+      spawnedProcess = ChildProcess.spawn(command, args, { detached: true });
+    } catch (error) { }
 
     return spawnedProcess;
   };
 
-  const spawnUpdate = function(args) {
+  const spawnUpdate = function (args) {
     return spawn(updateDotExe, args);
   };
 

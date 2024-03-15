@@ -9,7 +9,7 @@ import { MenuCategory } from "@Interfaces/menu-categories"
 let db: any = undefined
 
 export function initDB() {
-    db = new Database('SagraPOS.sqlite3', { verbose: console.log });
+    db = new Database('SagraPOS.sqlite3') //, { verbose: console.log });
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON')
     // db.prepare('CREATE TABLE IF NOT EXISTS testTable (' +
@@ -35,12 +35,13 @@ export function GetMenuEntryDTOs(): MenuEntryDTO[] {
 }
 
 export function GetMenuEntries(): di.MenuEntry[] {
-    const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price, Inventory FROM MenuEntries').all();
+    const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory FROM MenuEntries').all();
     return menuEntries.map((menuEntry: any): di.MenuEntry => ({
         id: menuEntry.ID,
         categoryID: menuEntry.CategoryID,
         printCategoryID: menuEntry.PrintCategoryID,
         name: menuEntry.Name,
+        printingName: menuEntry.PrintingName,
         price: menuEntry.Price,
         inventory: menuEntry.Inventory
     }));

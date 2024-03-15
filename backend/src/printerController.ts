@@ -28,6 +28,7 @@ export interface OrderToPrint {
 
 export interface PrintEntry {
     name: string,
+    printingName: string | null,
     quantityOrdered: number,
     sequence: number,
     entryPrice: number
@@ -71,7 +72,8 @@ export function printOrder(printerID: number, toPrint: OrderToPrint) {
             let pad = 12 // TODO should be configurable per-printer
             if (v.quantityOrdered > 10)
                 pad--
-            printer.println(`${v.name.toUpperCase().padEnd(pad)}x${v.quantityOrdered}`)
+            const name = v.printingName ?? v.name
+            printer.println(`${name.toUpperCase().padEnd(pad)}x${v.quantityOrdered}`)
             // Prenotation number
             // TODO make this settings-configurable so that it can be hidden
             printer.bold(false)
