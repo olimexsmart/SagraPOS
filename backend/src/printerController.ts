@@ -11,9 +11,9 @@ const PRINT_LOGO_HEIGHT = 'PrintLogoHeight'
 const TEXT_OVER_LOGO = 'OverLogoText'
 const TEXT_UNDER_LOGO = 'UnderLogoText'
 let printersInfo: Map<number, Printer>
-let logo: Buffer
-let textOverLogo: string
-let textUnderLogo: string
+let logo: Buffer | null
+let textOverLogo: string | null
+let textUnderLogo: string | null
 
 interface RequestedPrinter {
     printerInfo: Printer,
@@ -42,7 +42,8 @@ export function reloadPrintersAndData() { // TODO call this from printer CRUD AP
     }, new Map<number, Printer>())
     // Cache receipt settings
     logo = db.GetSettingValuesByKey(PRINT_LOGO).valueBlob
-    resizeImageToHeight(logo, db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT).valueNum).then(x => logo = x)
+    if (logo !== null)
+        resizeImageToHeight(logo, db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT).valueNum ?? 0).then(x => logo = x)
     textOverLogo = db.GetSettingValuesByKey(TEXT_OVER_LOGO).valueString
     textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO).valueString
 }

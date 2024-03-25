@@ -12,12 +12,87 @@ export function initDB() {
     db = new Database('SagraPOS.sqlite3') //, { verbose: console.log });
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON')
-    // db.prepare('CREATE TABLE IF NOT EXISTS testTable (' +
-    //     'ID INTEGER PRIMARY KEY,' +
-    //     'testData TEXT NOT NULL' +
-    //     ');').run()
-    // TODO create of all tables
-    // TODO initialize default settings if table is created
+    // Categories
+    db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
+        "ID"	INTEGER,
+        "Name"	TEXT NOT NULL,
+        PRIMARY KEY("ID" AUTOINCREMENT)
+        )`).run()
+    // MenuEntries
+    db.prepare(`CREATE TABLE IF NOT EXISTS "MenuEntries" (
+        "ID"	INTEGER,
+        "CategoryID"	INTEGER,
+        "PrintCategoryID"	INTEGER,
+        "Name"	TEXT NOT NULL,
+        "PrintingName"	TEXT DEFAULT NULL,
+        "Price"	REAL NOT NULL DEFAULT 0,
+        "Image"	BLOB,
+        "Inventory"	INTEGER,
+        FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID") ON DELETE SET NULL,
+        FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID") ON DELETE SET NULL,
+        PRIMARY KEY("ID" AUTOINCREMENT)
+        );`).run()
+    // OrderLogItems
+    db.prepare(`CREATE TABLE IF NOT EXISTS "OrderLogItems" (
+        "ID"	INTEGER,
+        "OrderID"	INTEGER NOT NULL,
+        "MenuEntryID"	INTEGER NOT NULL,
+        "Quantity"	INTEGER NOT NULL,
+        "Valid"	INTEGER NOT NULL DEFAULT 1,
+        FOREIGN KEY("MenuEntryID") REFERENCES "MenuEntries"("ID") on delete cascade,
+        FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade,
+        PRIMARY KEY("ID")
+        )`).run()
+    // OrdersLog
+    db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
+        "ID"	INTEGER,
+        "Total"	REAL NOT NULL,
+        "Time"	TEXT NOT NULL,
+        "Valid"	INTEGER NOT NULL DEFAULT 1,
+        PRIMARY KEY("ID")
+    )`).run()
+    // PrintCategories
+    db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
+        "ID"	INTEGER NOT NULL,
+        "Name"	TEXT NOT NULL,
+        PRIMARY KEY("ID" AUTOINCREMENT)
+    )`).run()
+    // Printers
+    db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (
+        "ID"	INTEGER,
+        "Name"	TEXT NOT NULL,
+        "IP"	TEXT NOT NULL,
+        "Port"	INTEGER NOT NULL DEFAULT 9100,
+        "Hidden"	INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY("ID")
+    )`).run()
+    // SettingCategories
+    db.prepare(`CREATE TABLE IF NOT EXISTS "SettingCategories" (
+        "ID"	INTEGER NOT NULL,
+        "Name"	TEXT NOT NULL,
+        PRIMARY KEY("ID" AUTOINCREMENT)
+    )`).run()
+    // Settings
+    db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" (
+        "Key"	TEXT NOT NULL,
+        "Category"	INTEGER NOT NULL,
+        "ValueString"	TEXT,
+        "ValueNum"	NUMERIC,
+        "ValueBlob"	BLOB,
+        "ValueInt"	INTEGER,
+        "DisplayName"	TEXT,
+        "Description"	TEXT,
+        PRIMARY KEY("Key"),
+        FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade
+    )`).run()
+    // Totals
+    // TODO what is this table for?
+    db.prepare(`CREATE TABLE IF NOT EXISTS "Totals" (
+        "Key"	TEXT NOT NULL,
+        "Value"	REAL NOT NULL DEFAULT 0,
+        PRIMARY KEY("Key")
+    )`).run()
+    // TODO initialize default settings if table is created?
 }
 
 /*
@@ -175,11 +250,18 @@ export function GetAllSettings() {
 
 export function GetSettingValuesByKey(key: string): di.SettingValues {
     const s = db.prepare('SELECT ValueString, ValueNum, ValueBlob FROM Settings WHERE Key = ?').get(key)
-    return {
-        valueNum: s.ValueNum,
-        valueBlob: s.ValueBlob,
-        valueString: s.ValueString
-    }
+    if (s === undefined)
+        return {
+            valueNum: null,
+            valueBlob: null,
+            valueString: null,
+        }
+    else
+        return {
+            valueNum: s.ValueNum,
+            valueBlob: s.ValueBlob,
+            valueString: s.ValueString
+        }
 }
 
 /*

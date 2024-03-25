@@ -20,7 +20,7 @@ export interface OrderLogItem {
 }
 
 export interface SettingValues {
-    valueNum: number,
-    valueString: string,
-    valueBlob: Buffer
+    valueNum: number | null,
+    valueString: string | null,
+    valueBlob: Buffer | null
 }
