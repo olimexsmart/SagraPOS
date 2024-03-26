@@ -6,6 +6,8 @@ import { GatherInfo } from "./infoController"
 import { CheckMasterPin } from "./settingsController"
 import { confirmOrder } from "./orderController"
 import * as pc from "./printerController"
+import { existsSync } from "fs"
+
 
 
 db.initDB()
@@ -178,8 +180,11 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
  * DB SWAP
  */
 app.get('/DownloadDB', function (req, res) {
-  const file = `${__dirname}/../SagraPOS.sqlite3`
-  res.download(file) // Set disposition and send it.
+  // TODO set env variable
+  const debugPath = `${__dirname}/../SagraPOS.sqlite3`
+  const deployPath = `${__dirname}/../../../../SagraPOS.sqlite3`
+  
+  res.download(existsSync(debugPath) ? debugPath : deployPath) 
 })
 
 /*
