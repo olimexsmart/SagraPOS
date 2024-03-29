@@ -8,10 +8,18 @@ import { MenuCategory } from "@Interfaces/menu-categories"
 // TODO rename columns to uniform to interfaces?
 let db: any = undefined
 
-export function initDB() {
+export function openDB() {
     db = new Database('SagraPOS.sqlite3') //, { verbose: console.log });
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON')
+}
+
+export function closeDB() {
+    db.close()
+}
+
+export function initDB() {
+    openDB()
     // Categories
     db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
         "ID"	INTEGER,

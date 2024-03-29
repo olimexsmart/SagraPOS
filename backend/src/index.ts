@@ -6,12 +6,11 @@ import { GatherInfo } from "./infoController"
 import { CheckMasterPin } from "./settingsController"
 import { confirmOrder } from "./orderController"
 import * as pc from "./printerController"
-import { existsSync } from "fs"
+import { existsSync, writeFile } from "fs"
 
 
 
-db.initDB()
-pc.reloadPrintersAndData()
+initBackend()
 // Express config
 const app: Express = express()
 const port = 3000
@@ -20,6 +19,12 @@ const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 app.use(express.static(path.join(__dirname, 'angular')))
 app.use(express.json())
+
+// Complete init 
+function initBackend() {
+  db.initDB()
+  pc.reloadPrintersAndData()
+}
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -180,12 +185,38 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
  * DB SWAP
  */
 app.get('/DownloadDB', function (req, res) {
+  // Close and the re-open DB, to ensure al pending changes are written on file
+  db.closeDB()
+  res.download(getPathDB())
+  db.openDB()
+})
+
+app.post('/UploadDB', upload.single('file'), (req, res) => {
+  // req.file contains the file data in a Buffer 
+  if (req.file) {
+    db.closeDB()
+    // Overwrite the existing file
+    writeFile(getPathDB(), req.file.buffer, (err) => {
+      if (err) {
+        console.error('Failed to write file:', err);
+        res.status(500).send('Failed to update file.');
+      } else {
+        console.log('File has been replaced successfully.');
+        res.sendStatus(201);
+      }
+      initBackend() // Re-init either way
+    });
+  } else {
+    res.status(400).send('No file uploaded.');
+  }
+});
+
+function getPathDB() {
   // TODO set env variable
   const debugPath = `${__dirname}/../SagraPOS.sqlite3`
   const deployPath = `${__dirname}/../../../../SagraPOS.sqlite3`
-  
-  res.download(existsSync(debugPath) ? debugPath : deployPath) 
-})
+  return existsSync(debugPath) ? debugPath : deployPath
+}
 
 /*
  * SERVER START

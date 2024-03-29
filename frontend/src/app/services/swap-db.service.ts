@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 
 @Injectable({
@@ -13,6 +13,22 @@ export class SwapDBService {
       .subscribe(blob => {
         this.downloadBlob(blob, 'SagraPOS.sqlite3');
       });
+  }
+
+  uploadFile(file: File): void {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    this.http.post(this.baseUrl + 'UploadDB', formData, {
+      reportProgress: true,
+      observe: 'events',
+      responseType: 'text'
+    }).subscribe(event => {
+      if (event.type === HttpEventType.Response) {
+        // File uploaded correctly, reload the page to restart application
+        location.reload()
+      }
+    });
   }
 
   private downloadBlob(blob: Blob, filename: string) {

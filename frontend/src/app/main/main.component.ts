@@ -62,7 +62,18 @@ export class MainComponent {
     this.swapDBService.downloadFile()
   }
 
-  uploadDB() {
-    
+  triggerFilePicker(): void {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.sqlite3';
+    fileInput.onchange = this.uploadDB.bind(this);
+    fileInput.click();
+  }
+
+  uploadDB(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.swapDBService.uploadFile(file);
+    }
   }
 }
