@@ -2,7 +2,7 @@ import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer
 import { InfoOrderEntryDTO, InfoOrdersDTO } from "@Interfaces/info-orders-dto"
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
-import sharp from "sharp";
+import Jimp from 'jimp';
 
 
 const CONSOLE_PRINTER_ID = 100
@@ -209,15 +209,23 @@ function printLineWithEuroSign(printer: ThermalPrinter, textBefore: string, text
     printer.println(textAfter)
 }
 
+
 async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): Promise<Buffer> {
     try {
-        const resizedImageBuffer: Buffer = await sharp(imageBuffer)
-            .resize({
-                height: targetHeight,
-                withoutEnlargement: true, // Ensures the image is not enlarged
-                fit: 'cover' // Ensures the resized image covers the specified dimensions
-            })
-            .toBuffer();
+        // Read the image from the buffer
+        const image = await Jimp.read(imageBuffer);
+        
+        // Resize the image to the desired height while maintaining the aspect ratio
+        const resizedImage = image.resize(Jimp.AUTO, targetHeight);
+        
+        // Get the buffer of the resized image
+        const resizedImageBuffer: Buffer = await new Promise((resolve, reject) => {
+            resizedImage.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                if (err) reject(err);
+                else resolve(buffer);
+            });
+        });
+        
         return resizedImageBuffer;
     } catch (error) {
         console.error('Error resizing image:', error);
