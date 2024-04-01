@@ -1,7 +1,7 @@
 # TODO First Release
 - [x] Load/Download DB from GUI 
 - [x] Printing name and display name separate
-- [ ] Create tables if DB is not existent
+- [x] Create tables if DB is not existent
 - [x] Fix electron packaging script
 - [x] Complete printing APIs
 - [ ] Follow as much TODOs in code as possible
@@ -25,6 +25,8 @@
 - [ ] Custom print order for menu items and print categories
 - [ ] Log also from which client the order was printed
 - [ ] Setup debugger
+- [ ] Image upload should resize images to a standard size
+- [ ] DB upload could also migrate from previous version. Introduce DB version in setting table
 #### Frontend
 - [ ] Spinner on order confirm (with error timeout)
 - [ ] QR code with WiFi credentials
@@ -45,6 +47,7 @@
 - [ ] Test Linux packaging
 - [ ] Test macOS packaging
 - [ ] License file
+- [ ] Should not be able to launch another instance (check for port 3000 in use)
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time
