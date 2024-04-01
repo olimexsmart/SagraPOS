@@ -1,12 +1,13 @@
 import express, { Express, Request, Response, NextFunction } from "express"
 import multer from 'multer'
 import path from "path"
+import os from 'os'
 import * as db from "./dbController"
 import { GatherInfo } from "./infoController"
 import { CheckMasterPin } from "./settingsController"
 import { confirmOrder } from "./orderController"
 import * as pc from "./printerController"
-import { existsSync, writeFile } from "fs"
+import { existsSync, rm, write, writeFile } from "fs"
 
 
 
@@ -194,18 +195,19 @@ app.get('/DownloadDB', function (req, res) {
 app.post('/UploadDB', upload.single('file'), (req, res) => {
   // req.file contains the file data in a Buffer 
   if (req.file) {
-    db.closeDB()
-    // Overwrite the existing file
-    writeFile(getPathDB(), req.file.buffer, (err) => {
-      if (err) {
-        console.error('Failed to write file:', err);
-        res.status(500).send('Failed to update file.');
-      } else {
-        console.log('File has been replaced successfully.');
+    const tempPath = path.join(os.tmpdir(), 'SagraPOS_temp.sqlite3')
+    console.log(tempPath);
+    writeFile(tempPath, req.file.buffer, (err) => {
+      if (db.copyDB(tempPath)) {
+        console.log('DB cloned successfully.');
+        pc.reloadPrintersAndData() // TODO better overall strategy 
         res.sendStatus(201);
+      } else {
+        console.error('Failed to clone DB');
+        res.status(500).send('Failed to update file.');
       }
-      initBackend() // Re-init either way
-    });
+      rm(tempPath, () => { })
+    })
   } else {
     res.status(400).send('No file uploaded.');
   }

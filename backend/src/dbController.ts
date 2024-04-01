@@ -95,12 +95,76 @@ export function initDB() {
     )`).run()
     // Totals
     // TODO what is this table for?
-    db.prepare(`CREATE TABLE IF NOT EXISTS "Totals" (
-        "Key"	TEXT NOT NULL,
-        "Value"	REAL NOT NULL DEFAULT 0,
-        PRIMARY KEY("Key")
-    )`).run()
+    // db.prepare(`CREATE TABLE IF NOT EXISTS "Totals" (
+    //     "Key"	TEXT NOT NULL,
+    //     "Value"	REAL NOT NULL DEFAULT 0,
+    //     PRIMARY KEY("Key")
+    // )`).run()
     // TODO initialize default settings if table is created?
+}
+
+interface ColInfo {
+    cid: number,
+    name: string,
+    type: string,
+    notnull: number,
+    dflt_value: any | null,
+    pk: number
+}
+
+export function copyDB(tempDBPath: string): boolean {
+    const sourceDB = new Database(tempDBPath)
+    // Check if tables are compatible (log tables do not matter), order is relevant for FKs
+    const tableList = ['Categories', 'PrintCategories', 'MenuEntries', 'SettingCategories', 'Settings', 'Printers']
+    let compatible = true
+    for (const table of tableList) {
+        const colsD: ColInfo[] = getTableInfo(db, table)
+        const colsS: ColInfo[] = getTableInfo(sourceDB, table)
+        // Check number of columns
+        if (colsD.length !== colsS.length) {
+            compatible = false
+            break
+        }
+        // Check column names and types
+        for (let i = 0; i < colsD.length; i++) {
+            compatible =
+                colsD[i].name === colsS[i].name
+                && colsD[i].type === colsS[i].type
+                && colsD[i].notnull === colsS[i].notnull
+                && colsD[i].dflt_value === colsS[i].dflt_value
+                && colsD[i].pk === colsS[i].pk
+        }
+        // Continue only if compatible
+        if(!compatible) break
+    }
+    // Only if everything is compatible proceed to copy
+    if(compatible){
+        db.prepare('ATTACH DATABASE ? AS sourceDB').run(tempDBPath)
+        // Empty tables, order is relevant for FKs
+        const deleteTableSeq = ['OrderLogItems', 'OrdersLog', 'MenuEntries', 'Categories', 'PrintCategories', 'Settings', 'SettingCategories', 'Printers']
+        for(const table of deleteTableSeq) {
+            db.prepare(`DELETE FROM ${table}`).run()
+        }
+        // Delete and insert
+        for (const table of tableList) {
+            db.prepare(`INSERT INTO ${table} SELECT * FROM sourceDB.${table}`).run()
+        }
+        db.prepare('DETACH DATABASE sourceDB').run()
+    }
+
+    return compatible;
+}
+
+function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
+    const colInfo = dbIn.prepare(`select * from pragma_table_info(?) as tblInfo`).all(tableName)
+    return colInfo.map((colEntry: any): ColInfo => ({
+        cid: colEntry.cid,
+        name: colEntry.name,
+        type: colEntry.type,
+        notnull: colEntry.notnull,
+        dflt_value: colEntry.dflt_value,
+        pk: colEntry.pk
+    }));
 }
 
 /*

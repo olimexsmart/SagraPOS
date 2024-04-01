@@ -26,7 +26,9 @@ export class SwapDBService {
     }).subscribe(event => {
       if (event.type === HttpEventType.Response) {
         // File uploaded correctly, reload the page to restart application
-        location.reload()
+        // TODO show progress bar or spinner
+        //location.reload() // TODO this is ugly, consider calling the APIs again instead of reloading
+        window.location.href = this.baseUrl.replace('proxy/', '')
       }
     });
   }
