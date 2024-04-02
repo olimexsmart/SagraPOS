@@ -1,10 +1,12 @@
+const path = require('path')
+
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: '/images',
+    icon: path.join(process.cwd(), 'images'),
     asarUnpack: [
-      "**/node_modules/sharp/**/*",
-      "**/node_modules/@img/**/*"
+      '**/node_modules/sharp/**/*',
+      '**/node_modules/@img/**/*'
     ]
   },
   rebuildConfig: {},
@@ -12,7 +14,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        // setupIcon: '/images/icon.ico'
+        setupIcon: path.join(process.cwd(), 'images', 'icon.ico'),
+        iconUrl: "file://" + __dirname + "/images/icon.ico"
       },
     },
     {
