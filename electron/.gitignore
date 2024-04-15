@@ -94,5 +94,8 @@ out/
 # SQLite 
 *.sqlite*
 
+# Electron-Builder
+dist/
+
 # Files built from other modules
 src/dist/

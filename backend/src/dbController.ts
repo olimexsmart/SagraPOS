@@ -1,3 +1,5 @@
+import path from 'path';
+import os from 'os'
 import Database from 'better-sqlite3';
 import * as di from './dbInterfaces'
 import { Inventory } from "@Interfaces/inventory"
@@ -5,20 +7,28 @@ import { Printer } from "@Interfaces/printer"
 import { MenuEntryDTO } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
 
+
 // TODO rename columns to uniform to interfaces?
 let db: any = undefined
+// Database path, default is user home directory (very cross-platform)
+let dbPath: string
 
-export function openDB() {
-    db = new Database('SagraPOS.sqlite3') //, { verbose: console.log });
+export function openDB(): void {
+    db = new Database(dbPath) //, { verbose: console.log });
     db.pragma('journal_mode = WAL');
     db.pragma('foreign_keys = ON')
 }
 
-export function closeDB() {
+export function closeDB(): void {
     db.close()
 }
 
-export function initDB() {
+export function getPathDB(): string {
+    return dbPath
+}
+
+export function initDB(appDir: string): void {
+    dbPath = path.join(appDir, 'SagraPOS.sqlite3')
     openDB()
     // Categories
     db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
@@ -135,14 +145,14 @@ export function copyDB(tempDBPath: string): boolean {
                 && colsD[i].pk === colsS[i].pk
         }
         // Continue only if compatible
-        if(!compatible) break
+        if (!compatible) break
     }
     // Only if everything is compatible proceed to copy
-    if(compatible){
+    if (compatible) {
         db.prepare('ATTACH DATABASE ? AS sourceDB').run(tempDBPath)
         // Empty tables, order is relevant for FKs
         const deleteTableSeq = ['OrderLogItems', 'OrdersLog', 'MenuEntries', 'Categories', 'PrintCategories', 'Settings', 'SettingCategories', 'Printers']
-        for(const table of deleteTableSeq) {
+        for (const table of deleteTableSeq) {
             db.prepare(`DELETE FROM ${table}`).run()
         }
         // Delete and insert

@@ -9,8 +9,8 @@ if (fs.existsSync('./backend/dist'))
     fs.rmSync('./backend/dist', { recursive: true, force: true });
 if (fs.existsSync('./frontend/dist'))
     fs.rmSync('./frontend/dist', { recursive: true, force: true });
-if (fs.existsSync('./electron/SagraPOS.sqlite3'))
-    fs.rmSync('./electron/SagraPOS.sqlite3', { recursive: true, force: true });
+// if (fs.existsSync('./electron/SagraPOS.sqlite3'))
+//     fs.rmSync('./electron/SagraPOS.sqlite3', { recursive: true, force: true });
 // Build backend
 console.log('Building backend');
 execSync('npx tsc -b', {
@@ -29,9 +29,6 @@ fs.cpSync('./backend/dist', './electron/src/dist', { recursive: true })
 // Copy frontend into electron
 console.log('Coping frontend into electron');
 fs.cpSync('./frontend/dist', './electron/src/dist/backend/src/angular', { recursive: true })
-// Copy DB file
-console.log('Coping DB into electron');
-fs.cpSync('./backend/SagraPOS.sqlite3', './electron/SagraPOS.sqlite3', { recursive: true })
 // Run electron
 if (process.argv[2] === 'run') {
     console.log('Running electron');

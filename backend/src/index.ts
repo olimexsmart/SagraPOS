@@ -7,23 +7,29 @@ import { GatherInfo } from "./infoController"
 import { CheckMasterPin } from "./settingsController"
 import { confirmOrder } from "./orderController"
 import * as pc from "./printerController"
-import { existsSync, rm, write, writeFile } from "fs"
+import { mkdirSync, rm, writeFile } from "fs"
 
 
-
-initBackend()
 // Express config
 const app: Express = express()
 const port = 3000
 // Configure multer to store files in memory
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
-app.use(express.static(path.join(__dirname, 'angular')))
-app.use(express.json())
+const appDir = path.join(os.homedir(), '.sagraPOS')
+
+initBackend() // TODO consider removing function
 
 // Complete init 
 function initBackend() {
-  db.initDB()
+  // Create application folder
+  mkdirSync(appDir, {recursive: true})
+  // Static file serve
+  app.use(express.static(path.join(__dirname, 'angular')))
+  // Use JSON to exchange data in APIs
+  app.use(express.json())
+  // Init other modules
+  db.initDB(appDir)
   pc.reloadPrintersAndData()
 }
 
@@ -188,7 +194,7 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
 app.get('/DownloadDB', function (req, res) {
   // Close and the re-open DB, to ensure al pending changes are written on file
   db.closeDB()
-  res.download(getPathDB())
+  res.download(db.getPathDB())
   db.openDB()
 })
 
@@ -212,13 +218,6 @@ app.post('/UploadDB', upload.single('file'), (req, res) => {
     res.status(400).send('No file uploaded.');
   }
 });
-
-function getPathDB() {
-  // TODO set env variable
-  const debugPath = `${__dirname}/../SagraPOS.sqlite3`
-  const deployPath = `${__dirname}/../../../../SagraPOS.sqlite3`
-  return existsSync(debugPath) ? debugPath : deployPath
-}
 
 /*
  * SERVER START
