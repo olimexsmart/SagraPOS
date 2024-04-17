@@ -31,6 +31,13 @@ import { InventoryModeComponent } from './inventory-mode/inventory-mode.componen
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DialogUpdateInventoryComponent } from './dialog-update-inventory/dialog-update-inventory.component'
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SettingsComponent } from './settings/settings.component';
+import { MatListModule } from '@angular/material/list';
+import { SettingsPrinterComponent } from './settings-printer/settings-printer.component';
+import { SettingsCategoriesComponent } from './settings-categories/settings-categories.component';
+import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
+import { SettingsPrintCategoriesComponent } from './settings-print-categories/settings-print-categories.component';
+import { SettingsDatabaseComponent } from './settings-database/settings-database.component';
 
 
 @NgModule({
@@ -42,10 +49,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     DialogPinComponent,
     PrinterSelectorComponent,
     InventoryModeComponent,
-    DialogUpdateInventoryComponent
+    DialogUpdateInventoryComponent,
+    SettingsComponent
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }), // TODO solve deprecation
     HttpClientModule,
     FormsModule,
     MatBadgeModule,
@@ -54,7 +62,36 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       { path: '', redirectTo: '/main', pathMatch: 'full' },
       // TODO animations on page change
       { path: 'main', component: MainComponent }, //, data: { animation: 'togglePage' } },
-      { path: 'info/:printerID', component: InfoComponent } //, data: { animation: 'togglePage' } },
+      { path: 'info/:printerID', component: InfoComponent }, //, data: { animation: 'togglePage' } },
+      {
+        path: 'settings', component: SettingsComponent,
+        children: [
+          {
+            path: '',
+            component: SettingsPrinterComponent
+          },
+          {
+            path: 'printer',
+            component: SettingsPrinterComponent
+          },
+          {
+            path: 'categories',
+            component: SettingsCategoriesComponent
+          },
+          {
+            path: 'menu',
+            component: SettingsMenuComponent
+          },
+          {
+            path: 'printCategories',
+            component: SettingsPrintCategoriesComponent
+          },
+          {
+            path: 'database',
+            component: SettingsDatabaseComponent
+          }
+        ]
+      }
       // { path: '**', component: NotFoundComponent },
     ]),
     BrowserModule,
@@ -80,7 +117,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatSelectModule,
     MatMenuModule,
     MatSlideToggleModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

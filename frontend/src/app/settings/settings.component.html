@@ -1,0 +1,31 @@
+<!-- TOOLBAR -->
+<mat-toolbar color="primary">
+    <button mat-icon-button routerLink="/main">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span>Settings</span>
+    <span class="flexSpacer"></span>
+    <button *ngIf="mobileQuery.matches" mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+    </button>
+</mat-toolbar>
+<mat-sidenav-container fullscreen class="sidenav-container">
+    <!-- SIDENAV -->
+    <mat-sidenav #sidenav [position]="mobileQuery.matches ? 'end' : 'start'" class="sidenav-lateral" [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [fixedInViewport]="true" fixedTopGap="64">
+        <mat-nav-list>
+            <ng-container *ngFor="let r of myWorkRoutes">
+                <mat-list-item [routerLink]="[r.route]" routerLinkActive="sidenav-item-active"
+                    (click)="sidenavItemClick()">
+                    <mat-icon matListItemIcon>{{ r.icon }}</mat-icon>
+                    <div matListItemTitle>{{r.label}}</div>
+                </mat-list-item>
+            </ng-container>
+        </mat-nav-list>
+    </mat-sidenav>
+    <!-- MAIN VIEW -->
+    <mat-sidenav-content>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+
+</mat-sidenav-container>

@@ -9,6 +9,9 @@
   <button mat-icon-button (click)="downloadDB()">
     <mat-icon>download</mat-icon>
   </button>
+  <button mat-icon-button [routerLink]="['/settings']">
+    <mat-icon>settings</mat-icon>
+  </button>
   <app-inventory-mode #inventoryMode></app-inventory-mode>
   <app-printer-selector #printerSelector></app-printer-selector>
   <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
