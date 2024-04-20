@@ -65,8 +65,6 @@ export class SettingsComponent {
   }
 
   sidenavItemClick() {
-    console.log('clikkk');
-    
     if (this.mobileQuery.matches) {
       this.sidenav.close()
     }

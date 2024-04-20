@@ -1,78 +1,78 @@
 <!-- TOOLBAR -->
 <mat-toolbar color="primary">
-    <button mat-icon-button routerLink="/main">
-        <mat-icon>arrow_back</mat-icon>
-    </button>
-    <span>Info</span>
-    <span class="flexSpacer"></span>
-    <button mat-icon-button (click)="clearInfo()">
-        <mat-icon>clear</mat-icon>
-    </button>
-    <button mat-icon-button (click)="printInfo()">
-        <mat-icon>print</mat-icon>
-    </button>
+  <button mat-icon-button routerLink="/main">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>Info</span>
+  <span class="flexSpacer"></span>
+  <button mat-icon-button (click)="clearInfo()">
+    <mat-icon>clear</mat-icon>
+  </button>
+  <button mat-icon-button (click)="printInfo()">
+    <mat-icon>print</mat-icon>
+  </button>
 </mat-toolbar>
 <div class="container">
-    <div class="mainInfo">
-        <mat-card class="mainInfoCard">
-            <mat-card-header>
-                <mat-card-title>{{infoOrders.numOrders}}</mat-card-title>
-                <mat-card-subtitle>Orders</mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        <mat-card class="mainInfoCard">
-            <mat-card-header>
-                <mat-card-title>€{{infoOrders.ordersTotal}}</mat-card-title>
-                <mat-card-subtitle>Profit</mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        <mat-card class="mainInfoCard">
-            <mat-card-header>
-                <mat-card-title>€{{infoOrders.ordersTotal / infoOrders.numOrders | number : '1.2-2'}}</mat-card-title>
-                <mat-card-subtitle>Av. Expense</mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-    </div>
+  <div class="mainInfo">
+    <mat-card class="mainInfoCard">
+      <mat-card-header>
+        <mat-card-title>{{infoOrders.numOrders}}</mat-card-title>
+        <mat-card-subtitle>Orders</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="mainInfoCard">
+      <mat-card-header>
+        <mat-card-title>€{{infoOrders.ordersTotal}}</mat-card-title>
+        <mat-card-subtitle>Profit</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-card class="mainInfoCard">
+      <mat-card-header>
+        <mat-card-title>€{{infoOrders.ordersTotal / infoOrders.numOrders | number : '1.2-2'}}</mat-card-title>
+        <mat-card-subtitle>Av. Expense</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+  </div>
 
-    <div class="mat-elevation-z8 table-all">
-        <table mat-table [dataSource]="tableDataSource" matSort class="table-striped">
-            <!-- Position Column -->
-            <ng-container matColumnDef="menuEntryName">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    Nome
-                </th>
-                <td mat-cell *matCellDef="let element"> {{element.menuEntryName}} </td>
-            </ng-container>
-            <!-- Name Column -->
-            <ng-container matColumnDef="quantitySold">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    # Venduti
-                </th>
-                <td mat-cell *matCellDef="let element"> {{element.quantitySold}} </td>
-            </ng-container>
-            <!-- Weight Column -->
-            <ng-container matColumnDef="totalSold">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    Lordo
-                </th>
-                <td mat-cell *matCellDef="let element"> {{element.totalSold}} </td>
-            </ng-container>
-            <!-- Symbol Column -->
-            <ng-container matColumnDef="totalSoldPercentage">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    % Venduti
-                </th>
-                <td mat-cell *matCellDef="let element"> {{element.totalSoldPercentage * 100 | number : '1.1-1'}} </td>
-            </ng-container>
-            <ng-container matColumnDef="totalPercentage">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    % Lordo
-                </th>
-                <td mat-cell *matCellDef="let element"> {{element.totalPercentage * 100 | number : '1.1-1'}} </td>
-            </ng-container>
+  <div class="mat-elevation-z8 table-all">
+    <table mat-table [dataSource]="tableDataSource" matSort class="table-striped">
+      <!-- Position Column -->
+      <ng-container matColumnDef="menuEntryName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Nome
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.menuEntryName}} </td>
+      </ng-container>
+      <!-- Name Column -->
+      <ng-container matColumnDef="quantitySold">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          # Venduti
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.quantitySold}} </td>
+      </ng-container>
+      <!-- Weight Column -->
+      <ng-container matColumnDef="totalSold">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Lordo
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalSold}} </td>
+      </ng-container>
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="totalSoldPercentage">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          % Venduti
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalSoldPercentage * 100 | number : '1.1-1'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="totalPercentage">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          % Lordo
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.totalPercentage * 100 | number : '1.1-1'}} </td>
+      </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-    </div>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
 </div>

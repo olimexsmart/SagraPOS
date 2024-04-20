@@ -4,8 +4,7 @@
 - [x] Create tables if DB is not existent
 - [x] Fix electron packaging script
 - [x] Complete printing APIs
-- [ ] Follow as much TODOs in code as possible
-- [ ] Icon
+- [x] Icon (not quite, consider electron builder)
 # TODO Improvements
 #### Printing
 - [ ] Printer auto-discovery (save MAC addresses to save a custom name)
@@ -29,6 +28,7 @@
 - [ ] DB upload could also migrate from previous version. Introduce DB version in setting table
 #### Frontend
 - [ ] Spinner on order confirm (with error timeout)
+- [ ] Spinner on menu loading (can take a while)
 - [ ] QR code with WiFi credentials
 - [ ] QR code for link to remote page
 - [ ] Number of clients connected on master screen
@@ -48,6 +48,7 @@
 - [ ] Test macOS packaging
 - [ ] License file
 - [ ] Should not be able to launch another instance (check for port 3000 in use)
+- [ ] Package script should also do `npm install` on the three folders
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time

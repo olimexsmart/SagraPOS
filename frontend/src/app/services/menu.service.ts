@@ -15,6 +15,18 @@ export class MenuService {
     return this.http.get<MenuCategory[]>(this.baseUrl + `GetCategories`)
   }
 
+  createCategory(mc: MenuCategory): Observable<void> {
+    return this.http.put<void>(this.baseUrl + `CreateCategory`, mc)
+  }
+
+  updateCategory(mc: MenuCategory): Observable<void> {
+    return this.http.put<void>(this.baseUrl + `UpdateCategory`, mc)
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(this.baseUrl + `DeleteCategory?id=${id}`)
+  }
+
   getMenuEntries(): Observable<MenuEntryDTO[]> {
     return this.http.get<MenuEntryDTO[]>(this.baseUrl + `GetMenuEntryDTOs`)
   }

@@ -1,0 +1,26 @@
+.table-all {
+    margin: 1em;
+    /* max-height: 100%; */
+    overflow: auto;
+}
+
+.container {
+    max-height: calc(100vh - 64px) !important;
+    display: flex;
+    flex-direction: column;
+    /* What if the toolbar has a different size? */
+}
+
+@media(max-width: 599px) {
+    .container {
+        max-height: calc(100vh - 56px) !important;
+    }
+}
+
+/* Add to categories.component.scss */
+.add-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+}

@@ -1,1 +1,42 @@
-<p>settings-categories works!</p>
+<!-- Category List -->
+<div class="container mat-elevation-z8 table-all">
+  <mat-table [dataSource]="categories">
+    <!-- Name -->
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <button mat-button (click)="openDialog(element)">Edit</button>
+        <button mat-button color="warn" (click)="deleteCategory(element.id)">Delete</button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>
+
+<button mat-fab color="primary" class="add-fab" (click)="openDialog()">
+  <mat-icon>add</mat-icon>
+</button>
+
+<!-- Edit/Create Category Dialog -->
+<ng-template #editCategoryTemplate let-data="data">
+  <h2 mat-dialog-title>{{data?.id ? 'Edit Category' : 'Add New Category'}}</h2>
+  <mat-dialog-content>
+    <form [formGroup]="editForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="false">Cancel</button>
+    <button mat-button [mat-dialog-close]="true">Save</button>
+  </mat-dialog-actions>
+</ng-template>

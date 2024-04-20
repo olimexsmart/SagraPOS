@@ -50,7 +50,12 @@ import { SettingsDatabaseComponent } from './settings-database/settings-database
     PrinterSelectorComponent,
     InventoryModeComponent,
     DialogUpdateInventoryComponent,
-    SettingsComponent
+    SettingsComponent,
+    SettingsCategoriesComponent,
+    SettingsDatabaseComponent,
+    SettingsMenuComponent,
+    SettingsPrintCategoriesComponent,
+    SettingsPrinterComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }), // TODO solve deprecation
