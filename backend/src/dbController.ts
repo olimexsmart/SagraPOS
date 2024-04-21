@@ -178,7 +178,7 @@ function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
 }
 
 /*
- * MENU
+ * MENU ENTRIES
  */
 export function GetMenuEntryDTOs(): MenuEntryDTO[] {
     const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price FROM MenuEntries').all();
@@ -212,6 +212,29 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
     return db.prepare('UPDATE MenuEntries SET Image = ? WHERE ID = ?').run(newImage, menuEntryID).changes
 }
 
+export function InsertMenuEntry(newEntry: MenuEntryDTO): number {
+    return db.prepare('INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, Price, Inventory)'
+        + ' VALUES (@categoryID, @printCategoryID, @name, @price, NULL)').run(newEntry).lastInsertRowid
+}
+
+export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
+    if (!updatedEntry.id) {
+        throw new Error("UpdateMenuEntry called without a valid 'id'");
+    }
+    return db.prepare('UPDATE MenuEntries SET CategoryID = @categoryID, PrintCategoryID = @printCategoryID, Name = @name, Price = @price WHERE ID = @id')
+        .run(updatedEntry).changes;
+}
+
+export function DeleteMenuEntry(entryId: number): number {
+    if (!entryId) {
+        throw new Error("DeleteMenuEntry called without a valid 'id'");
+    }
+    return db.prepare('DELETE FROM MenuEntries WHERE ID = ?').run(entryId).changes;
+}
+
+/*
+ * MENU CATEGORIES
+ */
 export function GetCategories(): MenuCategory[] {
     const menuCategories = db.prepare('SELECT * FROM Categories').all()
     return menuCategories.map((menuCategory: any): MenuCategory => ({
@@ -220,6 +243,29 @@ export function GetCategories(): MenuCategory[] {
     }));
 }
 
+export function InsertCategory(newEntry: MenuCategory): number {
+    return db.prepare('INSERT INTO Categories (Name)'
+        + ' VALUES (@name)').run(newEntry).lastInsertRowid
+}
+
+export function UpdateCategory(updatedEntry: MenuCategory): number {
+    if (!updatedEntry.id) { // TODO does this error serve any purpose?
+        throw new Error("UpdateCategory called without a valid 'id'");
+    }
+    return db.prepare('UPDATE Categories SET Name = @name WHERE ID = @id')
+        .run(updatedEntry).changes;
+}
+
+export function DeleteCategory(entryId: number): number {
+    if (!entryId) {
+        throw new Error("DeleteMenuEntry called without a valid 'id'");
+    }
+    return db.prepare('DELETE FROM Categories WHERE ID = ?').run(entryId).changes;
+}
+
+/*
+ * PRINT CATEGORIES
+ */
 export function GetPrintCategories(): MenuCategory[] {
     const menuCategories = db.prepare('SELECT * FROM PrintCategories').all()
     return menuCategories.map((menuCategory: any): MenuCategory => ({
@@ -228,24 +274,24 @@ export function GetPrintCategories(): MenuCategory[] {
     }));
 }
 
-export function InsertMenuEntry(newEntry: MenuEntryDTO): number {
-    return db.prepare('INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, Price, Inventory)'
-        + ' VALUES (@categoryID, @printCategoryID, @name, @price, NULL)').run(newEntry).lastInsertRowid
+export function InsertPrintCategory(newEntry: MenuCategory): number {
+    return db.prepare('INSERT INTO PrintCategories (Name)'
+        + ' VALUES (@name)').run(newEntry).lastInsertRowid
 }
 
-export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
-    if (!updatedEntry.id) {
-        throw new Error("UpdateMenuEntry called without a valid 'id'. Are you trying to update the void?");
+export function UpdatePrintCategory(updatedEntry: MenuCategory): number {
+    if (!updatedEntry.id) { // TODO does this error serve any purpose?
+        throw new Error("UpdateCategory called without a valid 'id'");
     }
-    return db.prepare('UPDATE MenuEntries SET CategoryID = @categoryID, PrintCategoryID = @printCategoryID, Name = @name, Price = @price WHERE ID = @id')
+    return db.prepare('UPDATE PrintCategories SET Name = @name WHERE ID = @id')
         .run(updatedEntry).changes;
 }
 
-export function DeleteMenuEntry(entryId: number): number {
+export function DeletePrintCategory(entryId: number): number {
     if (!entryId) {
-        throw new Error("DeleteMenuEntry called without a valid 'id'. Are you trying to make the database lose weight by deleting random chunks of it?");
+        throw new Error("DeleteMenuEntry called without a valid 'id'");
     }
-    return db.prepare('DELETE FROM MenuEntries WHERE ID = ?').run(entryId).changes;
+    return db.prepare('DELETE FROM PrintCategories WHERE ID = ?').run(entryId).changes;
 }
 
 

@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MenuService } from '../services/menu.service';
 import { MenuCategory } from '../interfaces/menu-categories';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings-categories',
@@ -14,23 +15,41 @@ export class SettingsCategoriesComponent implements OnInit {
   categories = new MatTableDataSource<MenuCategory>();
   displayedColumns: string[] = ['name', 'actions'];
   editForm: FormGroup;
+  private pin: number = 0
 
   @ViewChild('editCategoryTemplate') editCategoryTemplate!: TemplateRef<any>;
 
   constructor(
     private menuService: MenuService,
     private fb: FormBuilder,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private router: Router
   ) {
+    // Accessing navigation state
+    const navigation = this.router.getCurrentNavigation();
+    this.pin = navigation?.extras.state?.['pin'];
+    if (this.pin === undefined)
+      this.router.navigate(['settings'])
+
+
     this.editForm = this.fb.group({
       id: [''],
       name: ['', Validators.required]
     });
   }
 
+  // private getPinFromNavigation(event: NavigationStart) {
+  //   const state = this.router.getCurrentNavigation()?.extras.state as {exampleData: string};
+  //   if (state) {
+  //     this.exampleData = state.exampleData;
+  //   }
+  // }
+
   ngOnInit(): void {
     this.loadCategories();
     this.initForm();
+
+
   }
 
   initForm(category?: any): void {
@@ -67,19 +86,19 @@ export class SettingsCategoriesComponent implements OnInit {
   }
 
   updateCategory(): void {
-    this.menuService.updateCategory(this.editForm.value).subscribe(() => {
+    this.menuService.updateCategory(this.pin, this.editForm.value).subscribe(() => {
       this.loadCategories(); // Refresh the list
     });
   }
 
   createCategory(): void {
-    this.menuService.createCategory(this.editForm.value).subscribe(() => {
+    this.menuService.insertCategory(this.pin, this.editForm.value).subscribe(() => {
       this.loadCategories(); // Refresh the list
     });
   }
 
   deleteCategory(id: number): void {
-    this.menuService.deleteCategory(id).subscribe(() => {
+    this.menuService.deleteCategory(this.pin, id).subscribe(() => {
       this.loadCategories(); // Refresh the list after delete
     });
   }

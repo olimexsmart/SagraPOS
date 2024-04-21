@@ -23,7 +23,7 @@ initBackend() // TODO consider removing function
 // Complete init 
 function initBackend() {
   // Create application folder
-  mkdirSync(appDir, {recursive: true})
+  mkdirSync(appDir, { recursive: true })
   // Static file serve
   app.use(express.static(path.join(__dirname, 'angular')))
   // Use JSON to exchange data in APIs
@@ -53,28 +53,18 @@ app.get('/GetPrinters', (req: Request, res: Response) => {
 })
 
 /*
- * MENU
+ * MENU ENTRIES
  */
 app.get('/GetMenuEntryDTOs', (req: Request, res: Response) => {
   res.send(db.GetMenuEntryDTOs())
 })
 
 app.post('/InsertMenuEntry', (req: Request, res: Response) => {
-  const masterPinCheck = CheckMasterPin(req.query.pin)
-  if (masterPinCheck.statusCode != 200) {
-    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
-  } else {
-    res.status(201).send('New ID: ' + db.InsertMenuEntry(req.body).toString())
-  }
+  withPinAndBody(req, res, db.InsertMenuEntry)
 })
 
 app.put('/UpdateMenuEntry', (req: Request, res: Response) => {
-  const masterPinCheck = CheckMasterPin(req.query.pin)
-  if (masterPinCheck.statusCode != 200) {
-    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
-  } else {
-    res.status(200).send('Rows updated:' + db.UpdateMenuEntry(req.body).toString())
-  }
+  withPinAndBody(req, res, db.UpdateMenuEntry)
 })
 
 app.delete('/DeleteMenuEntry', (req: Request, res: Response) => {
@@ -89,10 +79,6 @@ app.delete('/DeleteMenuEntry', (req: Request, res: Response) => {
   } else {
     res.status(200).send('Rows updated:' + db.DeleteMenuEntry(menuEntryID).toString())
   }
-})
-
-app.get('/GetCategories', (req: Request, res: Response) => {
-  res.send(db.GetCategories())
 })
 
 app.get('/GetImage', (req: Request, res: Response) => {
@@ -134,6 +120,45 @@ app.put('/UpdateImage', upload.single('image'), async (req, res) => {
       res.status(201).send('Image uploaded and saved successfully.')
   }
 })
+
+/*
+ * MENU CATEGORIES
+ */
+app.get('/GetCategories', (req: Request, res: Response) => {
+  res.send(db.GetCategories())
+})
+
+app.post('/InsertCategory', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.InsertCategory)
+})
+
+app.put('/UpdateCategory', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.UpdateCategory)
+})
+
+app.delete('/DeleteCategory', (req: Request, res: Response) => {
+  withPinAndID(req, res, db.DeleteCategory)
+})
+
+/*
+ * PRINT CATEGORIES
+ */
+app.get('/GetPrintCategories', (req: Request, res: Response) => {
+  res.send(db.GetPrintCategories())
+})
+
+app.post('/InsertPrintCategory', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.InsertPrintCategory)
+})
+
+app.put('/UpdatePrintCategory', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.UpdatePrintCategory)
+})
+
+app.delete('/DeletePrintCategory', (req: Request, res: Response) => {
+  withPinAndID(req, res, db.DeletePrintCategory)
+})
+
 
 /*
  * INFO
@@ -188,9 +213,22 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
   res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
 })
 
+
 /*
- * DB SWAP
+ * SETTINGS
  */
+app.get('/CheckPIN', function (req, res) {
+  const masterPinCheck = CheckMasterPin(req.query.pin)
+  if(masterPinCheck.statusCode == 200)
+    res.send(true) // Focus on sending if the pin is valid or not, avoid errors
+  else if (masterPinCheck.statusCode == 401)
+    res.send(false)
+  else // Essentially a bad request
+    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
+})
+
+
+// TODO add pin to these two
 app.get('/DownloadDB', function (req, res) {
   // Close and the re-open DB, to ensure al pending changes are written on file
   db.closeDB()
@@ -226,3 +264,32 @@ app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`)
 })
 
+/*
+ * PRIVATE FUNCTIONS
+ */
+function withPinAndBody(req: Request, res: Response, fun: Function) {
+  const masterPinCheck = CheckMasterPin(req.query.pin)
+  if (masterPinCheck.statusCode != 200) {
+    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
+  } else {
+    res.status(201).send({
+      ret: fun(req.body)
+    })
+  }
+}
+
+function withPinAndID(req: Request, res: Response, fun: Function) {
+  const masterPinCheck = CheckMasterPin(req.query.pin)
+  const menuEntryID = parseInt(req.query.id as string)
+  if (isNaN(menuEntryID)) {
+    masterPinCheck.statusCode = 400
+    masterPinCheck.message = "Missing integer parameter with the ID of the resource to delete"
+  }
+  if (masterPinCheck.statusCode != 200) {
+    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
+  } else {
+    res.status(200).send({
+      ret: fun(menuEntryID)
+    })
+  }
+}

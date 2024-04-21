@@ -11,10 +11,11 @@ export function CheckMasterPin(pinParam: any): MasterPinCheck {
     const pinToCheck = parseInt(pinParam as string, 10);
     if (isNaN(pinToCheck)) {
         ret = { statusCode: 400, message: 'Missing integer parameter pin' }
-    }
-    const pin = db.GetMasterPin()
-    if (pinToCheck != pin) {
-        ret = { statusCode: 401, message: 'Wrong Master Pin: ' + pinToCheck }
+    } else {
+        const pin = db.GetMasterPin()
+        if (pinToCheck != pin) {
+            ret = { statusCode: 401, message: 'Wrong Master Pin: ' + pinToCheck }
+        }
     }
     return ret
 }

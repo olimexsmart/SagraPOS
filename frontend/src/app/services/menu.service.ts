@@ -15,16 +15,16 @@ export class MenuService {
     return this.http.get<MenuCategory[]>(this.baseUrl + `GetCategories`)
   }
 
-  createCategory(mc: MenuCategory): Observable<void> {
-    return this.http.put<void>(this.baseUrl + `CreateCategory`, mc)
+  insertCategory(pin: number, mc: MenuCategory): Observable<void> {
+    return this.http.post<void>(this.baseUrl + `InsertCategory?pin=${pin}`, mc)
   }
 
-  updateCategory(mc: MenuCategory): Observable<void> {
-    return this.http.put<void>(this.baseUrl + `UpdateCategory`, mc)
+  updateCategory(pin: number, mc: MenuCategory): Observable<void> {
+    return this.http.put<void>(this.baseUrl + `UpdateCategory?pin=${pin}`, mc)
   }
 
-  deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(this.baseUrl + `DeleteCategory?id=${id}`)
+  deleteCategory(pin: number, id: number): Observable<void> {
+    return this.http.delete<void>(this.baseUrl + `DeleteCategory?id=${id}&pin=${pin}`)
   }
 
   getMenuEntries(): Observable<MenuEntryDTO[]> {

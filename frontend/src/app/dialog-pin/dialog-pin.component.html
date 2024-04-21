@@ -1,14 +1,21 @@
-<h1 mat-dialog-title>{{title}}</h1>
-<div mat-dialog-content>
-  {{message}}
-  <form [formGroup]="form" class="form">
+<!-- Dialog Title -->
+<h1 mat-dialog-title>{{ title }}</h1>
+
+<!-- Dialog Content -->
+<mat-dialog-content>
+  <p>{{ message }}</p>
+  
+  <!-- Form for PIN input -->
+  <form [formGroup]="form" class="form" (keyup.enter)="onConfirm()">
     <mat-form-field appearance="fill">
       <mat-label>PIN</mat-label>
-      <input type="number" matInput formControlName="PIN" cdkTrapFocusAutoCapture cdkTrapFocus (keyup.enter)="onConfirm()"/>
+      <input matInput type="number" formControlName="PIN" cdkTrapFocusAutoCapture />
     </mat-form-field>
   </form>
-</div>
-<div mat-dialog-actions>
-  <button mat-button mat-dialog-close (click)="onDismiss()">Annulla</button>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false" (click)="onDismiss()">Annulla</button>
   <button mat-button (click)="onConfirm()">Conferma</button>
-</div>
+</mat-dialog-actions>

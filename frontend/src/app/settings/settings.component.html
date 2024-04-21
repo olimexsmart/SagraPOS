@@ -15,8 +15,8 @@
         [fixedInViewport]="true" fixedTopGap="64">
         <mat-nav-list>
             <ng-container *ngFor="let r of myWorkRoutes">
-                <mat-list-item [routerLink]="[r.route]" routerLinkActive="sidenav-item-active"
-                    (click)="sidenavItemClick()">
+                <mat-list-item routerLinkActive="sidenav-item-active"
+                    (click)="sidenavItemClick(r.route)">
                     <mat-icon matListItemIcon>{{ r.icon }}</mat-icon>
                     <div matListItemTitle>{{r.label}}</div>
                 </mat-list-item>
