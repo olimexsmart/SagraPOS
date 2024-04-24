@@ -9,8 +9,19 @@ if (fs.existsSync('./backend/dist'))
     fs.rmSync('./backend/dist', { recursive: true, force: true });
 if (fs.existsSync('./frontend/dist'))
     fs.rmSync('./frontend/dist', { recursive: true, force: true });
-// if (fs.existsSync('./electron/SagraPOS.sqlite3'))
-//     fs.rmSync('./electron/SagraPOS.sqlite3', { recursive: true, force: true });
+// Update NPM
+execSync('npm install', {
+    cwd: './backend',
+    stdio: 'inherit'
+})
+execSync('npm install', {
+    cwd: './frontend',
+    stdio: 'inherit'
+})
+execSync('npm install', {
+    cwd: './electron',
+    stdio: 'inherit'
+})
 // Build backend
 console.log('Building backend');
 execSync('npx tsc -b', {

@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "electron .",
-    "make": "electron-builder build --win portable"
+    "make": "electron-builder build"
   },
   "keywords": [],
   "author": {
@@ -30,6 +30,15 @@
     "artifactName": "${productName}_${version}.${ext}",
     "directories": {
       "buildResources": "images"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "deb"
+    },
+    "mac": {
+      "target": "zip"
     }
   }
 }
