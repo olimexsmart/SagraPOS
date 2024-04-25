@@ -13,7 +13,7 @@ import { NavigationStart, Router } from '@angular/router';
 })
 export class SettingsCategoriesComponent implements OnInit {
   categories = new MatTableDataSource<MenuCategory>();
-  displayedColumns: string[] = ['name', 'actions'];
+  displayedColumns: string[] = ['name', 'occurrences', 'actions'];
   editForm: FormGroup;
   private pin: number = 0
 

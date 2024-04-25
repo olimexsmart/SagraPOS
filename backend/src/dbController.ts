@@ -219,7 +219,7 @@ export function InsertMenuEntry(newEntry: MenuEntryDTO): number {
 
 export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
     if (!updatedEntry.id) {
-        throw new Error("UpdateMenuEntry called without a valid 'id'");
+        throw new Error('UpdateMenuEntry called without a valid id');
     }
     return db.prepare('UPDATE MenuEntries SET CategoryID = @categoryID, PrintCategoryID = @printCategoryID, Name = @name, Price = @price WHERE ID = @id')
         .run(updatedEntry).changes;
@@ -227,7 +227,7 @@ export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
 
 export function DeleteMenuEntry(entryId: number): number {
     if (!entryId) {
-        throw new Error("DeleteMenuEntry called without a valid 'id'");
+        throw new Error('DeleteMenuEntry called without a valid id');
     }
     return db.prepare('DELETE FROM MenuEntries WHERE ID = ?').run(entryId).changes;
 }
@@ -240,6 +240,7 @@ export function GetCategories(): MenuCategory[] {
     return menuCategories.map((menuCategory: any): MenuCategory => ({
         id: menuCategory.ID,
         name: menuCategory.Name,
+        occurrences: GetCategoryOccurrences(menuCategory.ID)
     }));
 }
 
@@ -250,7 +251,7 @@ export function InsertCategory(newEntry: MenuCategory): number {
 
 export function UpdateCategory(updatedEntry: MenuCategory): number {
     if (!updatedEntry.id) { // TODO does this error serve any purpose?
-        throw new Error("UpdateCategory called without a valid 'id'");
+        throw new Error('UpdateCategory called without a valid id');
     }
     return db.prepare('UPDATE Categories SET Name = @name WHERE ID = @id')
         .run(updatedEntry).changes;
@@ -258,9 +259,17 @@ export function UpdateCategory(updatedEntry: MenuCategory): number {
 
 export function DeleteCategory(entryId: number): number {
     if (!entryId) {
-        throw new Error("DeleteMenuEntry called without a valid 'id'");
+        throw new Error('DeleteCategory called without a valid id');
     }
-    return db.prepare('DELETE FROM Categories WHERE ID = ?').run(entryId).changes;
+    const occurrences = GetCategoryOccurrences(entryId)
+    if (occurrences > 0)
+        throw new RangeError(`Category with id ${entryId} is used and cannot be deleted`)
+    else
+        return db.prepare('DELETE FROM Categories WHERE ID = ?').run(entryId).changes;
+}
+
+function GetCategoryOccurrences(entryId: number): number {
+    return db.prepare('SELECT COUNT(*) AS out FROM MenuEntries WHERE CategoryID = ?').get(entryId).out ?? 0
 }
 
 /*
@@ -271,6 +280,7 @@ export function GetPrintCategories(): MenuCategory[] {
     return menuCategories.map((menuCategory: any): MenuCategory => ({
         id: menuCategory.ID,
         name: menuCategory.Name,
+        occurrences: GetPrintCategoryOccurrences(menuCategory.ID)
     }));
 }
 
@@ -281,7 +291,7 @@ export function InsertPrintCategory(newEntry: MenuCategory): number {
 
 export function UpdatePrintCategory(updatedEntry: MenuCategory): number {
     if (!updatedEntry.id) { // TODO does this error serve any purpose?
-        throw new Error("UpdateCategory called without a valid 'id'");
+        throw new Error('UpdatePrintCategory called without a valid id');
     }
     return db.prepare('UPDATE PrintCategories SET Name = @name WHERE ID = @id')
         .run(updatedEntry).changes;
@@ -289,11 +299,18 @@ export function UpdatePrintCategory(updatedEntry: MenuCategory): number {
 
 export function DeletePrintCategory(entryId: number): number {
     if (!entryId) {
-        throw new Error("DeleteMenuEntry called without a valid 'id'");
+        throw new Error('DeleteCategory called without a valid id');
     }
-    return db.prepare('DELETE FROM PrintCategories WHERE ID = ?').run(entryId).changes;
+    const occurrences = GetPrintCategoryOccurrences(entryId)
+    if (occurrences > 0)
+        throw new RangeError(`Category with id ${entryId} is used and cannot be deleted`)
+    else
+        return db.prepare('DELETE FROM PrintCategoryID WHERE ID = ?').run(entryId).changes;
 }
 
+function GetPrintCategoryOccurrences(entryId: number): number {
+    return db.prepare('SELECT COUNT(*) AS out FROM MenuEntries WHERE PrintCategoryID = ?').get(entryId).out ?? 0
+}
 
 /*
  * INVENTORY

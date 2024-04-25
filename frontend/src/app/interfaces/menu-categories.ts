@@ -1,4 +1,5 @@
 export interface MenuCategory {
     id: number,
-    name: string
+    name: string,
+    occurrences: number
 }

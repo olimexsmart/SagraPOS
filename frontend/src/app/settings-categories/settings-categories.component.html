@@ -6,13 +6,21 @@
       <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
       <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
     </ng-container>
-    <!-- Actions -->
-    <!-- TODO use icons instead -->
+    <!-- Name -->
+    <ng-container matColumnDef="occurrences">
+      <mat-header-cell *matHeaderCellDef> Occorrenze </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.occurrences}} </mat-cell>
+    </ng-container>    
+    <!-- Azione -->
     <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
       <mat-cell *matCellDef="let element">
-        <button mat-button (click)="openDialog(element)">Edit</button>
-        <button mat-button color="warn" (click)="deleteCategory(element.id)">Delete</button>
+        <button mat-icon-button (click)="openDialog(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" [disabled]="element.occurrences > 0" (click)="deleteCategory(element.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </mat-cell>
     </ng-container>
 
@@ -26,8 +34,8 @@
 </button>
 
 <!-- Edit/Create Category Dialog -->
-<ng-template #editCategoryTemplate let-data="data">
-  <h2 mat-dialog-title>{{data?.id ? 'Edit Category' : 'Add New Category'}}</h2>
+<ng-template #editCategoryTemplate let-data="editForm">
+  <h2 mat-dialog-title>{{editForm.value?.id ? 'Modifica Categoria' : 'Nuova Categoria'}}</h2>
   <mat-dialog-content>
     <form [formGroup]="editForm">
       <mat-form-field appearance="fill">
