@@ -24,7 +24,7 @@
     "node-thermal-printer": "^4.4.2"
   },
   "devDependencies": {
-    "electron": "29.3.0",
+    "electron": "30.0.1",
     "electron-builder": "^24.13.3"
   },
   "build": {
