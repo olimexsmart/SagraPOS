@@ -34,6 +34,7 @@ function initBackend() {
 }
 
 // Error handling middleware
+// TODO Use this in each API to send different status codes depending on exception thrown
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack)
   res.status(500).send('Something broke!')

@@ -26,17 +26,17 @@ export class SettingsComponent implements OnInit {
 
   myWorkRoutes: SidenavRoute[] = [{
     isHeader: false, // TODO remove this functionality
-    label: 'Printer',
+    label: 'Stampanti',
     icon: 'print',
     route: 'printer'
   }, {
     isHeader: false,
-    label: 'Categories',
+    label: 'Categorie',
     icon: 'tabs',
     route: 'categories'
   }, {
     isHeader: false,
-    label: 'Print Categories',
+    label: 'Categorie Stampa',
     icon: 'confirmation_number',
     route: 'printCategories'
   }, {
@@ -51,15 +51,17 @@ export class SettingsComponent implements OnInit {
     route: 'database'
   }]
 
-
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
     private dialog: MatDialog,
     private router: Router) {
-    this.mobileQuery = media.matchMedia('(max-width: 600px)');
-    this.mobileQueryListener = () => changeDetectorRef.detectChanges(); // Is this variable necessary?
-    this.mobileQuery.addListener(this.mobileQueryListener); // TODO fix this deprecation
+      this.mobileQuery = media.matchMedia('(max-width: 600px)');
+      this.mobileQueryListener = () => {
+        changeDetectorRef.detectChanges();
+        this.onScreenResize();
+      };
+      this.mobileQuery.addEventListener('change', this.mobileQueryListener);
   }
 
   @ViewChild('sidenav') sidenav!: MatDrawer;
@@ -83,6 +85,12 @@ export class SettingsComponent implements OnInit {
     })
   }
 
+  onScreenResize() {
+    if (!this.mobileQuery.matches) {
+      this.sidenav.open()
+    }
+  }
+
   sidenavItemClick(route: string) {
     if (this.mobileQuery.matches) {
       this.sidenav.close()
@@ -94,5 +102,10 @@ export class SettingsComponent implements OnInit {
       }
     };
     this.router.navigate(['settings/' + route], navigationExtras);
+  }
+
+  ngOnDestroy() {
+    // Clean up by removing the event listener when the component is destroyed
+    this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
   }
 }

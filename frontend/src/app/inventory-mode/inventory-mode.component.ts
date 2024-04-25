@@ -18,9 +18,9 @@ export class InventoryModeComponent {
   constructor(private dialog: MatDialog,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
-    this.mobileQuery = media.matchMedia('(max-width: 600px)');
-    this.mobileQueryListener = () => changeDetectorRef.detectChanges(); // Is this variable necessary?
-    this.mobileQuery.addListener(this.mobileQueryListener); // TODO fix this deprecation
+      this.mobileQuery = media.matchMedia('(max-width: 600px)');
+      this.mobileQueryListener = () => changeDetectorRef.detectChanges();
+      this.mobileQuery.addEventListener('change', this.mobileQueryListener);
   }
 
   public isActive(): boolean {
@@ -52,5 +52,10 @@ export class InventoryModeComponent {
         this.modeActive = true
       });
     }
+  }
+
+  ngOnDestroy() {
+    // Clean up by removing the event listener when the component is destroyed
+    this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
   }
 }

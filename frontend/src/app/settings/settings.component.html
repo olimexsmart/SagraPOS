@@ -11,12 +11,11 @@
 </mat-toolbar>
 <mat-sidenav-container fullscreen class="sidenav-container">
     <!-- SIDENAV -->
-    <mat-sidenav #sidenav [position]="mobileQuery.matches ? 'end' : 'start'" class="sidenav-lateral" [mode]="mobileQuery.matches ? 'over' : 'side'"
-        [fixedInViewport]="true" fixedTopGap="64">
+    <mat-sidenav #sidenav [position]="mobileQuery.matches ? 'end' : 'start'" class="sidenav-lateral"
+        [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="true" fixedTopGap="64">
         <mat-nav-list>
             <ng-container *ngFor="let r of myWorkRoutes">
-                <mat-list-item routerLinkActive="sidenav-item-active"
-                    (click)="sidenavItemClick(r.route)">
+                <mat-list-item routerLinkActive="sidenav-item-active" (click)="sidenavItemClick(r.route)">
                     <mat-icon matListItemIcon>{{ r.icon }}</mat-icon>
                     <div matListItemTitle>{{r.label}}</div>
                 </mat-list-item>

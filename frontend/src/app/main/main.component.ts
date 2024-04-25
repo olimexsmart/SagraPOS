@@ -29,9 +29,9 @@ export class MainComponent {
     private swapDBService: SwapDBService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
-    this.mobileQuery = media.matchMedia('(max-width: 600px)');
-    this.mobileQueryListener = () => changeDetectorRef.detectChanges(); // Is this variable necessary?
-    this.mobileQuery.addListener(this.mobileQueryListener); // TODO fix this deprecation
+      this.mobileQuery = media.matchMedia('(max-width: 600px)');
+      this.mobileQueryListener = () => changeDetectorRef.detectChanges();
+      this.mobileQuery.addEventListener('change', this.mobileQueryListener);
   }
 
   @ViewChild('sidenav') sidenav!: MatDrawer;
@@ -75,5 +75,10 @@ export class MainComponent {
     if (file) {
       this.swapDBService.uploadFile(file);
     }
+  }
+
+  ngOnDestroy() {
+    // Clean up by removing the event listener when the component is destroyed
+    this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
   }
 }
