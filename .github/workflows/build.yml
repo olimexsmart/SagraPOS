@@ -1,0 +1,162 @@
+name: Electron Build and Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    outputs:
+      windows_exe: ${{ steps.set_win.outputs.win_path }}
+      ubuntu_deb: ${{ steps.set_deb.outputs.deb_path }}
+      ubuntu_appimage: ${{ steps.set_appimage.outputs.appimage_path }}
+      macos_dmg: ${{ steps.set_macos.outputs.dmg_path }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Get Version from package.json
+        id: get_version
+        run: echo "::set-output name=version::$(jq -r .version electron/package.json)"
+
+      - name: Install Backend Dependencies
+        run: npm install
+        working-directory: backend
+
+      - name: Build Backend
+        run: npx tsc -b
+        working-directory: backend
+
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Build Frontend
+        run: npm run build -- --configuration production --output-hashing none
+        working-directory: frontend
+
+      - name: Copy Backend to Electron Directory (Windows)
+        if: matrix.os == 'windows-latest'
+        run: xcopy /E /I /Q /Y backend\dist electron\src\dist
+        shell: cmd
+
+      - name: Copy Backend to Electron Directory (Unix)
+        if: matrix.os != 'windows-latest'
+        run: cp -r backend/dist electron/src/dist
+        shell: bash
+
+      - name: Copy Frontend to Electron Directory (Windows)
+        if: matrix.os == 'windows-latest'
+        run: xcopy /E /I /Q /Y frontend\dist electron\src\dist\backend\src\angular
+        shell: cmd
+
+      - name: Copy Frontend to Electron Directory (Unix)
+        if: matrix.os != 'windows-latest'
+        run: cp -r frontend/dist electron/src/dist/backend/src/angular
+        shell: bash
+
+      - name: Install Electron Dependencies
+        run: npm install
+        working-directory: electron
+
+      - name: Build Electron Application
+        run: npm run make
+        working-directory: electron
+
+      - name: Set Windows output path
+        id: set_win
+        if: matrix.os == 'windows-latest'
+        run: echo "::set-output name=win_path::electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.exe"
+
+      - name: Set Ubuntu DEB output path
+        id: set_deb
+        if: matrix.os == 'ubuntu-latest'
+        run: echo "::set-output name=deb_path::electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.deb"
+
+      - name: Set Ubuntu AppImage output path
+        id: set_appimage
+        if: matrix.os == 'ubuntu-latest'
+        run: echo "::set-output name=appimage_path::electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.AppImage"
+
+      - name: Set macOS DMG output path
+        id: set_macos
+        if: matrix.os == 'macos-latest'
+        run: echo "::set-output name=dmg_path::electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.dmg"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: |
+            electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.exe
+            electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.deb
+            electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.AppImage
+            electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.dmg
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifacts
+          path: electron/dist/
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: 'Automated release ${{ github.ref }}'
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.windows_exe }}
+          asset_name: SagraPOS_${{ github.ref_name }}.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Ubuntu DEB Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.ubuntu_deb }}
+          asset_name: SagraPOS_${{ github.ref_name }}.deb
+          asset_content_type: application/octet-stream
+
+      - name: Upload Ubuntu AppImage Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.ubuntu_appimage }}
+          asset_name: SagraPOS_${{ github.ref_name }}.AppImage
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS DMG Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.macos_dmg }}
+          asset_name: SagraPOS_${{ github.ref_name }}.dmg
+          asset_content_type: application/octet-stream
