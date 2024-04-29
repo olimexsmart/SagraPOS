@@ -36,11 +36,11 @@
       "target": "portable"
     },
     "linux": {
-      "target": "deb",
+      "target": ["deb", "AppImage"],
       "category": "Office"
     },
     "mac": {
-      "target": "zip",
+      "target": ["dmg", "zip"],
       "category": "public.app-category.productivity",
 	  "icon": "images/icon.icns"
     }
