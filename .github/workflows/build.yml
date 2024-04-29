@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-13]
     outputs:
       windows_exe: ${{ steps.set_win.outputs.win_path }}
       ubuntu_deb: ${{ steps.set_deb.outputs.deb_path }}
@@ -86,7 +86,7 @@ jobs:
 
       - name: Set macOS DMG output path
         id: set_macos
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-13'
         run: echo "::set-output name=dmg_path::electron/dist/SagraPOS_${{ steps.get_version.outputs.version }}.dmg"
 
       - name: Upload Artifacts
