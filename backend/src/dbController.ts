@@ -305,7 +305,7 @@ export function DeletePrintCategory(entryId: number): number {
     if (occurrences > 0)
         throw new RangeError(`Category with id ${entryId} is used and cannot be deleted`)
     else
-        return db.prepare('DELETE FROM PrintCategoryID WHERE ID = ?').run(entryId).changes;
+        return db.prepare('DELETE FROM PrintCategories WHERE ID = ?').run(entryId).changes;
 }
 
 function GetPrintCategoryOccurrences(entryId: number): number {

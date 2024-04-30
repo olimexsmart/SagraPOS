@@ -36,7 +36,6 @@ import { MatListModule } from '@angular/material/list';
 import { SettingsPrinterComponent } from './settings-printer/settings-printer.component';
 import { SettingsCategoriesComponent } from './settings-categories/settings-categories.component';
 import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
-import { SettingsPrintCategoriesComponent } from './settings-print-categories/settings-print-categories.component';
 import { SettingsDatabaseComponent } from './settings-database/settings-database.component';
 
 
@@ -54,7 +53,6 @@ import { SettingsDatabaseComponent } from './settings-database/settings-database
     SettingsCategoriesComponent,
     SettingsDatabaseComponent,
     SettingsMenuComponent,
-    SettingsPrintCategoriesComponent,
     SettingsPrinterComponent
   ],
   imports: [
@@ -89,7 +87,7 @@ import { SettingsDatabaseComponent } from './settings-database/settings-database
           },
           {
             path: 'printCategories',
-            component: SettingsPrintCategoriesComponent
+            component: SettingsCategoriesComponent
           },
           {
             path: 'database',

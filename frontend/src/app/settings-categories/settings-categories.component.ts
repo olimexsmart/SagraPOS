@@ -6,6 +6,8 @@ import { MenuService } from '../services/menu.service';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { NavigationStart, Router } from '@angular/router';
 
+enum Mode { Categories, PrintCategories, Invalid }
+
 @Component({
   selector: 'app-settings-categories',
   templateUrl: './settings-categories.component.html',
@@ -15,7 +17,8 @@ export class SettingsCategoriesComponent implements OnInit {
   categories = new MatTableDataSource<MenuCategory>();
   displayedColumns: string[] = ['name', 'occurrences', 'actions'];
   editForm: FormGroup;
-  private pin: number = 0
+  private pin: number
+  private mode: Mode
 
   @ViewChild('editCategoryTemplate') editCategoryTemplate!: TemplateRef<any>;
 
@@ -28,9 +31,15 @@ export class SettingsCategoriesComponent implements OnInit {
     // Accessing navigation state
     const navigation = this.router.getCurrentNavigation();
     this.pin = navigation?.extras.state?.['pin'];
-    if (this.pin === undefined)
-      this.router.navigate(['settings'])
+    let r = navigation?.extras.state?.['route'] as string
+    this.mode = Mode.Invalid
+    if (r === 'categories')
+      this.mode = Mode.Categories
+    else if (r === 'printCategories')
+      this.mode = Mode.PrintCategories
 
+    if (this.pin === undefined || this.mode === Mode.Invalid)
+      this.router.navigate(['settings'])
 
     this.editForm = this.fb.group({
       id: [''],
@@ -38,18 +47,9 @@ export class SettingsCategoriesComponent implements OnInit {
     });
   }
 
-  // private getPinFromNavigation(event: NavigationStart) {
-  //   const state = this.router.getCurrentNavigation()?.extras.state as {exampleData: string};
-  //   if (state) {
-  //     this.exampleData = state.exampleData;
-  //   }
-  // }
-
   ngOnInit(): void {
     this.loadCategories();
     this.initForm();
-
-
   }
 
   initForm(category?: any): void {
@@ -60,10 +60,14 @@ export class SettingsCategoriesComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.menuService.getCategories().subscribe(data => {
+    (this.mode === Mode.Categories 
+      ? this.menuService.getCategories() 
+      : this.menuService.getPrintCategories()
+    ).subscribe(data => {
       this.categories.data = data;
     });
   }
+  
 
   openDialog(category?: any): void {
     // Initialize form with category data if available, otherwise start fresh
@@ -74,7 +78,7 @@ export class SettingsCategoriesComponent implements OnInit {
       data: { form: this.editForm }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       if (this.editForm.valid) {
         if (this.editForm.value.id) {
           this.updateCategory();
@@ -86,21 +90,25 @@ export class SettingsCategoriesComponent implements OnInit {
   }
 
   updateCategory(): void {
-    this.menuService.updateCategory(this.pin, this.editForm.value).subscribe(() => {
-      this.loadCategories(); // Refresh the list
-    });
+    (this.mode === Mode.Categories 
+      ? this.menuService.updateCategory(this.pin, this.editForm.value)
+      : this.menuService.updatePrintCategory(this.pin, this.editForm.value)
+    ).subscribe(() => this.loadCategories());
   }
-
+  
   createCategory(): void {
-    this.menuService.insertCategory(this.pin, this.editForm.value).subscribe(() => {
-      this.loadCategories(); // Refresh the list
-    });
+    (this.mode === Mode.Categories 
+      ? this.menuService.insertCategory(this.pin, this.editForm.value)
+      : this.menuService.insertPrintCategory(this.pin, this.editForm.value)
+    ).subscribe(() => this.loadCategories());
   }
-
+  
   deleteCategory(id: number): void {
-    this.menuService.deleteCategory(this.pin, id).subscribe(() => {
-      this.loadCategories(); // Refresh the list after delete
-    });
+    (this.mode === Mode.Categories 
+      ? this.menuService.deleteCategory(this.pin, id)
+      : this.menuService.deletePrintCategory(this.pin, id)
+    ).subscribe(() => this.loadCategories());
   }
+  
 }
 

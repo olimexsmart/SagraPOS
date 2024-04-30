@@ -74,7 +74,8 @@ export class SettingsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((dialogResult) => {
       // TODO understand if instead of .value can be specified a strong type
-      if (dialogResult.value === undefined) return
+      if (dialogResult?.value === undefined) 
+        this.router.navigate(['main'])
       this.pin = dialogResult.value
     });
   }
@@ -98,7 +99,8 @@ export class SettingsComponent implements OnInit {
     // Open detail settings passing administrator pin
     const navigationExtras: NavigationExtras = {
       state: {
-        pin: this.pin
+        pin: this.pin,
+        route: route
       }
     };
     this.router.navigate(['settings/' + route], navigationExtras);

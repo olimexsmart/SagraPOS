@@ -67,10 +67,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "sagraPOS:build:production"
+              "buildTarget": "sagraPOS:build:production"
             },
             "development": {
-              "browserTarget": "sagraPOS:build:development",
+              "buildTarget": "sagraPOS:build:development",
               "proxyConfig": "src/proxy.conf.json"
             }
           },
@@ -79,7 +79,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "sagraPOS:build"
+            "buildTarget": "sagraPOS:build"
           }
         },
         "test": {
