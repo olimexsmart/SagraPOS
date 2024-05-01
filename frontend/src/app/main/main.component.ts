@@ -26,7 +26,6 @@ export class MainComponent {
     @Inject('BASE_URL') public baseUrl: string,
     private menuService: MenuService,
     private inventoryService: InventoryService,
-    private swapDBService: SwapDBService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
       this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -58,24 +57,7 @@ export class MainComponent {
       this.sidenav.close()
   }
 
-  downloadDB() {
-    this.swapDBService.downloadFile()
-  }
 
-  triggerFilePicker(): void {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.sqlite3';
-    fileInput.onchange = this.uploadDB.bind(this);
-    fileInput.click();
-  }
-
-  uploadDB(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.swapDBService.uploadFile(file);
-    }
-  }
 
   ngOnDestroy() {
     // Clean up by removing the event listener when the component is destroyed

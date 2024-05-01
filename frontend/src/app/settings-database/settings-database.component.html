@@ -1,1 +1,48 @@
-<p>settings-database works!</p>
+<div class="container mat-elevation-z8 table-all">
+    <mat-accordion>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Database
+                </mat-panel-title>
+                <mat-panel-description>
+                    Scarica una copia del detabase o sostituiscilo
+                    <mat-icon>database</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <button mat-raised-button class="button-space" color="primary" (click)="triggerFilePicker()">
+                Carica Database
+            </button>
+            <button mat-raised-button color="accent" (click)="downloadDB()">
+                Salva Database
+            </button>
+            <!-- TODO can be formatted better -->
+            <p class="table-all">
+                <mat-icon fontIcon="warning"></mat-icon>
+                Attenzione caricare un database sovrascrive quello attuale
+            </p>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Stampa
+                </mat-panel-title>
+                <mat-panel-description>
+                    Personalizzazione scontrino
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>DA FARE</p>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    PIN
+                </mat-panel-title>
+                <mat-panel-description>
+                    Cambio PIN amministrazione
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>DA FARE</p>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

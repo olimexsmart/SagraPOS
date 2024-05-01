@@ -37,6 +37,7 @@ import { SettingsPrinterComponent } from './settings-printer/settings-printer.co
 import { SettingsCategoriesComponent } from './settings-categories/settings-categories.component';
 import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
 import { SettingsDatabaseComponent } from './settings-database/settings-database.component';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 
 @NgModule({
@@ -121,7 +122,8 @@ import { SettingsDatabaseComponent } from './settings-database/settings-database
     MatMenuModule,
     MatSlideToggleModule,
     MatCheckboxModule,
-    MatListModule
+    MatListModule,
+    MatExpansionModule
   ],
   providers: [],
   bootstrap: [AppComponent]

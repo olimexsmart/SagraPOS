@@ -26,6 +26,7 @@
 - [ ] Setup debugger
 - [ ] Image upload should resize images to a standard size
 - [ ] DB upload could also migrate from previous version. Introduce DB version in setting table
+- [ ] Split files, they are becoming too long
 #### Frontend
 - [ ] Spinner on order confirm (with error timeout)
 - [ ] Spinner on menu loading (can take a while)
@@ -39,17 +40,19 @@
 - [ ] Info table max width on large screens
 - [ ] Toggle to see all items in a unique list
 - [ ] Customizable color palette of interface (local to client)
-- [ ] Bump Angular version
+- [x] Bump Angular version
 - [ ] Refactor to use latest guidelines (standalone components)
+- [ ] favicon
 #### Deployment
-- [ ] Documentation integrated with GitHub wiki and hosted pages (docusaurus?)
-- [ ] Build pipeline + release on commit tag
+- [x] Build pipeline + release on commit tag
 - [ ] Test Linux packaging
-- [ ] Test macOS packaging
+- [x] Test macOS packaging
 - [ ] License file
 - [ ] Should not be able to launch another instance (check for port 3000 in use)
-- [ ] Package script should also do `npm install` on the three folders
+- [x] Package script should also do `npm install` on the three folders
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time
 - [ ] Setting an inventory value to null does not hide badge (caused by CSS)
+- [ ] macOS buggy little icon
+- [ ] Broken inventory badges after Angular version bump

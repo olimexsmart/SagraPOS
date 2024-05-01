@@ -2,13 +2,6 @@
 <mat-toolbar color="primary">
   <span>{{title}}</span>
   <span class="flexSpacer"></span>
-  <!-- TODO move into settings page -->
-  <button mat-icon-button (click)="triggerFilePicker()">
-    <mat-icon>upload</mat-icon>
-  </button>
-  <button mat-icon-button (click)="downloadDB()">
-    <mat-icon>download</mat-icon>
-  </button>
   <button mat-icon-button [routerLink]="['/settings']">
     <mat-icon>settings</mat-icon>
   </button>
