@@ -52,7 +52,7 @@ export class SettingsCategoriesComponent implements OnInit {
     this.initForm();
   }
 
-  initForm(category?: any): void {
+  initForm(category?: any): void { // TODO use interface instead of any
     this.editForm = this.fb.group({
       id: [category ? category.id : null],
       name: [category ? category.name : '', Validators.required]

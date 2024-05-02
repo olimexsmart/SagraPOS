@@ -1,32 +1,35 @@
 <!-- Category List -->
-<div class="container mat-elevation-z8 table-all">
-  <mat-table [dataSource]="categories">
-    <!-- Name -->
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
-    </ng-container>
-    <!-- Name -->
-    <ng-container matColumnDef="occurrences">
-      <mat-header-cell *matHeaderCellDef> Occorrenze </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.occurrences}} </mat-cell>
-    </ng-container>    
-    <!-- Azione -->
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
-      <mat-cell *matCellDef="let element">
-        <button mat-icon-button (click)="openDialog(element)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" [disabled]="element.occurrences > 0" (click)="deleteCategory(element.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
+<div class="container">
+  <div class="mat-elevation-z8 table-all">
+    <mat-table [dataSource]="categories">
+      <!-- Name -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+      <!-- Name -->
+      <ng-container matColumnDef="occurrences">
+        <mat-header-cell *matHeaderCellDef> Occorrenze </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.occurrences}} </mat-cell>
+      </ng-container>
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="openDialog(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" [disabled]="element.occurrences > 0"
+            (click)="deleteCategory(element.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </div>
 </div>
 
 <button mat-fab color="primary" class="add-fab" (click)="openDialog()">

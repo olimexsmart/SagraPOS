@@ -5,6 +5,9 @@
 
 .container {
     max-height: calc(100vh - 64px) !important;
+    display: flex;
+    flex-direction: column; 
+    /* What if the toolbar has a different size? */
 }
 
 @media(max-width: 599px) {
