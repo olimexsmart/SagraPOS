@@ -14,7 +14,7 @@ execSync('npm install', {
     cwd: './backend',
     stdio: 'inherit'
 })
-execSync('npm install', {
+execSync('npm install --legacy-peer-deps', {
     cwd: './frontend',
     stdio: 'inherit'
 })

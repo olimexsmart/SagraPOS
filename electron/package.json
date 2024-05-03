@@ -17,14 +17,14 @@
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "better-sqlite3": "^9.5.0",
+    "better-sqlite3": "^9.6.0",
     "express": "^4.19.2",
     "jimp": "^0.22.12",
     "multer": "^1.4.5-lts.1",
     "node-thermal-printer": "^4.4.2"
   },
   "devDependencies": {
-    "electron": "30.0.1",
+    "electron": "30.0.2",
     "electron-builder": "^24.13.3"
   },
   "build": {

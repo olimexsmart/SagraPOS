@@ -12,16 +12,16 @@
   "license": "ISC",
   "dependencies": {
     "@types/multer": "^1.4.11",
-    "better-sqlite3": "^9.5.0",
+    "better-sqlite3": "^9.6.0",
     "express": "^4.19.2",
     "jimp": "^0.22.12",
     "multer": "^1.4.5-lts.1",
     "node-thermal-printer": "^4.4.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.9",
+    "@types/better-sqlite3": "^7.6.10",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.12.2",
+    "@types/node": "^20.12.8",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
