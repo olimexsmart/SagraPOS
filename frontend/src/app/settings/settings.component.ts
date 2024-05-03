@@ -6,7 +6,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { NavigationExtras, Router } from '@angular/router';
 
 export interface SidenavRoute {
-  // id?: string;
   isHeader: boolean;
   label: string;
   icon: string;
@@ -67,7 +66,7 @@ export class SettingsComponent implements OnInit {
   @ViewChild('sidenav') sidenav!: MatDrawer;
 
   ngOnInit(): void {
-    const dialogData = new ConfirmDialogModel('PIN Amministrazione', '');
+    const dialogData = new ConfirmDialogModel('PIN Amministrazione', 'Default: 1234'); // TODO uniformare questi messaggi
     const dialogRef = this.dialog.open(DialogPinComponent, {
       maxWidth: '350px',
       data: dialogData,
