@@ -14,6 +14,9 @@
     matBadgeColor="accent" matBadgeSize="small">
     <mat-icon>receipt</mat-icon>
   </button>
+  <button mat-icon-button (click)="themeService.toggleTheme()">
+    <mat-icon>{{ themeService.isDarkTheme ? 'brightness_3' : 'wb_sunny' }}</mat-icon>
+  </button>
 </mat-toolbar>
 <!-- FOOD CARDS -->
 <!-- TODO fix inventory badges -->

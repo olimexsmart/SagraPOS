@@ -38,10 +38,12 @@ import { SettingsCategoriesComponent } from './settings-categories/settings-cate
 import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
 import { SettingsDatabaseComponent } from './settings-database/settings-database.component';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { AppLayoutComponent } from './app-layout/app-layout.component';
 
 
 @NgModule({
   declarations: [
+    AppLayoutComponent,
     AppComponent,
     OrderComponent,
     MainComponent,
