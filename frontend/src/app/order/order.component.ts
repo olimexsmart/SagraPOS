@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
+import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { OrderService } from '../services/order.service';
 import { Printer } from '../interfaces/printer';
@@ -13,22 +13,22 @@ export class OrderComponent {
 
   @Input() selectedPrinter: Printer = null!
   @Input() categories: MenuCategory[] = [];
-  @Input() menu: MenuEntryDTO[] = [];
+  @Input() menu: MenuEntry[] = [];
   @Output() orderConfirmed = new EventEmitter<string>();
 
-  order: Map<MenuEntryDTO, number> = new Map()
+  order: Map<MenuEntry, number> = new Map()
   catPresent: Map<number, number> = new Map()
   total: number = 0
 
   constructor(private orderService: OrderService) { }
 
-  addEntry(entry: MenuEntryDTO): void {
+  addEntry(entry: MenuEntry): void {
     this.order.set(entry, (this.order.get(entry) ?? 0) + 1)
     this.catPresent.set(entry.categoryID, (this.catPresent.get(entry.categoryID) ?? 0) + 1)
     this.total += entry.price
   }
 
-  removeEntry(entry: MenuEntryDTO): void {
+  removeEntry(entry: MenuEntry): void {
     this.order.set(entry, (this.order.get(entry) ?? 0) - 1)
     if (this.order.get(entry) === 0) {
       this.order.delete(entry)

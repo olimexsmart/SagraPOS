@@ -4,8 +4,13 @@
     <mat-table [dataSource]="menuEntries">
       <!-- Name -->
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+      <!-- Name Stampa-->
+      <ng-container matColumnDef="printingName">
+        <mat-header-cell *matHeaderCellDef> Nome Stampa </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.printingName}} </mat-cell>
       </ng-container>
       <!-- Price -->
       <ng-container matColumnDef="price">
@@ -21,6 +26,11 @@
       <ng-container matColumnDef="printCategoryName">
         <mat-header-cell *matHeaderCellDef> Categoria Stampa </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.printCategory.name}} </mat-cell>
+      </ng-container>
+      <!-- Inventario -->
+      <ng-container matColumnDef="inventory">
+        <mat-header-cell *matHeaderCellDef> Inventario</mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.inventory }} </mat-cell>
       </ng-container>
       <!-- Actions -->
       <ng-container matColumnDef="actions">
@@ -55,6 +65,10 @@
         <input matInput formControlName="name">
       </mat-form-field>
       <mat-form-field appearance="fill">
+        <mat-label>Nome Stampa</mat-label>
+        <input matInput formControlName="printingName">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
         <mat-label>Prezzo</mat-label>
         <input matInput type="number" formControlName="price">
       </mat-form-field>
@@ -73,6 +87,10 @@
           <mat-option [value]="c.id">{{c.name}}</mat-option>
           }
         </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Inventario</mat-label>
+        <input matInput type="number" formControlName="inventory">
       </mat-form-field>
     </form>
   </mat-dialog-content>

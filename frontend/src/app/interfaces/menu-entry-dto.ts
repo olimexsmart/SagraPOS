@@ -1,7 +1,10 @@
-export interface MenuEntryDTO {
-    id: number,
-    name: string,
-    price: number,
-    categoryID: number,
-    printCategoryID: number
+// TODO update file name
+export interface MenuEntry {
+  id: number,
+  categoryID: number,
+  printCategoryID: number,
+  name: string,
+  printingName: string | null
+  price: number,
+  inventory: number | null
 }

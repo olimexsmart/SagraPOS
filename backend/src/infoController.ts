@@ -10,7 +10,7 @@ export function GatherInfo(): InfoOrdersDTO {
     // For each menu item compute some basic statistics
     const totalItems = db.GetOrdersTotalItems();
     if (totalItems !== 0) {
-        const menuEntries = db.GetMenuEntryDTOs(); // Assuming this fetches all menu entries
+        const menuEntries = db.GetMenuEntries(); // Assuming this fetches all menu entries
         for (const me of menuEntries) {
             const quantitySold = db.GetOrdersTotalQuantityByEntry(me.id);
             const totalSold = quantitySold * me.price

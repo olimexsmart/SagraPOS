@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
+import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { BooleanResult } from '../interfaces/boolean-result';
 import { OrderEntryDTO } from '../interfaces/order-entry-dto';
 
@@ -12,7 +12,7 @@ export class OrderService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  postPrintOrder(printerID: number, order: Map<MenuEntryDTO, number>): Observable<any> {
+  postPrintOrder(printerID: number, order: Map<MenuEntry, number>): Observable<any> {
     let plainOrder: OrderEntryDTO[] = []
     for (const [key, value] of order) {
       plainOrder.push({

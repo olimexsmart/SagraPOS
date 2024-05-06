@@ -4,17 +4,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MenuService } from '../services/menu.service';
 import { Router } from '@angular/router';
-import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
+import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-interface MenuEntryExplicitDTO {
+interface MenuEntryExplicit { // TODO make this the common interface, populate using joins
   id: number,
-  name: string,
-  price: number,
   category: MenuCategory,
   printCategory: MenuCategory
+  name: string,
+  printingName: string | null
+  price: number,
+  inventory: number | null
 }
 
 @Component({
@@ -23,10 +25,18 @@ interface MenuEntryExplicitDTO {
   styleUrls: ['./settings-menu.component.css']
 })
 export class SettingsMenuComponent implements OnInit {
-  menuEntries = new MatTableDataSource<MenuEntryExplicitDTO>();
+  menuEntries = new MatTableDataSource<MenuEntryExplicit>();
   categories: MenuCategory[] = []
   printCategories: MenuCategory[] = []
-  displayedColumns: string[] = ['name', 'price', 'categoryName', 'printCategoryName', 'actions'];
+  displayedColumns: string[] = [
+    'name',
+    'printingName',
+    'categoryName',
+    'printCategoryName',
+    'price',
+    'inventory',
+    'actions'
+  ];
   editForm: FormGroup;
   private pin: number
 
@@ -46,11 +56,13 @@ export class SettingsMenuComponent implements OnInit {
       this.router.navigate(['settings'])
 
     this.editForm = this.fb.group({
-      id: [''],
-      name: ['', Validators.required],
-      price: ['', Validators.required],
-      categoryID: [''],
-      printCategoryID: [''],
+      // id: [''],
+      // categoryID: [''],
+      // printCategoryID: [''],
+      // name: ['', Validators.required],
+      // printingName: [''],
+      // price: ['', Validators.required],
+      // inventory: ['']
     });
   }
 
@@ -59,13 +71,15 @@ export class SettingsMenuComponent implements OnInit {
     this.initForm();
   }
 
-  initForm(menuEntry?: MenuEntryExplicitDTO): void {
+  initForm(menuEntry?: MenuEntryExplicit): void {
     this.editForm = this.fb.group({
       id: [menuEntry ? menuEntry.id : null],
-      name: [menuEntry ? menuEntry.name : '', Validators.required],
-      price: [menuEntry ? menuEntry.price : '', Validators.required], 
       categoryID: [menuEntry ? menuEntry.category.id : ''],
-      printCategoryID: [menuEntry ? menuEntry.printCategory.id : '', Validators.required]
+      printCategoryID: [menuEntry ? menuEntry.printCategory.id : '', Validators.required],
+      name: [menuEntry ? menuEntry.name : '', Validators.required],
+      printingName: [menuEntry ? menuEntry.printingName : ''],
+      price: [menuEntry ? menuEntry.price : '', Validators.required],
+      inventory: [menuEntry ? menuEntry.inventory : ''],
     });
   }
 
@@ -78,10 +92,12 @@ export class SettingsMenuComponent implements OnInit {
       map(({ categories, printCategories, menuEntries }) => {
         const menuEntriesExpl = menuEntries.map(me => ({
           id: me.id,
-          name: me.name,
-          price: me.price,
           category: categories.find(x => x.id === me.categoryID)!, // It's ok, it's a foreign key
-          printCategory: printCategories.find(x => x.id === me.printCategoryID)!
+          printCategory: printCategories.find(x => x.id === me.printCategoryID)!,
+          name: me.name,
+          printingName: me.printingName,
+          price: me.price,
+          inventory: me.inventory
         }));
         return { categories, printCategories, menuEntriesExpl };
       })
@@ -107,10 +123,8 @@ export class SettingsMenuComponent implements OnInit {
       data: { form: this.editForm }
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      console.log(this.editForm.value);
-      
-      if (this.editForm.valid) {
+    dialogRef.afterClosed().subscribe((result: boolean) => { // TODO uniform logic
+      if (result && this.editForm.valid) {
         if (this.editForm.value.id) {
           this.updateCategory();
         } else {
@@ -121,24 +135,18 @@ export class SettingsMenuComponent implements OnInit {
   }
 
   updateCategory(): void {
-    // (this.mode === Mode.Categories 
-    //   ? this.menuService.updateCategory(this.pin, this.editForm.value)
-    //   : this.menuService.updatePrintCategory(this.pin, this.editForm.value)
-    // ).subscribe(() => this.loadCategories());
+    this.menuService.updateMenuEntry(this.pin, this.editForm.value)
+      .subscribe(() => this.loadCategories());
   }
 
   createCategory(): void {
-    // (this.mode === Mode.Categories 
-    //   ? this.menuService.insertCategory(this.pin, this.editForm.value)
-    //   : this.menuService.insertPrintCategory(this.pin, this.editForm.value)
-    // ).subscribe(() => this.loadCategories());
+    this.menuService.insertMenuEntry(this.pin, this.editForm.value)
+      .subscribe(() => this.loadCategories());
   }
 
   deleteCategory(id: number): void {
-    // (this.mode === Mode.Categories 
-    //   ? this.menuService.deleteCategory(this.pin, id)
-    //   : this.menuService.deletePrintCategory(this.pin, id)
-    // ).subscribe(() => this.loadCategories());
+    this.menuService.deleteMenuEntry(this.pin, id)
+      .subscribe(() => this.loadCategories());
   }
 
 }

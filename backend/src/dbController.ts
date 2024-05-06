@@ -4,7 +4,7 @@ import Database from 'better-sqlite3';
 import * as di from './dbInterfaces'
 import { Inventory } from "@Interfaces/inventory"
 import { Printer } from "@Interfaces/printer"
-import { MenuEntryDTO } from "@Interfaces/menu-entry-dto"
+import { MenuEntry } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
 
 
@@ -39,15 +39,15 @@ export function initDB(appDir: string): void {
   // MenuEntries
   db.prepare(`CREATE TABLE IF NOT EXISTS "MenuEntries" (
         "ID"	INTEGER,
-        "CategoryID"	INTEGER,
-        "PrintCategoryID"	INTEGER,
+        "CategoryID" INTEGER NOT NULL,
+        "PrintCategoryID"	INTEGER NOT NULL,
         "Name"	TEXT NOT NULL,
-        "PrintingName"	TEXT DEFAULT NULL,
+        "PrintingName" TEXT DEFAULT NULL,
         "Price"	REAL NOT NULL DEFAULT 0,
         "Image"	BLOB,
         "Inventory"	INTEGER,
-        FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID") ON DELETE SET NULL,
-        FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID") ON DELETE SET NULL,
+        FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
+        FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
         PRIMARY KEY("ID" AUTOINCREMENT)
         );`).run()
   // OrderLogItems
@@ -180,20 +180,9 @@ function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
 /*
  * MENU ENTRIES
  */
-export function GetMenuEntryDTOs(): MenuEntryDTO[] {
-  const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, Price FROM MenuEntries').all();
-  return menuEntries.map((menuEntry: any): MenuEntryDTO => ({
-    id: menuEntry.ID,
-    name: menuEntry.Name,
-    price: menuEntry.Price,
-    categoryID: menuEntry.CategoryID,
-    printCategoryID: menuEntry.PrintCategoryID
-  }));
-}
-
-export function GetMenuEntries(): di.MenuEntry[] {
+export function GetMenuEntries(): MenuEntry[] {
   const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory FROM MenuEntries').all();
-  return menuEntries.map((menuEntry: any): di.MenuEntry => ({
+  return menuEntries.map((menuEntry: any): MenuEntry => ({
     id: menuEntry.ID,
     categoryID: menuEntry.CategoryID,
     printCategoryID: menuEntry.PrintCategoryID,
@@ -212,16 +201,22 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
   return db.prepare('UPDATE MenuEntries SET Image = ? WHERE ID = ?').run(newImage, menuEntryID).changes
 }
 
-export function InsertMenuEntry(newEntry: MenuEntryDTO): number {
-  return db.prepare('INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, Price, Inventory)'
-    + ' VALUES (@categoryID, @printCategoryID, @name, @price, NULL)').run(newEntry).lastInsertRowid
+export function InsertMenuEntry(newEntry: MenuEntry): number {
+  return db.prepare(
+    'INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory)'
+    + ' VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory)')
+    .run(newEntry).lastInsertRowid
 }
 
-export function UpdateMenuEntry(updatedEntry: MenuEntryDTO): number {
+export function UpdateMenuEntry(updatedEntry: MenuEntry): number {
   if (!updatedEntry.id) {
     throw new Error('UpdateMenuEntry called without a valid id');
   }
-  return db.prepare('UPDATE MenuEntries SET CategoryID = @categoryID, PrintCategoryID = @printCategoryID, Name = @name, Price = @price WHERE ID = @id')
+  return db.prepare(
+    'UPDATE MenuEntries SET CategoryID = @categoryID, '
+    + 'PrintCategoryID = @printCategoryID, Name = @name, '
+    + 'PrintingName = @printingName, Price = @price, Inventory = @inventory '
+    + 'WHERE ID = @id')
     .run(updatedEntry).changes;
 }
 

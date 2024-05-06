@@ -56,8 +56,8 @@ app.get('/GetPrinters', (req: Request, res: Response) => {
 /*
  * MENU ENTRIES
  */
-app.get('/GetMenuEntryDTOs', (req: Request, res: Response) => {
-  res.send(db.GetMenuEntryDTOs())
+app.get('/GetMenuEntries', (req: Request, res: Response) => {
+  res.send(db.GetMenuEntries())
 })
 
 app.post('/InsertMenuEntry', (req: Request, res: Response) => {
@@ -69,17 +69,7 @@ app.put('/UpdateMenuEntry', (req: Request, res: Response) => {
 })
 
 app.delete('/DeleteMenuEntry', (req: Request, res: Response) => {
-  const masterPinCheck = CheckMasterPin(req.query.pin)
-  const menuEntryID = parseInt(req.query.menuEntryID as string)
-  if (isNaN(menuEntryID)) {
-    masterPinCheck.statusCode = 400
-    masterPinCheck.message = "Missing integer parameter menuEntryID"
-  }
-  if (masterPinCheck.statusCode != 200) {
-    res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
-  } else {
-    res.status(200).send('Rows updated:' + db.DeleteMenuEntry(menuEntryID).toString())
-  }
+  withPinAndID(req, res, db.DeleteMenuEntry)
 })
 
 app.get('/GetImage', (req: Request, res: Response) => {
@@ -220,7 +210,7 @@ app.put('/SetQuantity', (req: Request, res: Response) => {
  */
 app.get('/CheckPIN', function (req, res) {
   const masterPinCheck = CheckMasterPin(req.query.pin)
-  if(masterPinCheck.statusCode == 200)
+  if (masterPinCheck.statusCode == 200)
     res.send(true) // Focus on sending if the pin is valid or not, avoid errors
   else if (masterPinCheck.statusCode == 401)
     res.send(false)

@@ -3,7 +3,7 @@ import { Inventory } from './../interfaces/inventory';
 import { Component, ChangeDetectorRef, ViewChild, Inject } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 
-import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
+import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
@@ -19,7 +19,7 @@ export class MainComponent {
   private mobileQueryListener: () => void;
   title = 'SagraPOS';
   categories: MenuCategory[] = []
-  menuEntries: MenuEntryDTO[] = []
+  menuEntries: MenuEntry[] = []
   badgeCount: Inventory = {}
 
   constructor(

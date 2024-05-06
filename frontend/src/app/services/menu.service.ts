@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@angular/core';
 import { MenuCategory } from '../interfaces/menu-categories';
-import { MenuEntryDTO } from '../interfaces/menu-entry-dto';
+import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MenuService {
+export class MenuService { // TODO consider splitting this service up
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
@@ -31,8 +31,8 @@ export class MenuService {
   }
 
   /*
-  * PRINT CATEGORIES
-  */
+   * PRINT CATEGORIES
+   */
   getPrintCategories(): Observable<MenuCategory[]> {
     return this.http.get<MenuCategory[]>(this.baseUrl + `GetPrintCategories`)
   }
@@ -49,7 +49,22 @@ export class MenuService {
     return this.http.delete<void>(this.baseUrl + `DeletePrintCategory?id=${id}&pin=${pin}`)
   }
 
-  getMenuEntries(): Observable<MenuEntryDTO[]> {
-    return this.http.get<MenuEntryDTO[]>(this.baseUrl + `GetMenuEntryDTOs`)
+  /*
+   * MENU ENTRIES
+   */
+  getMenuEntries(): Observable<MenuEntry[]> {
+    return this.http.get<MenuEntry[]>(this.baseUrl + `GetMenuEntries`)
+  }
+
+  insertMenuEntry(pin: number, me: MenuEntry): Observable<void> {
+    return this.http.post<void>(this.baseUrl + `InsertMenuEntry?pin=${pin}`, me)
+  }
+
+  updateMenuEntry(pin: number, me: MenuEntry): Observable<void> {
+    return this.http.put<void>(this.baseUrl + `UpdateMenuEntry?pin=${pin}`, me)
+  }
+
+  deleteMenuEntry(pin: number, id: number): Observable<void> {
+    return this.http.delete<void>(this.baseUrl + `DeleteMenuEntry?id=${id}&pin=${pin}`)
   }
 }
