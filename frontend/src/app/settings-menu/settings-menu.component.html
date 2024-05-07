@@ -92,6 +92,9 @@
         <mat-label>Inventario</mat-label>
         <input matInput type="number" formControlName="inventory">
       </mat-form-field>
+      <mat-dialog-content>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+      </mat-dialog-content>
     </form>
   </mat-dialog-content>
   <mat-dialog-actions align="end">

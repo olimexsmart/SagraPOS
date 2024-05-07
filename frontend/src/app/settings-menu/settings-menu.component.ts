@@ -39,6 +39,7 @@ export class SettingsMenuComponent implements OnInit {
   ];
   editForm: FormGroup;
   private pin: number
+  selectedFile: File | null = null;
 
   @ViewChild('editCategoryTemplate') editCategoryTemplate!: TemplateRef<any>;
 
@@ -55,15 +56,7 @@ export class SettingsMenuComponent implements OnInit {
     if (this.pin === undefined)
       this.router.navigate(['settings'])
 
-    this.editForm = this.fb.group({
-      // id: [''],
-      // categoryID: [''],
-      // printCategoryID: [''],
-      // name: ['', Validators.required],
-      // printingName: [''],
-      // price: ['', Validators.required],
-      // inventory: ['']
-    });
+    this.editForm = this.fb.group({});
   }
 
   ngOnInit(): void {
@@ -123,13 +116,17 @@ export class SettingsMenuComponent implements OnInit {
       data: { form: this.editForm }
     });
 
-    dialogRef.afterClosed().subscribe((result: boolean) => { // TODO uniform logic
+    dialogRef.afterClosed().subscribe((result: boolean) => { // TODO uniform logic on other dialogs
       if (result && this.editForm.valid) {
         if (this.editForm.value.id) {
           this.updateCategory();
         } else {
           this.createCategory();
         }
+        // Check if an image was selected and upload that
+        if (this.selectedFile)
+          this.menuService.uploadImage(this.pin, this.editForm.value.id, this.selectedFile)
+            .subscribe(() => { console.log('image uploaded') });
       }
     });
   }
@@ -148,6 +145,21 @@ export class SettingsMenuComponent implements OnInit {
     this.menuService.deleteMenuEntry(this.pin, id)
       .subscribe(() => this.loadCategories());
   }
+
+  onFileSelected(event: Event): void {
+    // First, ensure that event.target is not null and is an HTMLInputElement
+    const element = event.target as HTMLInputElement | null;
+
+    if (element && element.files && element.files.length > 0) {
+      // Safely access the first file, since we now know there is at least one file
+      const file = element.files[0];
+      this.selectedFile = file;
+    } else {
+      // Handle the case where no file is selected, or the input element is not correct
+      this.selectedFile = null;
+    }
+  }
+
 
 }
 

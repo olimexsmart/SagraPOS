@@ -180,6 +180,16 @@ function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
 /*
  * MENU ENTRIES
  */
+/* See setting-menu.component.ts in frontend project
+'SELECT m.ID, m.CategoryID, m.PrintCategoryID, '
++ 'm.Name, m.PrintingName, m.Price, '
++ 'm.Inventory, c.Name AS CategoryName, '
++ 'pc.Name AS PrintingCategoryName '
++ 'FROM MenuEntries m '
++ 'INNER JOIN Categories c ON m.CategoryID = c.ID '
++ 'INNER JOIN PrintCategories pc ON m.PrintCategoryID = pc.ID'
+
+ */
 export function GetMenuEntries(): MenuEntry[] {
   const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory FROM MenuEntries').all();
   return menuEntries.map((menuEntry: any): MenuEntry => ({

@@ -94,10 +94,10 @@ app.get('/GetImage', (req: Request, res: Response) => {
 
 app.put('/UpdateImage', upload.single('image'), async (req, res) => {
   const masterPinCheck = CheckMasterPin(req.query.pin)
-  const menuEntryID = parseInt(req.query.menuEntryID as string)
-  if (isNaN(menuEntryID)) {
+  const id = parseInt(req.query.id as string)
+  if (isNaN(id)) {
     masterPinCheck.statusCode = 400
-    masterPinCheck.message = "Missing integer parameter menuEntryID"
+    masterPinCheck.message = "Missing integer parameter id"
   }
   if (!req.file) {
     masterPinCheck.statusCode = 400
@@ -107,8 +107,8 @@ app.put('/UpdateImage', upload.single('image'), async (req, res) => {
   if (masterPinCheck.statusCode != 200) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
   } else {
-    if (db.UpdateImage(menuEntryID, req.file!.buffer) > 0)
-      res.status(201).send('Image uploaded and saved successfully.')
+    if (db.UpdateImage(id, req.file!.buffer) > 0)
+      res.status(201)
   }
 })
 
@@ -181,7 +181,7 @@ app.get('/GetQuantities', (req: Request, res: Response) => {
 
 app.put('/SetQuantity', (req: Request, res: Response) => {
   const masterPinCheck = CheckMasterPin(req.query.pin)
-  const entryID = parseInt(req.query.entryID as string)
+  const entryID = parseInt(req.query.entryID as string) // TODO uniform to "id"
   if (isNaN(entryID)) {
     masterPinCheck.statusCode = 400
     masterPinCheck.message = "Missing integer parameter entryID"

@@ -67,4 +67,11 @@ export class MenuService { // TODO consider splitting this service up
   deleteMenuEntry(pin: number, id: number): Observable<void> {
     return this.http.delete<void>(this.baseUrl + `DeleteMenuEntry?id=${id}&pin=${pin}`)
   }
+
+  uploadImage(pin: number, id: number, selectedFile: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('image', selectedFile, selectedFile.name);
+    return this.http.put<void>(this.baseUrl + `UpdateImage?id=${id}&pin=${pin}`, formData)
+  }
+
 }
