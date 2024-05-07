@@ -1,0 +1,32 @@
+@use '@angular/material' as mat;
+
+mat.$theme-ignore-duplication-warnings: true;
+
+@include mat.core();
+
+$indigo-palette: mat.define-palette(mat.$indigo-palette);
+$pink-palette: mat.define-palette(mat.$pink-palette);
+$blue-palette: mat.define-palette(mat.$blue-grey-palette);
+
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: $indigo-palette,
+    accent: $pink-palette,
+  )
+));
+
+// Define the dark theme's color configuration.
+$dark-theme: mat.define-dark-theme((
+  color: (
+    primary: $pink-palette,
+    accent: $blue-palette,
+  )
+));
+
+// Applying the light theme globally
+@include mat.all-component-themes($light-theme);
+
+// Dark theme targeted by a CSS class
+.dark-theme {
+  @include mat.all-component-themes($dark-theme);
+}

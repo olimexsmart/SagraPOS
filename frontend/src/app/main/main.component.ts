@@ -8,6 +8,7 @@ import { MenuCategory } from '../interfaces/menu-categories';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
 import { SwapDBService } from '../services/swap-db.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-main',
@@ -26,6 +27,7 @@ export class MainComponent {
     @Inject('BASE_URL') public baseUrl: string,
     private menuService: MenuService,
     private inventoryService: InventoryService,
+    public themeService: ThemeService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
       this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -34,6 +36,7 @@ export class MainComponent {
   }
 
   @ViewChild('sidenav') sidenav!: MatDrawer;
+
 
   ngOnInit(): void {
     this.menuService.getCategories().subscribe(categories => this.categories = categories)

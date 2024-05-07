@@ -2,6 +2,9 @@
 <mat-toolbar color="primary">
   <span>{{title}}</span>
   <span class="flexSpacer"></span>
+  <button mat-icon-button (click)="themeService.toggleTheme()">
+    <mat-icon>{{ themeService.isDarkTheme ? 'brightness_3' : 'wb_sunny' }}</mat-icon>
+  </button>
   <button mat-icon-button [routerLink]="['/settings']">
     <mat-icon>settings</mat-icon>
   </button>
@@ -10,10 +13,11 @@
   <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
     <mat-icon>info</mat-icon>
   </button>
-  <button mat-icon-button (click)="sidenav.toggle()" [matBadge]="order.getEntriesNumber()" matBadgePosition="after"
-    matBadgeColor="accent" matBadgeSize="small">
-    <mat-icon>receipt</mat-icon>
-  </button>
+  <div [matBadge]="order.getEntriesNumber()" matBadgePosition="after" matBadgeColor="accent"  >
+    <button mat-icon-button (click)="sidenav.toggle()" >
+      <mat-icon>receipt</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
 <!-- FOOD CARDS -->
 <!-- TODO fix inventory badges -->
