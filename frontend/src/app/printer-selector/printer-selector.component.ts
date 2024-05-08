@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { SettingsService } from '../services/settings.service';
-import { ArePrintersEqual, InitEmptyPrinter, Printer } from '../interfaces/printer';
+import { arePrintersEqual, initEmptyPrinter, Printer } from '../interfaces/printer';
 
 @Component({
   selector: 'app-printer-selector',
@@ -10,7 +10,7 @@ import { ArePrintersEqual, InitEmptyPrinter, Printer } from '../interfaces/print
 export class PrinterSelectorComponent {
   readonly KEY: string = 'PRINTER'
   printers: Printer[] = []
-  selectedPrinter: Printer = InitEmptyPrinter()
+  selectedPrinter: Printer = initEmptyPrinter()
 
   constructor(
     private settingService: SettingsService
@@ -21,7 +21,7 @@ export class PrinterSelectorComponent {
       this.printers = printers
       // Check if the selected printer is in data received from server
       let s = localStorage.getItem(this.KEY)
-      if (s !== null && !printers.some(x => ArePrintersEqual(x, this.selectedPrinter)))
+      if (s !== null && !printers.some(x => arePrintersEqual(x, this.selectedPrinter)))
         this.changeSelectedPrinter(JSON.parse(s) as Printer)
       else
         this.changeSelectedPrinter(printers[0])

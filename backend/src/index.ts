@@ -53,6 +53,18 @@ app.get('/GetPrinters', (req: Request, res: Response) => {
   res.send(db.GetPrinters())
 })
 
+app.get('/ScanPrinters', async (req: Request, res: Response) => {
+  let port = parseInt(req.query.port as string, 10)
+  if(isNaN(port)) 
+    res.send(await pc.scanPrinters())
+  else
+    res.send(await pc.scanPrinters(port))
+})
+
+app.get('/PokePrinter', (req: Request, res: Response) => {
+  res.send() // TODO will take ip and port and print an image with the ip and port
+})
+
 /*
  * MENU ENTRIES
  */
