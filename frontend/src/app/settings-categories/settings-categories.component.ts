@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MenuService } from '../services/menu.service';
 import { MenuCategory } from '../interfaces/menu-categories';
-import { NavigationStart, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 enum Mode { Categories, PrintCategories, Invalid }
 

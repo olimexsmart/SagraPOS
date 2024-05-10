@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
-import { SettingsService } from '../services/settings.service';
+import { Component } from '@angular/core';
 import { arePrintersEqual, initEmptyPrinter, Printer } from '../interfaces/printer';
+import { PrinterService } from '../services/printer.service';
 
 @Component({
   selector: 'app-printer-selector',
@@ -13,11 +13,11 @@ export class PrinterSelectorComponent {
   selectedPrinter: Printer = initEmptyPrinter()
 
   constructor(
-    private settingService: SettingsService
+    private printerService: PrinterService
   ) { }
 
   ngOnInit(): void {
-    this.settingService.getPrinters().subscribe(printers => {
+    this.printerService.getPrinters().subscribe(printers => {
       this.printers = printers
       // Check if the selected printer is in data received from server
       let s = localStorage.getItem(this.KEY)

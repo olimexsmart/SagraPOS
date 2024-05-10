@@ -1,1 +1,47 @@
-<p>IN ALLESTIMENTO</p>
+<!-- Category List -->
+<div class="container">
+    <div class="mat-elevation-z8 table-all">
+        <mat-table [dataSource]="printer">
+            <!-- Name -->
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+            </ng-container>
+            <!-- IP -->
+            <ng-container matColumnDef="ip">
+                <mat-header-cell *matHeaderCellDef> IP </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.ip}} </mat-cell>
+            </ng-container>
+            <!-- Port -->
+            <ng-container matColumnDef="port">
+                <mat-header-cell *matHeaderCellDef> Port </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.port}} </mat-cell>
+            </ng-container>
+            <!-- Hidden -->
+            <ng-container matColumnDef="hidden">
+                <mat-header-cell *matHeaderCellDef> Hidden </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.hidden}} </mat-cell>
+            </ng-container>
+            <!-- Actions -->
+            <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <!-- <button mat-icon-button (click)="openDialog(element)">
+                        <mat-icon>edit</mat-icon>
+                    </button> -->
+                    <!-- <button mat-icon-button color="warn" [disabled]="element.occurrences > 0"
+                        (click)="deleteCategory(element.id)">
+                        <mat-icon>delete</mat-icon>
+                    </button> -->
+                </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+    </div>
+</div>
+
+<!-- <button mat-fab color="primary" class="add-fab" (click)="openDialog()">
+    <mat-icon>add</mat-icon>
+</button> -->
