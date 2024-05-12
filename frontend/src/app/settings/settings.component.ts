@@ -55,12 +55,12 @@ export class SettingsComponent implements OnInit {
     media: MediaMatcher,
     private dialog: MatDialog,
     private router: Router) {
-      this.mobileQuery = media.matchMedia('(max-width: 600px)');
-      this.mobileQueryListener = () => {
-        changeDetectorRef.detectChanges();
-        this.onScreenResize();
-      };
-      this.mobileQuery.addEventListener('change', this.mobileQueryListener);
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this.mobileQueryListener = () => {
+      changeDetectorRef.detectChanges();
+      this.onScreenResize();
+    };
+    this.mobileQuery.addEventListener('change', this.mobileQueryListener);
   }
 
   @ViewChild('sidenav') sidenav!: MatDrawer;
@@ -73,9 +73,11 @@ export class SettingsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((dialogResult) => {
       // TODO understand if instead of .value can be specified a strong type
-      if (dialogResult?.value === undefined) 
+      if (dialogResult?.value === undefined)
         this.router.navigate(['main'])
+
       this.pin = dialogResult.value
+      this.sidenavItemClick(this.myWorkRoutes[0].route) // To be sure the pin is passed to the child component
     });
   }
 

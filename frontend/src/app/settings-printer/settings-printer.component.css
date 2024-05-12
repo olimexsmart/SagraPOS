@@ -1,3 +1,5 @@
+/* TODO avoid repeating these, place in some application-wide CSS file */
+
 .table-all {
     margin: 1em;
     overflow: auto;
@@ -16,3 +18,16 @@
     }
 }
 
+.search-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 90px;
+    z-index: 1000;
+}
+
+.add-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+}

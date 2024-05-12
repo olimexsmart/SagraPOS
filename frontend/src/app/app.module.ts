@@ -37,8 +37,10 @@ import { SettingsPrinterComponent } from './settings-printer/settings-printer.co
 import { SettingsCategoriesComponent } from './settings-categories/settings-categories.component';
 import { SettingsMenuComponent } from './settings-menu/settings-menu.component';
 import { SettingsDatabaseComponent } from './settings-database/settings-database.component';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -125,7 +127,9 @@ import { AppLayoutComponent } from './app-layout/app-layout.component';
     MatSlideToggleModule,
     MatCheckboxModule,
     MatListModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatProgressBarModule,
+    MatSnackBarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

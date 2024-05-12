@@ -430,3 +430,29 @@ export function GetPrinters(): Printer[] {
     hidden: printer.Hidden === 1 // Convert integer to boolean 
   }))
 }
+
+export function InsertPrinter(newEntry: Printer): number {
+  return db.prepare(
+    'INSERT INTO Printers (Name, IP, Port, Hidden)'
+    + ' VALUES (@name, @ip, @port, @hidden)')
+    .run(newEntry).lastInsertRowid
+}
+
+export function UpdatePrinter(updatedEntry: Printer): number {
+  if (!updatedEntry.id) {
+    throw new Error('UpdatePrinter called without a valid id');
+  }
+  return db.prepare(
+    'UPDATE Printers SET '
+    + 'Name = @name, IP = @ip'
+    + 'Port = @port, Hidden = @hidden '
+    + 'WHERE ID = @id')
+    .run(updatedEntry).changes;
+}
+
+export function DeletePrinter(entryId: number): number {
+  if (!entryId) {
+    throw new Error('DeletePrinter called without a valid id');
+  }
+  return db.prepare('DELETE FROM Printers WHERE ID = ?').run(entryId).changes;
+}

@@ -43,14 +43,26 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 /*
  * PRINTER
  */
+app.get('/GetPrinters', (req: Request, res: Response) => {
+  res.send(db.GetPrinters())
+})
+
+app.post('/InsertPrinter', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.InsertPrinter)
+})
+
+app.put('/UpdatePrinter', (req: Request, res: Response) => {
+  withPinAndBody(req, res, db.UpdatePrinter)
+})
+
+app.delete('/DeletePrinter', (req: Request, res: Response) => {
+  withPinAndID(req, res, db.DeletePrinter)
+})
+
 app.post('/ConfirmOrder', (req: Request, res: Response) => {
   const toPrint = confirmOrder(req.body)
   pc.printOrder(parseInt(req.query.printerID as string), toPrint)
   res.send()
-})
-
-app.get('/GetPrinters', (req: Request, res: Response) => {
-  res.send(db.GetPrinters())
 })
 
 app.get('/ScanPrinters', async (req: Request, res: Response) => {
