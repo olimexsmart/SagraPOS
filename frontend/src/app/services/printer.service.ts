@@ -14,12 +14,12 @@ export class PrinterService {
     return this.http.get<Printer[]>(this.baseUrl + `GetPrinters`)
   }
 
-  insertPrinter(pin: number, mc: Printer): Observable<void> {
-    return this.http.post<void>(this.baseUrl + `InsertPrinter?pin=${pin}`, mc)
+  insertPrinter(pin: number, p: Printer): Observable<void> {
+    return this.http.post<void>(this.baseUrl + `InsertPrinter?pin=${pin}`, p)
   }
 
-  updatePrinter(pin: number, mc: Printer): Observable<void> {
-    return this.http.put<void>(this.baseUrl + `UpdatePrinter?pin=${pin}`, mc)
+  updatePrinter(pin: number, p: Printer): Observable<void> {
+    return this.http.put<void>(this.baseUrl + `UpdatePrinter?pin=${pin}`, p)
   }
 
   deletePrinter(pin: number, id: number): Observable<void> {
@@ -28,5 +28,9 @@ export class PrinterService {
 
   scanPrinters(port: number ): Observable<string[]> {
     return this.http.get<string[]>(this.baseUrl + `ScanPrinters?port=${port}`)
+  }
+
+  pokePrinter(p: Printer): Observable<void> {
+    return this.http.post<void>(this.baseUrl + `PokePrinter`, p)
   }
 }

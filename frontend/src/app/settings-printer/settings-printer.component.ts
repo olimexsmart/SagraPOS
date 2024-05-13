@@ -157,4 +157,10 @@ export class SettingsPrinterComponent implements OnInit {
       }
     })
   }
+
+  pokePrinter(printer: PrinterExtra) {
+    this.printerService.pokePrinter(printer).subscribe(
+      () => this.snackBar.open('Stampa test inviata', undefined, this.defSnackConfig)
+    )
+  }
 }

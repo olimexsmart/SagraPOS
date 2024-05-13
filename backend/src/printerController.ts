@@ -37,7 +37,7 @@ export interface PrintEntry {
   entryPrice: number
 };
 
-export function reloadPrintersAndData() { 
+export function reloadPrintersAndData() {
   // Cache printers
   printersInfo = db.GetPrinters().reduce((map, printer) => {
     map.set(printer.id, printer)
@@ -51,8 +51,34 @@ export function reloadPrintersAndData() {
   textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO).valueString
 }
 
+export function pokePrinter(printerToPoke: Printer) {
+  if (printerToPoke.id === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
+    console.log(printerToPoke);
+    return
+  }
+  // Connect to printer using the provided ip
+  let printer = new ThermalPrinter({
+    type: PrinterTypes.EPSON,
+    interface: `tcp://${printerToPoke.ip}:${printerToPoke.port}`,
+    characterSet: CharacterSet.PC858_EURO
+  })
+  printer.bold(true)
+  printer.setTextSize(1, 1)
+  printer.println(`Name: ${printerToPoke.name}`)
+  printer.println(`IP: ${printerToPoke.ip}`)
+  printer.println(`Port: ${printerToPoke.port}`)
+  printer.cut() // TODO make it nicer
+  // Confirm print
+  printer.execute().then(() => {
+    console.log("Print done!")
+  }).catch((e) => {
+    // TODO this should propagate to frontend
+    console.error("Print failed:", e)
+  })
+}
+
 export function printOrder(printerID: number, toPrint: OrderToPrint) {
-  if (printerID == CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
+  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     consolePrintOrder(toPrint)
     return
   }
@@ -143,7 +169,7 @@ export function printOrder(printerID: number, toPrint: OrderToPrint) {
 
 // TODO layout is very basic could be nicer to look at
 export function printInfo(printerID: number, toPrint: InfoOrdersDTO) {
-  if (printerID == CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
+  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     consolePrintInfo(toPrint)
     return
   }
@@ -180,7 +206,7 @@ export function printInfo(printerID: number, toPrint: InfoOrdersDTO) {
   })
 }
 
-export async function scanPrinters(port: number = 9100) : Promise<string[]> {
+export async function scanPrinters(port: number = 9100): Promise<string[]> {
   const subnet = findLocalSubnet();
   if (!subnet) {
     console.error('No suitable subnet found.');

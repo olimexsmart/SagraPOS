@@ -76,8 +76,10 @@ app.get('/ScanPrinters', async (req: Request, res: Response) => {
     res.send(await pc.scanPrinters(port))
 })
 
-app.get('/PokePrinter', (req: Request, res: Response) => {
-  res.send() // TODO will take ip and port and print an image with the ip and port
+app.post('/PokePrinter', (req: Request, res: Response) => { // TODO make it a get with 3 query params
+  // TODO add master pin
+  pc.pokePrinter(req.body)
+  res.send() 
 })
 
 /*
