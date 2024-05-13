@@ -159,7 +159,5 @@ export class SettingsMenuComponent implements OnInit {
       this.selectedFile = null;
     }
   }
-
-
 }
 

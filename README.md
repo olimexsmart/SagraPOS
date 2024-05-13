@@ -37,22 +37,27 @@
 - [ ] Better spacing in tablet view (kinda too crammed)
 - [ ] Remember order selection when changing screen
 - [ ] Confirm OK/NOK snackbar when performing operations (like order)
-- [ ] Info table max width on large screens
+- [ ] Info table limit max width on large screens
 - [ ] Toggle to see all items in a unique list
-- [ ] Customizable color palette of interface (local to client)
+- [x] Light/Dark theme
 - [x] Bump Angular version
 - [ ] Refactor to use latest guidelines (standalone components)
 - [ ] favicon
-#### Deployment
+- [ ] Mono font in order component similar to printing font and loaded locally 
+- [ ] Confetti on order confirm
+- [ ] Use pipe for currency
+#### General
 - [x] Build pipeline + release on commit tag
-- [ ] Test Linux packaging
+- [x] Test Linux packaging
 - [x] Test macOS packaging
 - [ ] License file
 - [ ] Should not be able to launch another instance (check for port 3000 in use)
 - [x] Package script should also do `npm install` on the three folders
+- [ ] Managed monorepo with nx, lerna, npm workspaces
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time
 - [ ] Setting an inventory value to null does not hide badge (caused by CSS)
 - [ ] macOS buggy little icon
-- [ ] Broken inventory badges after Angular version bump
+- [ ] Broken inventory badges after Angular version bump, refactor using chip inside card
+- [ ] Refresh does not works on clients (`/main` not found)

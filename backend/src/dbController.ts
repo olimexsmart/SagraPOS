@@ -432,22 +432,30 @@ export function GetPrinters(): Printer[] {
 }
 
 export function InsertPrinter(newEntry: Printer): number {
+  const entryWithConvertedHidden = {
+    ...newEntry,
+    hidden: newEntry.hidden ? 1 : 0, // Convert hidden to integer
+  };
   return db.prepare(
     'INSERT INTO Printers (Name, IP, Port, Hidden)'
     + ' VALUES (@name, @ip, @port, @hidden)')
-    .run(newEntry).lastInsertRowid
+    .run(entryWithConvertedHidden).lastInsertRowid
 }
 
 export function UpdatePrinter(updatedEntry: Printer): number {
   if (!updatedEntry.id) {
     throw new Error('UpdatePrinter called without a valid id');
   }
+  const entryWithConvertedHidden = {
+    ...updatedEntry,
+    hidden: updatedEntry.hidden ? 1 : 0, // Convert hidden to integer
+  };
   return db.prepare(
     'UPDATE Printers SET '
-    + 'Name = @name, IP = @ip'
+    + 'Name = @name, IP = @ip, '
     + 'Port = @port, Hidden = @hidden '
     + 'WHERE ID = @id')
-    .run(updatedEntry).changes;
+    .run(entryWithConvertedHidden).changes;
 }
 
 export function DeletePrinter(entryId: number): number {

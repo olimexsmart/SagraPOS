@@ -1,53 +1,80 @@
 <!-- Category List -->
 <div class="container">
-    @if(scanning){
-        <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
-    }
-    <div class="mat-elevation-z8 table-all">
-        <mat-table [dataSource]="printer">
-            <!-- Name -->
-            <ng-container matColumnDef="name">
-                <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
-            </ng-container>
-            <!-- IP -->
-            <ng-container matColumnDef="ip">
-                <mat-header-cell *matHeaderCellDef> IP </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.ip}} </mat-cell>
-            </ng-container>
-            <!-- Port -->
-            <ng-container matColumnDef="port">
-                <mat-header-cell *matHeaderCellDef> Port </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.port}} </mat-cell>
-            </ng-container>
-            <!-- Hidden -->
-            <ng-container matColumnDef="hidden">
-                <mat-header-cell *matHeaderCellDef> Nascosta </mat-header-cell>
-                <mat-cell *matCellDef="let element"> {{element.hidden}} </mat-cell>
-            </ng-container>
-            <!-- Actions -->
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
-                <mat-cell *matCellDef="let element">
-                    <!-- <button mat-icon-button (click)="openDialog(element)">
-                        <mat-icon>edit</mat-icon>
-                    </button> -->
-                    <button mat-icon-button color="warn" [disabled]="element.name=='Console'"
-                        (click)="deletePrinter(element.id)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </mat-cell>
-            </ng-container>
+  @if(scanning){
+  <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+  }
+  <div class="mat-elevation-z8 table-all">
+    <mat-table [dataSource]="printer">
+      <!-- Name -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+      <!-- IP -->
+      <ng-container matColumnDef="ip">
+        <mat-header-cell *matHeaderCellDef> IP </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.ip}} </mat-cell>
+      </ng-container>
+      <!-- Port -->
+      <ng-container matColumnDef="port">
+        <mat-header-cell *matHeaderCellDef> Port </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.port}} </mat-cell>
+      </ng-container>
+      <!-- Hidden -->
+      <ng-container matColumnDef="hidden">
+        <mat-header-cell *matHeaderCellDef> Visibilità </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.hidden ? "Nascosta" : "Visibile"}} </mat-cell>
+      </ng-container>
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="openDialog(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" [disabled]="element.name=='Console'" (click)="deletePrinter(element.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
 
-            <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
-    </div>
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </div>
 </div>
 
 <button mat-fab color="primary" class="search-fab" (click)="scanPrinters()">
-    <mat-icon>search</mat-icon>
+  <mat-icon>search</mat-icon>
 </button>
-<button mat-fab color="primary" class="add-fab" (click)="scanPrinters()">
-    <mat-icon>add</mat-icon>
+<button mat-fab color="primary" class="add-fab" (click)="openDialog()">
+  <mat-icon>add</mat-icon>
 </button>
+
+<!-- Edit/Create Category Dialog -->
+<ng-template #editPrinterTemplate let-data="editForm">
+  <h2 mat-dialog-title>{{editForm.value?.id ? 'Modifica Stampante' : 'Nuova Stampante'}}</h2>
+  <mat-dialog-content>
+    <form [formGroup]="editForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>IP</mat-label>
+        <input matInput formControlName="ip">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Port</mat-label>
+        <input matInput type="number" formControlName="port">
+      </mat-form-field>
+
+      <mat-checkbox formControlName="hidden">Nascondi</mat-checkbox>
+
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="false">Cancel</button>
+    <button mat-button [mat-dialog-close]="true">Save</button>
+  </mat-dialog-actions>
+</ng-template>
