@@ -1,10 +1,10 @@
 <!-- Category List -->
 <div class="container">
-  @if(scanning){
+  @if(loading){
   <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
   }
   <div class="mat-elevation-z8 table-all">
-    <mat-table [dataSource]="printer">
+    <mat-table [dataSource]="printers">
       <!-- Name -->
       <ng-container matColumnDef="name">
         <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
@@ -29,11 +29,33 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
         <mat-cell *matCellDef="let element">
+          @switch (element.scanResult) {
+          @case(ScanResult.New) {
+          <button mat-icon-button (click)="createPrinter(element)">
+            <mat-icon color="primary">add_circle</mat-icon>
+          </button>
+          }
+          @case(ScanResult.Found) {
+          <button mat-icon-button>
+            <mat-icon color="primary">check_circle</mat-icon>
+          </button>
+          }
+          @case(ScanResult.NotFound) {
+          <button mat-icon-button color="warn" [disabled]="element.name=='Console'" (click)="deletePrinter(element.id)">
+            <mat-icon>cancel</mat-icon>
+          </button>
+          }
+          @case (ScanResult.NotScanned) {
           <button mat-icon-button (click)="openDialog(element)">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button color="warn" [disabled]="element.name=='Console'" (click)="deletePrinter(element.id)">
             <mat-icon>delete</mat-icon>
+          </button>
+          }
+          }
+          <button mat-icon-button (click)="openDialog(element)">
+            <mat-icon>touch_app</mat-icon>
           </button>
         </mat-cell>
       </ng-container>
@@ -44,9 +66,15 @@
   </div>
 </div>
 
-<button mat-fab color="primary" class="search-fab" (click)="scanPrinters()">
-  <mat-icon>search</mat-icon>
-</button>
+@if (scanned) {
+  <button mat-fab color="primary" class="search-fab" (click)="loadPrinters()">
+    <mat-icon>check</mat-icon>
+  </button>
+} @else {
+  <button mat-fab color="primary" class="search-fab" (click)="scanPrinters()">
+    <mat-icon>search</mat-icon>
+  </button>
+}
 <button mat-fab color="primary" class="add-fab" (click)="openDialog()">
   <mat-icon>add</mat-icon>
 </button>

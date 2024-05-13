@@ -6,6 +6,13 @@ export interface Printer {
     hidden: boolean
 }
 
+export enum ScanResult { New, Found, NotFound, NotScanned }
+  
+export interface PrinterExtra extends Printer {
+  scanResult: ScanResult
+}
+
+
 export function initEmptyPrinter(): Printer {
     return { id: 0, name: 'ND', ip: '0.0.0.0', port: 0, hidden: false }
 }

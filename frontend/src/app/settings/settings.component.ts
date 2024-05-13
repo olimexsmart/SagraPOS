@@ -75,9 +75,10 @@ export class SettingsComponent implements OnInit {
       // TODO understand if instead of .value can be specified a strong type
       if (dialogResult?.value === undefined)
         this.router.navigate(['main'])
-
-      this.pin = dialogResult.value
-      this.sidenavItemClick(this.myWorkRoutes[0].route) // To be sure the pin is passed to the child component
+      else {
+        this.pin = dialogResult.value
+        this.sidenavItemClick(this.myWorkRoutes[0].route) // To be sure the pin is passed to the child component
+      }
     });
   }
 

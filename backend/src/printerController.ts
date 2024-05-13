@@ -37,7 +37,7 @@ export interface PrintEntry {
   entryPrice: number
 };
 
-export function reloadPrintersAndData() { // TODO call this from printer CRUD API
+export function reloadPrintersAndData() { 
   // Cache printers
   printersInfo = db.GetPrinters().reduce((map, printer) => {
     map.set(printer.id, printer)

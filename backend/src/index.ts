@@ -49,14 +49,17 @@ app.get('/GetPrinters', (req: Request, res: Response) => {
 
 app.post('/InsertPrinter', (req: Request, res: Response) => {
   withPinAndBody(req, res, db.InsertPrinter)
+  pc.reloadPrintersAndData()
 })
 
 app.put('/UpdatePrinter', (req: Request, res: Response) => {
   withPinAndBody(req, res, db.UpdatePrinter)
+  pc.reloadPrintersAndData()
 })
 
 app.delete('/DeletePrinter', (req: Request, res: Response) => {
   withPinAndID(req, res, db.DeletePrinter)
+  pc.reloadPrintersAndData()
 })
 
 app.post('/ConfirmOrder', (req: Request, res: Response) => {
