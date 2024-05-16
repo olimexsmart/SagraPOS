@@ -13,14 +13,12 @@
   <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
     <mat-icon>info</mat-icon>
   </button>
-  <div [matBadge]="order.getEntriesNumber()" matBadgePosition="after" matBadgeColor="accent"  >
-    <button mat-icon-button (click)="sidenav.toggle()" >
-      <mat-icon>receipt</mat-icon>
-    </button>
-  </div>
+  <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>receipt</mat-icon>
+  </button>
+  <mat-chip color="accent" highlighted>{{order.getEntriesNumber()}}</mat-chip>
 </mat-toolbar>
 <!-- FOOD CARDS -->
-<!-- TODO fix inventory badges -->
 <mat-sidenav-container fullscreen class="sidenav-container">
   <mat-sidenav #sidenav position="end" class="sidenav-lateral" [mode]="mobileQuery.matches ? 'over' : 'side'"
     [fixedInViewport]="true" fixedTopGap="64">
@@ -30,27 +28,36 @@
   <!-- TABS -->
   <mat-tab-group class="makeTabGroupSticky">
     <!-- Add a tab for each category -->
-    <mat-tab *ngFor="let c of categories" label="{{c.name}}">
+    @for(c of categories; track c){
+    <mat-tab label="{{c.name}}">
       <div class="content">
-        <ng-container *ngFor="let m of menuEntries">
-          <div *ngIf="m.categoryID==c.id" [matBadge]="badgeCount[m.id]" matBadgePosition="after" matBadgeColor="accent">
-            <!-- CARDS -->
-            <!-- Loop on each MenuEntry and add it if it's the right category -->
-            <mat-card class="mat-elevation-z4 entryCard" matRipple
-              [matRippleAnimation]="{ enterDuration: 500, exitDuration: 1000 }"
-              (click)="inventoryMode.isActive() ? inventoryMode.updateInventory(m.id) : order.addEntry(m)">
-              <img mat-card-image class="cardImageStandardize" src="{{baseUrl}}GetImage?id={{m.id}}" alt="{{m.name}}">
-              <mat-card-header>
-                <mat-card-title class="cardHead">{{m.name}}</mat-card-title>
-                <span class="flexSpacer"></span>
-                <mat-chip-set>
-                  <mat-chip>{{m.price}}€</mat-chip>
-                </mat-chip-set>
-              </mat-card-header>
-            </mat-card>
-          </div>
-        </ng-container>
+        @for(m of menuEntries; track m) {
+        @if(m.categoryID==c.id)
+        {
+        <!-- CARDS -->
+        <!-- Loop on each MenuEntry and add it if it's the right category -->
+        <mat-card class="mat-elevation-z4 entryCard" matRipple
+          [matRippleAnimation]="{ enterDuration: 500, exitDuration: 1000 }"
+          (click)="inventoryMode.isActive() ? inventoryMode.updateInventory(m.id) : order.addEntry(m)">
+          <img mat-card-image class="cardImageStandardize" src="{{baseUrl}}GetImage?id={{m.id}}" alt="{{m.name}}">
+          <mat-card-header>
+            <mat-chip-listbox class="mat-mdc-chip-set-stacked">
+              <mat-chip color="accent" highlighted>{{m.name}}</mat-chip>
+              <mat-chip>{{m.price}}€</mat-chip>
+              <!-- This mess because [hidden] wouldn't work -->
+              <mat-chip [ngStyle]="{'visibility': badgeCount[m.id] === null ? 'hidden' : 'visible'}"
+                [color]="badgeCount[m.id]! >= 20 ? 'primary':'warn'"
+                [highlighted]="badgeCount[m.id]! >= 20 ? 'false' : 'true'">
+                Inventario: {{badgeCount[m.id]}}
+              </mat-chip>
+              <!-- TODO configurable threshold -->
+            </mat-chip-listbox>
+          </mat-card-header>
+        </mat-card>
+        }
+        }
       </div>
     </mat-tab>
+    }
   </mat-tab-group>
 </mat-sidenav-container>

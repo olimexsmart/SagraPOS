@@ -1,79 +1,84 @@
 .flexSpacer {
-    flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 
 .content {
-    padding: 16px;
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: flex-start;
+  padding: 16px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
 }
 
 .entryCard {
-    cursor: pointer;
-    width: 12rem;
-    margin: 8px;
+  cursor: pointer;
+  width: 12rem;
+  margin: 8px;
+}
+
+/* Wondeful moment in train with Marco */
+.entryCard mat-chip:last-child {
+  margin-bottom: 1em;
 }
 
 .cardHead {
-    min-height: 64px;
+  min-height: 64px;
 }
 
 .makeTabGroupSticky {
-    max-height: 100%;
+  max-height: 100%;
 }
 
 .cardImageStandardize {
-    min-height: 150px;
-    max-height: 150px;
-    object-fit: cover;
+  min-height: 150px;
+  max-height: 150px;
+  object-fit: cover;
 }
 
 .sidenav-container {
-    top: 64px !important;
-    /* What if the toolbar has a different size? */
+  top: 64px !important;
+  /* What if the toolbar has a different size? */
 }
 
 .sidenav-lateral {
-    min-width: 25%;
+  min-width: 25%;
 }
 
 .mat-badge-content {
-    width: auto;
-    display: grid;
-    min-width: 2.5em;
-    min-height: 2.5em;
-    text-align: center;
-    font-size: large;
-    align-items: center;
-    padding: 3px;
-    margin-bottom: .5em;
-    margin-right: .5em;
+  width: auto;
+  display: grid;
+  min-width: 2.5em;
+  min-height: 2.5em;
+  text-align: center;
+  font-size: large;
+  align-items: center;
+  padding: 3px;
+  margin-bottom: .5em;
+  margin-right: .5em;
 }
 
 .mat-badge-medium.mat-badge-above .mat-badge-content {
-    top: 0.8em;
-    right: 0.6em;
+  top: 0.8em;
+  right: 0.6em;
 }
 
 @media(max-width: 599px) {
-    .sidenav-container {
-        top: 56px !important;
-    }
+  .sidenav-container {
+    top: 56px !important;
+  }
 
-    .sidenav-lateral {
-        min-width: 100%;
-        top: 56px !important;
-    }
+  .sidenav-lateral {
+    min-width: 100%;
+    top: 56px !important;
+  }
 
-    .entryCard {
-        cursor: pointer;
-        width: 8rem;
-        margin: 5px;
-    }
+  .entryCard {
+    cursor: pointer;
+    width: 8rem;
+    margin: 5px;
+  }
 
-    .cardHead {
-        font-size: medium;
-        min-height: 48px;
-    }
+  .cardHead {
+    font-size: medium;
+    min-height: 48px;
+  }
 }
