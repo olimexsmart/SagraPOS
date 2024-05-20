@@ -278,6 +278,13 @@ app.post('/UploadDB', upload.single('file'), (req, res) => {
 });
 
 /*
+ * REDIRECT
+ */
+app.get(['/main', '/settings/*', '/info/*'], function (req, res) {
+  res.redirect('/index.html');
+});
+
+/*
  * SERVER START
  */
 app.listen(port, () => {

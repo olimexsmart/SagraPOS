@@ -73,8 +73,9 @@
 
   .entryCard {
     cursor: pointer;
-    width: 8rem;
-    margin: 5px;
+    width: 40vw;
+    margin-right: 5px;
+    margin-bottom: 5px
   }
 
   .cardHead {
