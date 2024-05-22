@@ -6,6 +6,7 @@ import { Inventory } from "@Interfaces/inventory"
 import { Printer } from "@Interfaces/printer"
 import { MenuEntry } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
+import { Setting, SettingCategory } from "@Interfaces/setting"
 
 
 // TODO rename columns to uniform to interfaces?
@@ -391,30 +392,75 @@ export function InsertOrdersLog(orderLog: di.OrdersLog, orderLogItems: di.OrderL
  * SETTING
  */
 export function GetMasterPin(): number {
-  let pin = db.prepare('SELECT ValueInt FROM Settings WHERE Key = ?').get('PIN')?.ValueInt
+  let pin = db.prepare('SELECT Value FROM Settings WHERE Key = ?').get('PIN')?.Value // TODO const labels for all settings
   if (pin === undefined)
-    pin = 1234
-  return pin
+    return 1234 // TODO const label for hardcoded default pin
+  return parseInt(pin)
 }
 
-export function GetAllSettings() {
-  // TODO for frontend settings page (check if json can handle decently Buffers)
+const settingJoinQuery = `SELECT
+                            s.Key, 
+                            s.Category, 
+                            s.InputType, 
+                            s.Value, 
+                            s.DisplayName, 
+                            s.Description, 
+                            sc.ID AS CategoryID,
+                            sc.Name AS CategoryName
+                          FROM 
+                            Settings s
+                          INNER JOIN 
+                            SettingCategories sc ON s.Category = sc.ID
+`
+
+export function GetAllSettings(): Setting[] {
+  const sRaw = db.prepare(settingJoinQuery).all()
+  return sRaw.map((s: any): Setting => ({
+    key: s.Key,
+    category: {
+      id: s.CategoryID,
+      name: s.CategoryName
+    },
+    inputType: s.InputType,
+    value: s.Value,
+    displayName: s.DisplayName,
+    description: s.Description
+  }));
 }
 
-export function GetSettingValuesByKey(key: string): di.SettingValues {
-  const s = db.prepare('SELECT ValueString, ValueNum, ValueBlob FROM Settings WHERE Key = ?').get(key)
+export function GetSettingValuesByKey(key: string): Setting | null {
+  const s = db.prepare(`${settingJoinQuery}
+                        WHERE 
+                          Key = ?`).get(key)
   if (s === undefined)
-    return {
-      valueNum: null,
-      valueBlob: null,
-      valueString: null,
-    }
-  else
-    return {
-      valueNum: s.ValueNum,
-      valueBlob: s.ValueBlob,
-      valueString: s.ValueString
-    }
+    return null
+
+  return {
+    key: s.Key,
+    category: {
+      id: s.CategoryID,
+      name: s.CategoryName
+    },
+    inputType: s.InputType,
+    value: s.Value,
+    displayName: s.DisplayName,
+    description: s.Description
+  }
+}
+
+export function SetSettingValueByKey(settingMod: Setting): number {
+  return db.prepare(`UPDATE 
+                      Settings 
+                    SET 
+                      Key = @key,
+                      Category = @category,
+                      InputType = @inputType,
+                      Value = @value,
+                      DisplayName = @displayName,
+                      Description = @description
+                    WHERE 
+                      ID = @id`)
+    .run(settingMod).changes;
 }
 
 /*

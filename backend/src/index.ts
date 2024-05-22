@@ -247,6 +247,14 @@ app.get('/CheckPIN', function (req, res) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
 })
 
+app.get('/GetAllSettings', (req: Request, res: Response) => {
+  res.send(db.GetAllSettings())
+})
+
+app.put('/ChangeSetting', function (req, res) {
+  withPinAndBody(req, res, db.SetSettingValueByKey)
+})
+
 
 // TODO add pin to these two
 app.get('/DownloadDB', function (req, res) {

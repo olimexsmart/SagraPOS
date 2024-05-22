@@ -44,11 +44,17 @@ export function reloadPrintersAndData() {
     return map;
   }, new Map<number, Printer>())
   // Cache receipt settings
-  logo = db.GetSettingValuesByKey(PRINT_LOGO).valueBlob
-  if (logo !== null)
-    resizeImageToHeight(logo, db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT).valueNum ?? 0).then(x => logo = x)
-  textOverLogo = db.GetSettingValuesByKey(TEXT_OVER_LOGO).valueString
-  textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO).valueString
+  const logoDB = db.GetSettingValuesByKey(PRINT_LOGO)
+  if (logoDB !== null) {
+    const logoHeightRaw = db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT)?.value ?? "0"
+    const logoHeight = parseInt(logoHeightRaw)
+    resizeImageToHeight(
+      Buffer.from(logoDB.value, 'base64'),
+      logoHeight)
+      .then(x => logo = x)
+  }
+  textOverLogo = db.GetSettingValuesByKey(TEXT_OVER_LOGO)?.value ?? ""
+  textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO)?.value ?? ""
 }
 
 export function pokePrinter(printerToPoke: Printer) {
@@ -284,24 +290,29 @@ function printLineWithEuroSign(printer: ThermalPrinter, textBefore: string, text
 
 async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): Promise<Buffer> {
   try {
+    if (!imageBuffer || imageBuffer.length === 0) {
+      throw new Error('Invalid image buffer provided');
+    }
     // Read the image from the buffer
     const image = await Jimp.read(imageBuffer);
-
     // Resize the image to the desired height while maintaining the aspect ratio
     const resizedImage = image.resize(Jimp.AUTO, targetHeight);
-
     // Get the buffer of the resized image
     const resizedImageBuffer: Buffer = await new Promise((resolve, reject) => {
       resizedImage.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-        if (err) reject(err);
-        else resolve(buffer);
+        if (err) {
+          console.error('Error getting buffer:', err);
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
       });
     });
 
     return resizedImageBuffer;
   } catch (error) {
     console.error('Error resizing image:', error);
-    throw error; // Rethrow or handle the error as needed
+    throw error; // TODO Rethrow or handle the error as needed
   }
 }
 
