@@ -14,15 +14,14 @@
 - [ ] Serial Printer
 #### Backend
 - [ ] Settings to deactivate item sequence number printing
-- [ ] Settings to deactivate PrintCategories (fallback to normal categories)
-- [ ] By default PrintCategories are the same as Categories, when inserting a new entry with PrintCategories deactivated
+- [ ] API to copy PrintCategories from Categories, if needed to be the same
 - [ ] Setting view (and then edit) page
 - [ ] Product view (and then edit) page
 - [ ] Complete log of events table (with its screen accessible from settings)
 - [ ] Optional order recap print in settings
 - [ ] Custom view order for menu items and categories
 - [ ] Custom print order for menu items and print categories
-- [ ] Log also from which client the order was printed
+- [ ] Log also from which printer the order was printed
 - [ ] Setup debugger
 - [ ] Image upload should resize images to a standard size
 - [ ] DB upload could also migrate from previous version. Introduce DB version in setting table
@@ -31,10 +30,10 @@
 #### Frontend
 - [ ] Spinner on order confirm (with error timeout)
 - [ ] Spinner on menu loading (can take a while)
+- [x] Spinner on application launch (instead of "Loading...")
 - [ ] QR code with WiFi credentials
 - [ ] QR code for link to remote page
 - [ ] Number of clients connected 
-- [ ] Dialog for cash computations
 - [ ] Better spacing in tablet view (kinda too crammed)
 - [ ] Remember order selection when changing screen
 - [ ] Confirm OK/NOK snackbar when performing operations (like order)
@@ -49,6 +48,7 @@
 - [ ] Use pipe for currency
 - [ ] Insert cash amount and compute remainder on total
 - [ ] Main page sidenav to declutter toolbar icons
+- [ ] Update to Angular v18
 #### General
 - [x] Build pipeline + release on commit tag
 - [x] Test Linux packaging
@@ -60,7 +60,7 @@
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [ ] Log entries should carry prices along, because prices could change in time
-- [ ] Setting an inventory value to null does not hide badge (caused by CSS)
+- [x] Setting an inventory value to null does not hide badge (caused by CSS)
 - [ ] macOS buggy little icon
-- [ ] Broken inventory badges after Angular version bump, refactor using chip inside card
+- [x] Broken inventory badges after Angular version bump, refactor using chip inside card
 - [x] Refresh does not works on clients (`/main` not found)
