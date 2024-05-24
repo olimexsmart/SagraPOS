@@ -449,17 +449,14 @@ export function GetSettingValuesByKey(key: string): Setting | null {
 }
 
 export function SetSettingValueByKey(settingMod: Setting): number {
+  console.log(settingMod);
+  
   return db.prepare(`UPDATE 
                       Settings 
                     SET 
-                      Key = @key,
-                      Category = @category,
-                      InputType = @inputType,
-                      Value = @value,
-                      DisplayName = @displayName,
-                      Description = @description
+                      Value = @value
                     WHERE 
-                      ID = @id`)
+                      Key = @key`)
     .run(settingMod).changes;
 }
 

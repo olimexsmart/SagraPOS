@@ -164,7 +164,7 @@ app.delete('/DeleteCategory', (req: Request, res: Response) => {
  * PRINT CATEGORIES
  */
 app.get('/GetPrintCategories', (req: Request, res: Response) => {
-  res.send(db.GetPrintCategories())
+  res.send(db.GetPrintCategories()) // TODO use pin on selected?
 })
 
 app.post('/InsertPrintCategory', (req: Request, res: Response) => {

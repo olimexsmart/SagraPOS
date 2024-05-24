@@ -16,3 +16,13 @@
 .button-space {
     margin-right: 8px;
 }
+
+.full-width {
+    width: 100%;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}

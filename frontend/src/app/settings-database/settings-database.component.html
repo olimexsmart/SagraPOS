@@ -1,48 +1,51 @@
 <div class="container mat-elevation-z8 table-all">
-    <mat-accordion>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Database
-                </mat-panel-title>
-                <mat-panel-description>
-                    Scarica una copia del detabase o sostituiscilo
-                    <mat-icon>database</mat-icon>
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <button mat-raised-button class="button-space" color="primary" (click)="triggerFilePicker()">
-                Carica Database
-            </button>
-            <button mat-raised-button color="accent" (click)="downloadDB()">
-                Salva Database
-            </button>
-            <!-- TODO can be formatted better -->
-            <p class="table-all">
-                <mat-icon fontIcon="warning"></mat-icon>
-                Attenzione caricare un database sovrascrive quello attuale
-            </p>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Stampa
-                </mat-panel-title>
-                <mat-panel-description>
-                    Personalizzazione scontrino
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <p>DA FARE</p>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    PIN
-                </mat-panel-title>
-                <mat-panel-description>
-                    Cambio PIN amministrazione
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <p>DA FARE</p>
-        </mat-expansion-panel>
-    </mat-accordion>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Database
+        </mat-panel-title>
+        <mat-panel-description>
+          Scarica una copia del detabase o sostituiscilo
+          <mat-icon>database</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <button mat-raised-button class="button-space" color="primary" (click)="triggerFilePicker()">
+        Carica Database
+      </button>
+      <button mat-raised-button color="accent" (click)="downloadDB()">
+        Salva Database
+      </button>
+      <!-- TODO can be formatted better -->
+      <p class="table-all">
+        <mat-icon fontIcon="warning"></mat-icon>
+        Attenzione caricare un database sovrascrive quello attuale
+      </p>
+    </mat-expansion-panel>
+    @for (s of settings; track $index) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{s.displayName}}
+        </mat-panel-title>
+        <mat-panel-description>
+          {{s.description}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      @if(s.inputType !== 'file')
+      {
+      <mat-form-field class="full-width">
+        <input matInput [type]="s.inputType" [(ngModel)]="s.value" />
+      </mat-form-field>
+      }
+      @else {
+      <!-- TODO better styling or better merge logic with DB upload button above -->
+      <input type="file" accept="image/png" (change)="onFileSelected($event, s)" />
+      }
+      <div class="actions-container">
+        <button mat-raised-button color="primary" (click)="saveSetting(s)">Save</button>
+      </div>
+    </mat-expansion-panel>
+    }
+  </mat-accordion>
 </div>
