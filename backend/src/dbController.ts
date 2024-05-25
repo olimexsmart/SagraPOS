@@ -90,6 +90,12 @@ export function initDB(appDir: string): void {
         "Name"	TEXT NOT NULL,
         PRIMARY KEY("ID" AUTOINCREMENT)
     )`).run()
+  // ServerCategories
+  db.prepare(`CREATE TABLE IF NOT EXISTS "ServerSettings" (
+        "Wifi_SSID"	TEXT NOT NULL,
+        "Wifi_password"	TEXT NOT NULL,
+        "Server_Url"	TEXT NOT NULL
+    )`).run() 
   // Settings
   db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" (
         "Key"	TEXT NOT NULL,
@@ -397,6 +403,24 @@ export function GetMasterPin(): number {
   return pin
 }
 
+export function GetServerSettings(): di.ServerSettings {
+  // TODO: retrieve server settings from db
+  const s = db.prepare('SELECT Server_Url AS ServerUrl, Wifi_SSID AS WifiSsid, Wifi_password AS WifiPwd FROM "ServerSettings"').get()
+  if (s === undefined)
+    return {
+      serverUrl: null,
+      wifi: null,
+    }
+  else
+    return {
+      serverUrl: s.ServerUrl,
+      wifi: {
+        ssid: s.WifiSsid,
+        password: s.WifiPwd
+      }
+    }
+}
+
 export function GetAllSettings() {
   // TODO for frontend settings page (check if json can handle decently Buffers)
 }
@@ -464,3 +488,5 @@ export function DeletePrinter(entryId: number): number {
   }
   return db.prepare('DELETE FROM Printers WHERE ID = ?').run(entryId).changes;
 }
+
+
