@@ -247,6 +247,14 @@ app.get('/CheckPIN', function (req, res) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
 })
 
+app.get('/GetAllSettings', (req: Request, res: Response) => {
+  res.send(db.GetAllSettings())
+})
+
+app.put('/ChangeSetting', function (req, res) {
+  withPinAndBody(req, res, db.SetSettingValueByKey)
+})
+
 app.get('/GetServerSettings', function (req, res) {
   // const serverSettings = GetServerSettings()
   res.send(db.GetServerSettings())
@@ -280,6 +288,13 @@ app.post('/UploadDB', upload.single('file'), (req, res) => {
   } else {
     res.status(400).send('No file uploaded.');
   }
+});
+
+/*
+ * REDIRECT
+ */
+app.get(['/main', '/settings/*', '/info/*'], function (req, res) {
+  res.redirect('/index.html');
 });
 
 /*

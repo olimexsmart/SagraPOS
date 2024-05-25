@@ -19,12 +19,6 @@ export interface OrderLogItem {
     quantity: number,
 }
 
-export interface SettingValues {
-    valueNum: number | null,
-    valueString: string | null,
-    valueBlob: Buffer | null
-}
-
 export interface ServerSettings {
     serverUrl: string | null,
     wifi: Wifi | null
