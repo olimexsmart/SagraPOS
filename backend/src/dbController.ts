@@ -413,6 +413,24 @@ const settingJoinQuery = `SELECT
                             SettingCategories sc ON s.Category = sc.ID
 `
 
+export function GetServerSettings(): di.ServerSettings {
+  // TODO: retrieve server settings from db
+  const s = db.prepare('SELECT Server_Url AS ServerUrl, Wifi_SSID AS WifiSsid, Wifi_password AS WifiPwd FROM "ServerSettings"').get()
+  if (s === undefined)
+    return {
+      serverUrl: null,
+      wifi: null,
+    }
+  else
+    return {
+      serverUrl: s.ServerUrl,
+      wifi: {
+        ssid: s.WifiSsid,
+        password: s.WifiPwd
+      }
+    }
+}
+
 export function GetAllSettings(): Setting[] {
   const sRaw = db.prepare(settingJoinQuery).all()
   return sRaw.map((s: any): Setting => ({
@@ -428,7 +446,7 @@ export function GetAllSettings(): Setting[] {
   }));
 }
 
-export function GetSettingValuesByKey(key: string): Setting | null {
+export function GetSettingByKey(key: string): Setting | null {
   const s = db.prepare(`${settingJoinQuery}
                         WHERE 
                           Key = ?`).get(key)
@@ -507,3 +525,5 @@ export function DeletePrinter(entryId: number): number {
   }
   return db.prepare('DELETE FROM Printers WHERE ID = ?').run(entryId).changes;
 }
+
+

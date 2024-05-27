@@ -1,0 +1,53 @@
+<!-- TOOLBAR -->
+<mat-toolbar color="primary" class="toolbar">
+    <button mat-icon-button routerLink="/main">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span>Dispositivi</span>
+    <span class="flexSpacer"></span>
+</mat-toolbar>
+<mat-sidenav-container fullscreen>
+    <div class="container">
+        <div class="steps-container m-auto">
+            <mat-accordion multi class="w-100">
+                <mat-expansion-panel [expanded]="true" hidetoggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Assicurati che il nuovo dispositivo sia connesso a questa rete WiFi
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="step-container">
+                        @if(!wifiSSID || !wifiPassword) {
+                        <p>⚠️ Nessuna Wifi Configurata: Le
+                            impostazioni WiFi devono essere
+                            configurate dal menu
+                            Impostazioni.</p>
+                        } @else {
+                        <img [src]="wifiQRCode" alt="QR Code WiFi">
+                        <p>SSID: <strong>{{ wifiSSID }}</strong></p>
+                        }
+                    </div>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="true">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Collega il nuovo dispositivo alla cassa
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="step-container">
+                        @if(!wifiSSID || !wifiPassword) {
+                        <p>⚠️ Nessun indirizzo Configurato: Impostare
+                            l'indirizzo del dispositivo principale dal menu
+                            Impostazioni.</p>
+                        } @else {
+                        <img [src]="urlQRCode" alt="QR Code URL">
+                        <p>Inquadra il QR-Code oppure vai al link:
+                            <a [href]="serverURL">{{ serverURL }}</a>
+                        </p>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</mat-sidenav-container>

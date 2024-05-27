@@ -251,8 +251,17 @@ app.get('/GetAllSettings', (req: Request, res: Response) => {
   res.send(db.GetAllSettings())
 })
 
+app.get('/GetSettingByKey', (req: Request, res: Response) => {
+  res.send(db.GetSettingByKey(req.query.key as string))
+})
+
 app.put('/ChangeSetting', function (req, res) {
   withPinAndBody(req, res, db.SetSettingValueByKey)
+})
+
+app.get('/GetServerSettings', function (req, res) {
+  // const serverSettings = GetServerSettings()
+  res.send(db.GetServerSettings())
 })
 
 

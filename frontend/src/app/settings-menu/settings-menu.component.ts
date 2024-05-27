@@ -103,7 +103,7 @@ export class SettingsMenuComponent implements OnInit {
       error: (err) => {
         console.error('Error loading data', err);
       }
-    });
+    })
   }
 
 
