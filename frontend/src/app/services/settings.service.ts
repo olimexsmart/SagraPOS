@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Printer } from '../interfaces/printer';
 import { Observable } from 'rxjs';
 import { BooleanResult } from '../interfaces/boolean-result';
 import { Setting } from '../interfaces/setting';
@@ -18,6 +17,10 @@ export class SettingsService {
 
   getSettings(): Observable<Setting[]> {
     return this.http.get<Setting[]>(this.baseUrl + `GetAllSettings`)
+  }
+
+  getSettingByValue(key: string): Observable<Setting> {
+    return this.http.get<Setting>(this.baseUrl + `GetSettingByKey?key=${key}`)
   }
 
   saveSetting(pin: number, setting: Setting): Observable<void> {

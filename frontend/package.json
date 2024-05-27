@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve", 
+    "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -20,6 +20,7 @@
     "@angular/platform-browser": "17.3.7",
     "@angular/platform-browser-dynamic": "17.3.7",
     "@angular/router": "17.3.7",
+    "qrcode": "^1.5.3",
     "rxjs": "7.8.1",
     "tslib": "2.6.2",
     "zone.js": "0.14.5"
@@ -29,6 +30,7 @@
     "@angular/cli": "17.3.6",
     "@angular/compiler-cli": "17.3.7",
     "@types/jasmine": "5.1.4",
+    "@types/qrcode": "^1.5.5",
     "jasmine-core": "5.1.2",
     "karma": "6.4.3",
     "karma-chrome-launcher": "3.2.0",

@@ -44,17 +44,17 @@ export function reloadPrintersAndData() {
     return map;
   }, new Map<number, Printer>())
   // Cache receipt settings
-  const logoDB = db.GetSettingValuesByKey(PRINT_LOGO)
+  const logoDB = db.GetSettingByKey(PRINT_LOGO)
   if (logoDB !== null) {
-    const logoHeightRaw = db.GetSettingValuesByKey(PRINT_LOGO_HEIGHT)?.value ?? "0"
+    const logoHeightRaw = db.GetSettingByKey(PRINT_LOGO_HEIGHT)?.value ?? "0"
     const logoHeight = parseInt(logoHeightRaw)
     resizeImageToHeight(
       Buffer.from(logoDB.value, 'base64'),
       logoHeight)
       .then(x => logo = x)
   }
-  textOverLogo = db.GetSettingValuesByKey(TEXT_OVER_LOGO)?.value ?? ""
-  textUnderLogo = db.GetSettingValuesByKey(TEXT_UNDER_LOGO)?.value ?? ""
+  textOverLogo = db.GetSettingByKey(TEXT_OVER_LOGO)?.value ?? ""
+  textUnderLogo = db.GetSettingByKey(TEXT_UNDER_LOGO)?.value ?? ""
 }
 
 export function pokePrinter(printerToPoke: Printer) {

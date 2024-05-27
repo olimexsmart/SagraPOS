@@ -41,6 +41,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { QrCodeComponent } from './qr-code/qr-code.component';
 
 
 @NgModule({
@@ -58,7 +59,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     SettingsCategoriesComponent,
     SettingsDatabaseComponent,
     SettingsMenuComponent,
-    SettingsPrinterComponent
+    SettingsPrinterComponent,
+    QrCodeComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }), // TODO solve deprecation
@@ -99,7 +101,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
             component: SettingsDatabaseComponent
           }
         ]
-      }
+      },
+      { path: 'qr-code', component: QrCodeComponent }
       // { path: '**', component: NotFoundComponent },
     ]),
     BrowserModule,
