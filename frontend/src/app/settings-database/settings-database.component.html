@@ -22,6 +22,9 @@
         Attenzione caricare un database sovrascrive quello attuale
       </p>
     </mat-expansion-panel>
+
+
+    @for (settings of settingsByCat.values(); track $index) {
     @for (s of settings; track $index) {
     <mat-expansion-panel>
       <mat-expansion-panel-header>
@@ -29,7 +32,7 @@
           {{s.displayName}}
         </mat-panel-title>
         <mat-panel-description>
-          {{s.description}}
+          {{s.category.name}}
         </mat-panel-description>
       </mat-expansion-panel-header>
       @if(s.inputType !== 'file')
@@ -46,6 +49,7 @@
         <button mat-raised-button color="primary" (click)="saveSetting(s)">Save</button>
       </div>
     </mat-expansion-panel>
+    }
     }
   </mat-accordion>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SwapDBService } from '../services/swap-db.service';
 import { SettingsService } from '../services/settings.service';
-import { Setting } from '../interfaces/setting';
+import { Setting, SettingCategory } from '../interfaces/setting';
 import { Router } from '@angular/router';
 
 
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./settings-database.component.css']
 })
 export class SettingsDatabaseComponent implements OnInit {
-  settings: Setting[] = []
+  settingsByCat = new Map<number, Setting[]>()
   private pin: number
 
   constructor(
@@ -29,7 +29,14 @@ export class SettingsDatabaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.settingService.getSettings().subscribe(data => {
-      this.settings = data
+      let settings: Setting[] = data
+      this.settingsByCat = settings.reduce((sByCat, s) => {
+        if (sByCat.has(s.category.id))
+          sByCat.get(s.category.id)?.push(s)
+        else
+          sByCat.set(s.category.id, [s])
+        return sByCat
+      }, new Map<number, Setting[]>())
     })
   }
 
