@@ -5,6 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MenuService } from '../services/menu.service';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { Router } from '@angular/router';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 enum Mode { Categories, PrintCategories, Invalid }
 
@@ -19,6 +20,18 @@ export class SettingsCategoriesComponent implements OnInit {
   editForm: FormGroup;
   private pin: number
   private mode: Mode
+  loading: boolean = false
+
+  private subCallBacks = {
+    complete: () => {
+      this.snackBar.showSuccess()
+      this.loadCategories()
+    },
+    error: () => {
+      this.snackBar.showError()
+      this.loading = false
+    }
+  };
 
   @ViewChild('editCategoryTemplate') editCategoryTemplate!: TemplateRef<any>;
 
@@ -26,7 +39,8 @@ export class SettingsCategoriesComponent implements OnInit {
     private menuService: MenuService,
     private fb: FormBuilder,
     public dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private snackBar: EmojiSnackBarService
   ) {
     // Accessing navigation state
     const navigation = this.router.getCurrentNavigation();
@@ -60,14 +74,17 @@ export class SettingsCategoriesComponent implements OnInit {
   }
 
   loadCategories(): void {
-    (this.mode === Mode.Categories 
-      ? this.menuService.getCategories() 
+    this.loading = true;
+
+    (this.mode === Mode.Categories
+      ? this.menuService.getCategories()
       : this.menuService.getPrintCategories()
     ).subscribe(data => {
       this.categories.data = data;
+      this.loading = false
     });
   }
-  
+
 
   openDialog(category?: any): void {
     // Initialize form with category data if available, otherwise start fresh
@@ -90,25 +107,33 @@ export class SettingsCategoriesComponent implements OnInit {
   }
 
   updateCategory(): void {
-    (this.mode === Mode.Categories 
+    this.loading = true;
+
+    (this.mode === Mode.Categories
       ? this.menuService.updateCategory(this.pin, this.editForm.value)
       : this.menuService.updatePrintCategory(this.pin, this.editForm.value)
-    ).subscribe(() => this.loadCategories());
+    ).subscribe(this.subCallBacks);
   }
-  
+
   createCategory(): void {
-    (this.mode === Mode.Categories 
+    this.loading = true;
+
+    (this.mode === Mode.Categories
       ? this.menuService.insertCategory(this.pin, this.editForm.value)
       : this.menuService.insertPrintCategory(this.pin, this.editForm.value)
-    ).subscribe(() => this.loadCategories());
+    ).subscribe(this.subCallBacks);
   }
-  
+
   deleteCategory(id: number): void {
-    (this.mode === Mode.Categories 
+    this.loading = true;
+
+    (this.mode === Mode.Categories
       ? this.menuService.deleteCategory(this.pin, id)
       : this.menuService.deletePrintCategory(this.pin, id)
-    ).subscribe(() => this.loadCategories());
+    ).subscribe(this.subCallBacks);
   }
-  
+
+
+
 }
 

@@ -1,5 +1,11 @@
 <!-- Category List -->
 <div class="container">
+  @if(loading){
+  <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+  }@else {
+  <div class="progress-bar-placeholder"></div>
+  }
+
   <div class="mat-elevation-z8 table-all">
     <mat-table [dataSource]="categories">
       <!-- Name -->

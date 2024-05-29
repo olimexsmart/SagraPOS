@@ -6,8 +6,6 @@ import { OrderLogItem } from "./dbInterfaces";
 // TODO init function that gets some setting from DB
 const maxItems = 99;
 
-
-
 export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
   // Get complete information about each order entry
   const menuEntries = db.GetMenuEntries()

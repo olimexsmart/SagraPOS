@@ -2,6 +2,8 @@
 <div class="container">
   @if(loading){
   <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+  } @else {
+  <div class="progress-bar-placeholder"></div>
   }
   <div class="mat-elevation-z8 table-all">
     <mat-table [dataSource]="printers">
@@ -31,7 +33,7 @@
         <mat-cell *matCellDef="let element">
           @switch (element.scanResult) {
           @case(ScanResult.New) {
-          <button mat-icon-button (click)="createPrinter(element)">
+          <button mat-icon-button (click)="insertPrinter(element)">
             <mat-icon color="primary">add_circle</mat-icon>
           </button>
           }
@@ -67,13 +69,13 @@
 </div>
 
 @if (scanned) {
-  <button mat-fab color="primary" class="search-fab" (click)="loadPrinters()">
-    <mat-icon>check</mat-icon>
-  </button>
+<button mat-fab color="primary" class="search-fab" (click)="loadPrinters()">
+  <mat-icon>check</mat-icon>
+</button>
 } @else {
-  <button mat-fab color="primary" class="search-fab" (click)="scanPrinters()">
-    <mat-icon>search</mat-icon>
-  </button>
+<button mat-fab color="primary" class="search-fab" (click)="scanPrinters()">
+  <mat-icon>search</mat-icon>
+</button>
 }
 <button mat-fab color="primary" class="add-fab" (click)="openDialog()">
   <mat-icon>add</mat-icon>

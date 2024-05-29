@@ -12,6 +12,11 @@
     <mat-icon>print</mat-icon>
   </button>
 </mat-toolbar>
+@if(loading){
+<mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+}@else {
+<div class="progress-bar-placeholder"></div>
+}
 <div class="container">
   <div class="mainInfo">
     <mat-card class="mainInfoCard">
@@ -22,13 +27,13 @@
     </mat-card>
     <mat-card class="mainInfoCard">
       <mat-card-header>
-        <mat-card-title>€{{infoOrders.ordersTotal}}</mat-card-title>
+        <mat-card-title>{{infoOrders.ordersTotal | currency: 'EUR'}}</mat-card-title>
         <mat-card-subtitle>Profit</mat-card-subtitle>
       </mat-card-header>
     </mat-card>
     <mat-card class="mainInfoCard">
       <mat-card-header>
-        <mat-card-title>€{{infoOrders.ordersTotal / infoOrders.numOrders | number : '1.2-2'}}</mat-card-title>
+        <mat-card-title>{{infoOrders.ordersTotal / infoOrders.numOrders | currency: 'EUR'}}</mat-card-title>
         <mat-card-subtitle>Av. Expense</mat-card-subtitle>
       </mat-card-header>
     </mat-card>

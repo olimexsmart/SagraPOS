@@ -3,6 +3,7 @@ import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { OrderService } from '../services/order.service';
 import { Printer } from '../interfaces/printer';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 @Component({
   selector: 'app-order',
@@ -19,8 +20,12 @@ export class OrderComponent {
   order: Map<MenuEntry, number> = new Map()
   catPresent: Map<number, number> = new Map()
   total: number = 0
+  printing: boolean = false
 
-  constructor(private orderService: OrderService) { }
+  constructor(
+    private orderService: OrderService,
+    private snackBar: EmojiSnackBarService,
+  ) { }
 
   addEntry(entry: MenuEntry): void {
     this.order.set(entry, (this.order.get(entry) ?? 0) + 1)
@@ -46,11 +51,20 @@ export class OrderComponent {
   }
 
   printAndClear(): void {
-    this.orderService.postPrintOrder(this.selectedPrinter.id, this.order).subscribe(() => {
-      this.order.clear()
-      this.catPresent.clear()
-      this.total = 0
-      this.orderConfirmed.emit()
+    this.printing = true
+    this.orderService.postPrintOrder(this.selectedPrinter.id, this.order).subscribe({
+      complete: () => {
+        this.order.clear()
+        this.catPresent.clear()
+        this.total = 0
+        this.orderConfirmed.emit()
+        this.printing = false
+        this.snackBar.showSuccess('Ordine OK')
+      },
+      error: () => {
+        this.snackBar.showError('Ordine in errore')
+        this.printing = false
+      }
     })
   }
 

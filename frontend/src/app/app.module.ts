@@ -40,8 +40,9 @@ import { SettingsDatabaseComponent } from './settings-database/settings-database
 import { MatExpansionModule } from '@angular/material/expansion';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { QrCodeComponent } from './qr-code/qr-code.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -132,7 +133,8 @@ import { QrCodeComponent } from './qr-code/qr-code.component';
     MatListModule,
     MatExpansionModule,
     MatProgressBarModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -83,8 +83,8 @@ export function pokePrinter(printerToPoke: Printer) {
   })
 }
 
-export function printOrder(printerID: number, toPrint: OrderToPrint) {
-  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
+export function printOrder(printerID: number, toPrint: OrderToPrint): void {
+  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded special case for debugging
     consolePrintOrder(toPrint)
     return
   }
@@ -317,14 +317,26 @@ async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): P
 }
 
 function consolePrintOrder(toPrint: OrderToPrint) {
+  fakeLoading(2000)
   console.log('Total: ' + toPrint.total)
   console.log(toPrint.entries)
 }
 
 function consolePrintInfo(toPrint: InfoOrdersDTO) {
+  fakeLoading(2000)
   console.log('Total number of orders: ' + toPrint.numOrders)
   console.log('Total of all orders: ' + toPrint.ordersTotal)
   console.log(toPrint.infoOrderEntries);
+}
+
+function fakeLoading(ms: number):void {
+    // Contraption to have a two seconds fake loading for debugging
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+      if ((new Date().getTime() - start) > ms) {
+        break;
+      }
+    }
 }
 
 async function scanIp(ip: string, port: number): Promise<ScanResult> {

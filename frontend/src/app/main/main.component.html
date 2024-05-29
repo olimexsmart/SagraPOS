@@ -46,7 +46,7 @@
           <mat-card-header>
             <mat-chip-listbox class="mat-mdc-chip-set-stacked">
               <mat-chip color="accent" highlighted>{{m.name}}</mat-chip>
-              <mat-chip>{{m.price}}€</mat-chip>
+              <mat-chip>{{m.price | currency: 'EUR'}}</mat-chip>
               <!-- This mess because [hidden] wouldn't work -->
               <mat-chip [ngStyle]="{'visibility': badgeCount[m.id] === null ? 'hidden' : 'visible'}"
                 [color]="badgeCount[m.id]! >= 20 ? 'primary':'warn'"

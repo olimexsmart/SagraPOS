@@ -3,9 +3,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { PrinterExtra, ScanResult } from '../interfaces/printer';
 import { PrinterService } from '../services/printer.service';
 import { Router } from '@angular/router';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 
 @Component({
@@ -19,20 +19,27 @@ export class SettingsPrinterComponent implements OnInit {
   private pin: number = 0
   loading: boolean = false
   scanned: boolean = false
-  private defSnackConfig: MatSnackBarConfig = {
-    duration: 3000,
-    horizontalPosition: 'start'
-  }
   editForm: FormGroup;
 
   ScanResult = ScanResult // Trick suggested by chatGPT to expose the enum to the template file
+
+  private subCallBacks = {
+    complete: () => {
+      this.snackBar.showSuccess()
+      this.loadPrinters()
+    },
+    error: () => {
+      this.snackBar.showError()
+      this.loading = false
+    }
+  };
 
   @ViewChild('editPrinterTemplate') editPrinterTemplate!: TemplateRef<any>;
 
   constructor(
     private printerService: PrinterService,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private snackBar: EmojiSnackBarService,
     private fb: FormBuilder,
     public dialog: MatDialog,
   ) {
@@ -74,7 +81,7 @@ export class SettingsPrinterComponent implements OnInit {
         if (this.editForm.value.id) {
           this.updatePrinter();
         } else {
-          this.createPrinter();
+          this.insertPrinter();
         }
       }
     });
@@ -99,22 +106,27 @@ export class SettingsPrinterComponent implements OnInit {
   updatePrinter(): void {
     this.loading = true
     this.printerService.updatePrinter(this.pin, this.editForm.value)
-      .subscribe(() => this.loadPrinters());
+      .subscribe(this.subCallBacks);
   }
 
-  createPrinter(printer?: PrinterExtra): void { // TODO not clear, split into two methods named differently
+  insertPrinter(printer?: PrinterExtra): void {
     this.loading = true
-    if (printer) {
+    if (printer) { // Found by scanning and saved
       this.printerService.insertPrinter(this.pin, printer)
-        .subscribe(() => {
-          this.snackBar.open('Stampante aggiunta', undefined, this.defSnackConfig)
-          printer.scanResult = ScanResult.Found
-          this.loading = false
+        .subscribe({
+          complete: () => {
+            this.snackBar.showSuccess('Stampante aggiunta')
+            printer.scanResult = ScanResult.Found
+            this.loading = false
+          },
+          error: () => {
+            this.snackBar.showError()
+          }
         });
     }
-    else
+    else // Manually inserted from editform
       this.printerService.insertPrinter(this.pin, this.editForm.value)
-        .subscribe(() => this.loadPrinters());
+        .subscribe(this.subCallBacks);
   }
 
   deletePrinter(id: number) {
@@ -129,7 +141,7 @@ export class SettingsPrinterComponent implements OnInit {
     this.loading = true
     this.printerService.scanPrinters(port).subscribe((foundPrinterIPs) => {
       if (foundPrinterIPs.length > 0) {
-        this.snackBar.open('Numero stampanti trovate: ' + foundPrinterIPs.length, undefined, this.defSnackConfig);
+        this.snackBar.showSuccess('Numero stampanti trovate: ' + foundPrinterIPs.length)
         // Update scanning status of each printer
         let p = this.printers.data.map(p => {
           p.scanResult = foundPrinterIPs.includes(p.ip) ? ScanResult.Found : ScanResult.NotFound
@@ -153,14 +165,17 @@ export class SettingsPrinterComponent implements OnInit {
         this.loading = false
         this.scanned = true
       } else {
-        this.snackBar.open('Nessuna spampante trovata', undefined, this.defSnackConfig);
+        this.snackBar.showError('Nessuna spampante trovata')
+        this.loading = false
+        this.scanned = true
       }
     })
   }
 
   pokePrinter(printer: PrinterExtra) {
-    this.printerService.pokePrinter(printer).subscribe(
-      () => this.snackBar.open('Stampa test inviata', undefined, this.defSnackConfig)
-    )
+    this.printerService.pokePrinter(printer).subscribe({
+      complete: () => this.snackBar.showSuccess('Stampa test inviata'),
+      error: () => this.snackBar.showError('Errore in stampa test')
+    })
   }
 }

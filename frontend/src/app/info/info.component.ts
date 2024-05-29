@@ -6,6 +6,7 @@ import { InfoService } from '../services/info.service';
 import { ConfirmDialogModel, DialogPinComponent } from '../dialog-pin/dialog-pin.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 
 @Component({
@@ -19,11 +20,13 @@ export class InfoComponent {
   tableDataSource;
   @ViewChild(MatSort) sort: MatSort = null!;
   printerID: number = 0;
+  loading: boolean = false
 
   constructor(
     private infoService: InfoService,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: EmojiSnackBarService,
   ) {
     this.infoOrders = {
       infoOrderEntries: [],
@@ -39,7 +42,6 @@ export class InfoComponent {
   }
 
   clearInfo(): void {
-    // TODO Properly handle network errors
     const message = 'Tutti i dati andranno persi';
     const dialogData = new ConfirmDialogModel('Azzera info?', message);
     const dialogRef = this.dialog.open(DialogPinComponent, {
@@ -48,27 +50,44 @@ export class InfoComponent {
     });
     dialogRef.afterClosed().subscribe((dialogResult) => {
       // TODO understand if instead of .value can be specified a strong type
-      if(dialogResult.value === undefined) return
+      if (dialogResult.value === undefined) return
       this.infoService.resetInfoOrder(dialogResult.value).subscribe(
         {
-          complete: this.refreshInfo.bind(this), // Love to know this hack by myself
-          error: console.error // TODO snackbar with success/fail
+          complete: () => {
+            this.refreshInfo.bind(this) // Loved to know this hack by myself
+            this.snackBar.showSuccess('Info cancellate OK')
+            this.loading = false
+          },
+          error: () => {
+            console.error
+            this.loading = false
+            this.snackBar.showError('Errore in cancellare info')
+          }
         });
     });
   }
 
-  printInfo() : void {
+  printInfo(): void {
+    this.loading = true
     this.infoService.printInfo(this.printerID).subscribe(
       {
-        complete: console.log, // Love to know this hack by myself
-        error: console.error // TODO snackbar with success/fail
+        complete: () => {
+          this.snackBar.showSuccess('Info stampate OK')
+          this.loading = false
+        },
+        error: () => {
+          this.snackBar.showError('Errore in stampare info')
+          this.loading = false
+        }
       });
   }
 
   private refreshInfo(): void {
+    this.loading = true
     this.infoService.getInfoOrder().subscribe(infoOrders => {
       this.infoOrders = infoOrders
       this.tableDataSource = new MatTableDataSource(this.infoOrders.infoOrderEntries)
+      this.loading = false
     })
   }
 }

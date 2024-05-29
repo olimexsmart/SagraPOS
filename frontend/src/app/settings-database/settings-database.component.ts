@@ -3,6 +3,7 @@ import { SwapDBService } from '../services/swap-db.service';
 import { SettingsService } from '../services/settings.service';
 import { Setting, SettingCategory } from '../interfaces/setting';
 import { Router } from '@angular/router';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 
 @Component({
@@ -13,11 +14,13 @@ import { Router } from '@angular/router';
 export class SettingsDatabaseComponent implements OnInit {
   settingsByCat = new Map<number, Setting[]>()
   private pin: number
+  loading: boolean = false
 
   constructor(
     private swapDBService: SwapDBService,
     private settingService: SettingsService,
-    private router: Router
+    private router: Router,
+    private snackBar: EmojiSnackBarService
   ) {
     // Accessing navigation state
     const navigation = this.router.getCurrentNavigation();
@@ -28,16 +31,25 @@ export class SettingsDatabaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.settingService.getSettings().subscribe(data => {
-      let settings: Setting[] = data
-      this.settingsByCat = settings.reduce((sByCat, s) => {
-        if (sByCat.has(s.category.id))
-          sByCat.get(s.category.id)?.push(s)
-        else
-          sByCat.set(s.category.id, [s])
-        return sByCat
-      }, new Map<number, Setting[]>())
-    })
+    this.loading = true
+    this.settingService.getSettings().subscribe({
+      next: data => {
+        let settings: Setting[] = data
+        this.settingsByCat = settings.reduce((sByCat, s) => {
+          if (sByCat.has(s.category.id))
+            sByCat.get(s.category.id)?.push(s)
+          else
+            sByCat.set(s.category.id, [s])
+          return sByCat
+        }, new Map<number, Setting[]>())
+        this.loading = false
+      },
+      error: () => {
+        this.snackBar.showError()
+        this.loading = false
+      }
+    }
+    )
   }
 
   downloadDB() {
@@ -56,6 +68,7 @@ export class SettingsDatabaseComponent implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       this.swapDBService.uploadFile(file);
+      // After this call whole app is reloaded
     }
   }
 
@@ -79,13 +92,17 @@ export class SettingsDatabaseComponent implements OnInit {
   }
 
   saveSetting(setting: Setting): void {
-    this.settingService.saveSetting(this.pin, setting).subscribe({
-      next: response => {
-        console.log('Setting saved successfully', response);
-      },
-      error: error => {
-        console.error('Error saving setting', error);
-      }
-    });
+    this.loading = true
+    this.settingService.saveSetting(this.pin, setting)
+      .subscribe({
+        complete: () => {
+          this.snackBar.showSuccess()
+          this.loading = false
+        },
+        error: () => {
+          this.snackBar.showError()
+          this.loading = false
+        }
+      });
   }
 }

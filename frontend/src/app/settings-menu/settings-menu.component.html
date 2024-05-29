@@ -1,5 +1,11 @@
 <!-- Category List -->
 <div class="container">
+  @if(loading){
+  <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+  }
+  @else {
+  <div class="progress-bar-placeholder"></div>
+  }
   <div class="mat-elevation-z8 table-all">
     <mat-table [dataSource]="menuEntries">
       <!-- Name -->
@@ -39,7 +45,7 @@
           <button mat-icon-button (click)="openDialog(element)">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteCategory(element.id)">
+          <button mat-icon-button color="warn" (click)="deleteMenuItem(element.id)">
             <mat-icon>delete</mat-icon>
           </button>
         </mat-cell>
@@ -55,7 +61,7 @@
   <mat-icon>add</mat-icon>
 </button>
 
-<!-- Edit/Create Category Dialog -->
+<!-- Edit/Create MenuItem Dialog -->
 <ng-template #editCategoryTemplate let-data="editForm">
   <h2 mat-dialog-title>{{editForm.value?.id ? 'Modifica Categoria' : 'Nuova Categoria'}}</h2>
   <mat-dialog-content>

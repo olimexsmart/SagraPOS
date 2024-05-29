@@ -1,33 +1,33 @@
 .flexSpacer {
-    flex: 1 1 auto;
+  flex: 1 1 auto;
 }
 
 .sidenav-container {
-    top: 64px !important;
-    /* What if the toolbar has a different size? */
+  top: 64px !important;
+  /* What if the toolbar has a different size? */
 }
 
 .sidenav-lateral {
-    min-width: 20%;
+  min-width: 20%;
 }
 
 @media(max-width: 599px) {
-    .sidenav-container {
-        top: 56px !important;
-    }
+  .sidenav-container {
+    top: 56px !important;
+  }
 
-    .sidenav-lateral {
-        min-width: 100%;
-        top: 56px !important;
-    }
+  .sidenav-lateral {
+    min-width: 100%;
+    top: 56px !important;
+  }
 
 }
 
 /* Auto applied by Angular (to understand how) */
 .mat-mdc-list-item-icon {
-    color: rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
 }
 
 .sidenav-item-active {
-    background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as QRCode from 'qrcode';
-import { ServerSettings } from '../interfaces/server-settings';
 import { SettingsService } from '../services/settings.service';
 import { forkJoin } from 'rxjs';
 

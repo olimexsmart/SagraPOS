@@ -8,6 +8,7 @@ import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 interface MenuEntryExplicit { // TODO make this the common interface, populate using joins
   id: number,
@@ -40,6 +41,18 @@ export class SettingsMenuComponent implements OnInit {
   editForm: FormGroup;
   private pin: number
   selectedFile: File | null = null;
+  loading: boolean = false
+
+  private subCallBacks = {
+    complete: () => {
+      this.snackBar.showSuccess()
+      this.loadMenuItems()
+    },
+    error: () => {
+      this.snackBar.showError()
+      this.loading = false
+    }
+  };
 
   @ViewChild('editCategoryTemplate') editCategoryTemplate!: TemplateRef<any>;
 
@@ -47,7 +60,8 @@ export class SettingsMenuComponent implements OnInit {
     private menuService: MenuService,
     private fb: FormBuilder,
     public dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private snackBar: EmojiSnackBarService
   ) {
     // Accessing navigation state
     const navigation = this.router.getCurrentNavigation();
@@ -60,7 +74,7 @@ export class SettingsMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCategories();
+    this.loadMenuItems();
     this.initForm();
   }
 
@@ -76,7 +90,8 @@ export class SettingsMenuComponent implements OnInit {
     });
   }
 
-  loadCategories(): void {
+  loadMenuItems(): void {
+    this.loading = true
     forkJoin({
       categories: this.menuService.getCategories(),
       printCategories: this.menuService.getPrintCategories(),
@@ -99,9 +114,11 @@ export class SettingsMenuComponent implements OnInit {
         this.categories = categories;
         this.printCategories = printCategories;
         this.menuEntries.data = menuEntriesExpl;
+        this.loading = false
       },
-      error: (err) => {
-        console.error('Error loading data', err);
+      error: () => {
+        this.snackBar.showError()
+        this.loading = false
       }
     })
   }
@@ -119,9 +136,9 @@ export class SettingsMenuComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: boolean) => { // TODO uniform logic on other dialogs
       if (result && this.editForm.valid) {
         if (this.editForm.value.id) {
-          this.updateCategory();
+          this.updateMenuItem();
         } else {
-          this.createCategory();
+          this.createMenuItem();
         }
         // Check if an image was selected and upload that
         if (this.selectedFile)
@@ -131,19 +148,19 @@ export class SettingsMenuComponent implements OnInit {
     });
   }
 
-  updateCategory(): void {
+  updateMenuItem(): void {
     this.menuService.updateMenuEntry(this.pin, this.editForm.value)
-      .subscribe(() => this.loadCategories());
+      .subscribe(this.subCallBacks);
   }
 
-  createCategory(): void {
+  createMenuItem(): void {
     this.menuService.insertMenuEntry(this.pin, this.editForm.value)
-      .subscribe(() => this.loadCategories());
+      .subscribe(this.subCallBacks);
   }
 
-  deleteCategory(id: number): void {
+  deleteMenuItem(id: number): void {
     this.menuService.deleteMenuEntry(this.pin, id)
-      .subscribe(() => this.loadCategories());
+      .subscribe(this.subCallBacks);
   }
 
   onFileSelected(event: Event): void {
