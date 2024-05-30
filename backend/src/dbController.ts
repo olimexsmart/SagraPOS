@@ -95,15 +95,13 @@ export function initDB(appDir: string): void {
   db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" (
         "Key"	TEXT NOT NULL,
         "Category"	INTEGER NOT NULL,
-        "ValueString"	TEXT,
-        "ValueNum"	NUMERIC,
-        "ValueBlob"	BLOB,
-        "ValueInt"	INTEGER,
+        "InputType"	TEXT,
+        "Value"	TEXT,
         "DisplayName"	TEXT,
         "Description"	TEXT,
-        PRIMARY KEY("Key"),
-        FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade
-    )`).run()
+        FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade,
+        PRIMARY KEY("Key")
+  )`).run()
   // Totals
   // TODO what is this table for?
   // db.prepare(`CREATE TABLE IF NOT EXISTS "Totals" (
@@ -111,7 +109,7 @@ export function initDB(appDir: string): void {
   //     "Value"	REAL NOT NULL DEFAULT 0,
   //     PRIMARY KEY("Key")
   // )`).run()
-  // TODO initialize default settings if table is created?
+  // TODO initialize default settings if table is created
 }
 
 interface ColInfo {
