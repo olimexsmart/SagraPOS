@@ -25,14 +25,15 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
     const entryPrice = menuEntry.price * o.quantity
     total += entryPrice
     // Sequence number of this item
-    const sequence = db.GetSequenceNumberByEntry(o.menuEntryID)
+    const sequence = db.GetSequenceNumberByEntry(menuEntry.name)
     // Update inventory
     if (menuEntry.inventory != null)  // Also checks for undefined
       db.UpdateInventory(o.menuEntryID, menuEntry.inventory - o.quantity)
     // Fill log entry object
     orderLogItems.push({
-      menuEntryID: o.menuEntryID,
-      orderID: 0,
+      orderID: 0, // Will be set by DB
+      name: menuEntry.name,
+      price: menuEntry.price,
       quantity: o.quantity
     })
     // Fill print entry object
@@ -52,10 +53,7 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
     }
   }
   // Update logs
-  db.InsertOrdersLog({
-    time: new Date().toISOString(),
-    total: total
-  }, orderLogItems)
+  db.InsertOrdersLog(orderLogItems)
   // Return to the caller that will then print
   return {
     total: total,

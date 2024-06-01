@@ -9,13 +9,13 @@ export interface MenuEntry {
 }
 
 export interface OrdersLog {
-    total: number,
     time: string, // SQLite handles dates as strings
 }
 
 export interface OrderLogItem {
     orderID: number,
-    menuEntryID: number,
+    name: string,
+    price: number,
     quantity: number,
 }
 

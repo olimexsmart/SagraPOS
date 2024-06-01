@@ -50,32 +50,30 @@ export function initDB(appDir: string): void {
         FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
         FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
         PRIMARY KEY("ID" AUTOINCREMENT)
-        );`).run()
+      )`).run()
   // OrderLogItems
   db.prepare(`CREATE TABLE IF NOT EXISTS "OrderLogItems" (
         "ID"	INTEGER,
         "OrderID"	INTEGER NOT NULL,
-        "MenuEntryID"	INTEGER NOT NULL,
+        "Name"	TEXT NOT NULL,
+        "Price"	REAL NOT NULL,
         "Quantity"	INTEGER NOT NULL,
-        "Valid"	INTEGER NOT NULL DEFAULT 1,
-        FOREIGN KEY("MenuEntryID") REFERENCES "MenuEntries"("ID") on delete cascade,
         FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade,
-        PRIMARY KEY("ID")
-        )`).run()
+        PRIMARY KEY("ID" AUTOINCREMENT)
+      )`).run()
   // OrdersLog
   db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
-        "ID"	INTEGER,
-        "Total"	REAL NOT NULL,
-        "Time"	TEXT NOT NULL,
-        "Valid"	INTEGER NOT NULL DEFAULT 1,
-        PRIMARY KEY("ID")
-    )`).run()
+              "ID"	INTEGER,
+              "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              "Valid"	INTEGER NOT NULL DEFAULT 1,
+              PRIMARY KEY("ID")
+      )`).run()
   // PrintCategories
   db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
         "ID"	INTEGER NOT NULL,
         "Name"	TEXT NOT NULL,
         PRIMARY KEY("ID" AUTOINCREMENT)
-    )`).run()
+      )`).run()
   // Printers
   db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (
         "ID"	INTEGER,
@@ -360,9 +358,13 @@ export function GetOrdersTotalQuantityByEntry(menuEntryID: number): number {
   return db.prepare('SELECT SUM(Quantity) AS out FROM OrderLogItems WHERE Valid = 1 AND MenuEntryID = ?').get(menuEntryID)?.out ?? 0
 }
 
-export function GetSequenceNumberByEntry(menuEntryID: number): number {
-  return db.prepare('SELECT COUNT(DISTINCT orderID) AS out FROM OrderLogItems'
-    + ' WHERE menuentryid = ? AND valid = 1').get(menuEntryID)?.out ?? 0
+export function GetSequenceNumberByEntry(menuEntryName: string): number {
+  return db.prepare(`SELECT COUNT(DISTINCT orderID) AS out 
+                     FROM OrderLogItems
+                     INNER JOIN 
+                     OrdersLog ol ON ol.ID = OrderLogItems.OrderID
+                     WHERE Name = ? AND ol.Valid = 1`)
+     .get(menuEntryName)?.out ?? 0
 }
 
 export function ResetOrdersLog(): void {
@@ -373,17 +375,17 @@ export function ResetOrdersLog(): void {
   tr()
 }
 
-export function InsertOrdersLog(orderLog: di.OrdersLog, orderLogItems: di.OrderLogItem[]): void {
-  const tr = db.transaction((orderLog: di.OrdersLog, orderLogItems: di.OrderLogItem[]) => {
-    const info = db.prepare('INSERT INTO OrdersLog (Total, Time, Valid) VALUES (@total, @time, 1)').run(orderLog)
+export function InsertOrdersLog(orderLogItems: di.OrderLogItem[]): void {
+  const tr = db.transaction((orderLogItems: di.OrderLogItem[]) => {
+    const info = db.prepare('INSERT INTO "OrdersLog" DEFAULT VALUES;').run()
     for (const oli of orderLogItems) {
       oli.orderID = info.lastInsertRowid
-      db.prepare('INSERT INTO OrderLogItems (OrderID, MenuEntryID, Quantity, Valid)'
-        + ' VALUES (@orderID, @menuEntryID, @quantity, 1)').run(oli)
+      db.prepare('INSERT INTO OrderLogItems (OrderID, Name, Price, Quantity)'
+        + ' VALUES (@orderID, @name, @price, @quantity)').run(oli)
     }
   })
 
-  tr(orderLog, orderLogItems)
+  tr(orderLogItems)
 }
 
 /*
@@ -466,7 +468,7 @@ export function GetSettingByKey(key: string): Setting | null {
 
 export function SetSettingValueByKey(settingMod: Setting): number {
   console.log(settingMod);
-  
+
   return db.prepare(`UPDATE 
                       Settings 
                     SET 
