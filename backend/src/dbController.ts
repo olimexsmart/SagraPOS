@@ -7,6 +7,7 @@ import { Printer } from "@Interfaces/printer"
 import { MenuEntry } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
 import { Setting, SettingCategory } from "@Interfaces/setting"
+import { OrdersInfo, OrdersInfoEntry } from '@Interfaces/info-orders-dto';
 
 
 // TODO rename columns to uniform to interfaces?
@@ -33,80 +34,73 @@ export function initDB(appDir: string): void {
   openDB()
   // Categories
   db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
-        "ID"	INTEGER,
-        "Name"	TEXT NOT NULL,
-        PRIMARY KEY("ID" AUTOINCREMENT)
-        )`).run()
+    "ID"	INTEGER,
+    "Name"	TEXT NOT NULL,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`).run()
   // MenuEntries
   db.prepare(`CREATE TABLE IF NOT EXISTS "MenuEntries" (
-        "ID"	INTEGER,
-        "CategoryID" INTEGER NOT NULL,
-        "PrintCategoryID"	INTEGER NOT NULL,
-        "Name"	TEXT NOT NULL,
-        "PrintingName" TEXT DEFAULT NULL,
-        "Price"	REAL NOT NULL DEFAULT 0,
-        "Image"	BLOB,
-        "Inventory"	INTEGER,
-        FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
-        FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
-        PRIMARY KEY("ID" AUTOINCREMENT)
-      )`).run()
+    "ID"	INTEGER,
+    "CategoryID" INTEGER NOT NULL,
+    "PrintCategoryID"	INTEGER NOT NULL,
+    "Name"	TEXT NOT NULL,
+    "PrintingName" TEXT DEFAULT NULL,
+    "Price"	REAL NOT NULL DEFAULT 0,
+    "Image"	BLOB,
+    "Inventory"	INTEGER,
+    FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
+    FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`).run()
   // OrderLogItems
   db.prepare(`CREATE TABLE IF NOT EXISTS "OrderLogItems" (
-        "ID"	INTEGER,
-        "OrderID"	INTEGER NOT NULL,
-        "Name"	TEXT NOT NULL,
-        "Price"	REAL NOT NULL,
-        "Quantity"	INTEGER NOT NULL,
-        FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade,
-        PRIMARY KEY("ID" AUTOINCREMENT)
-      )`).run()
+    "ID"	INTEGER,
+    "OrderID"	INTEGER NOT NULL,
+    "Name"	TEXT NOT NULL,
+    "Price"	REAL NOT NULL,
+    "Quantity"	INTEGER NOT NULL,
+    "Valid"	INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY("ID" AUTOINCREMENT),
+    FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade
+  )`).run()
   // OrdersLog
   db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
-              "ID"	INTEGER,
-              "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              "Valid"	INTEGER NOT NULL DEFAULT 1,
-              PRIMARY KEY("ID")
-      )`).run()
+    "ID"	INTEGER,
+    "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY("ID")
+  )`).run()
   // PrintCategories
   db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
-        "ID"	INTEGER NOT NULL,
-        "Name"	TEXT NOT NULL,
-        PRIMARY KEY("ID" AUTOINCREMENT)
-      )`).run()
+    "ID"	INTEGER NOT NULL,
+    "Name"	TEXT NOT NULL,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`).run()
   // Printers
   db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (
-        "ID"	INTEGER,
-        "Name"	TEXT NOT NULL,
-        "IP"	TEXT NOT NULL,
-        "Port"	INTEGER NOT NULL DEFAULT 9100,
-        "Hidden"	INTEGER NOT NULL DEFAULT 0,
-        PRIMARY KEY("ID")
-    )`).run()
+    "ID"	INTEGER,
+    "Name"	TEXT NOT NULL,
+    "IP"	TEXT NOT NULL,
+    "Port"	INTEGER NOT NULL DEFAULT 9100,
+    "Hidden"	INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY("ID")
+  )`).run()
   // SettingCategories
   db.prepare(`CREATE TABLE IF NOT EXISTS "SettingCategories" (
-        "ID"	INTEGER NOT NULL,
-        "Name"	TEXT NOT NULL,
-        PRIMARY KEY("ID" AUTOINCREMENT)
-    )`).run()
+    "ID"	INTEGER NOT NULL,
+    "Name"	TEXT NOT NULL,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`).run()
   // Settings
   db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" (
-        "Key"	TEXT NOT NULL,
-        "Category"	INTEGER NOT NULL,
-        "InputType"	TEXT,
-        "Value"	TEXT,
-        "DisplayName"	TEXT,
-        "Description"	TEXT,
-        FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade,
-        PRIMARY KEY("Key")
+    "Key"	TEXT NOT NULL,
+    "Category"	INTEGER NOT NULL,
+    "InputType"	TEXT,
+    "Value"	TEXT,
+    "DisplayName"	TEXT,
+    "Description"	TEXT,
+    FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade,
+    PRIMARY KEY("Key")
   )`).run()
-  // Totals
-  // TODO what is this table for?
-  // db.prepare(`CREATE TABLE IF NOT EXISTS "Totals" (
-  //     "Key"	TEXT NOT NULL,
-  //     "Value"	REAL NOT NULL DEFAULT 0,
-  //     PRIMARY KEY("Key")
-  // )`).run()
   // TODO initialize default settings if table is created
 }
 
@@ -342,37 +336,53 @@ export function UpdateInventory(menuEntryID: number, newInventory: number | null
 /*
  * ORDERS LOG
  */
-export function GetOrdersTotal(): number {
-  return db.prepare('SELECT SUM(Total) AS out FROM OrdersLog WHERE Valid = 1').get().out ?? 0
+export function GatherOrdersInfo(): OrdersInfo {
+  return {
+    grossProfit: GetOrdersGrossProfit(),
+    numberOfOrders: GetNumberOfOrders(),
+    infoByEntry: GetOrdersTotalsByEntry()
+  }
 }
 
-export function GetOrdersNumber(): number {
-  return db.prepare('SELECT COUNT(*) AS out FROM OrdersLog WHERE Valid = 1;').get().out ?? 0
+function GetOrdersGrossProfit(): number {
+  return db.prepare(`SELECT SUM(Price * Quantity) AS out
+  FROM OrderLogItems
+  WHERE Valid = 1;
+  `).get().out ?? 0
 }
 
-export function GetOrdersTotalItems(): number {
-  return db.prepare('SELECT SUM(Quantity) AS out FROM OrderLogItems WHERE Valid = 1').get().out ?? 0
+function GetNumberOfOrders(): number {
+  return db.prepare(`SELECT COUNT(DISTINCT OrderID) AS out
+  FROM OrderLogItems
+  WHERE Valid = 1
+  `).get().out ?? 0
 }
 
-export function GetOrdersTotalQuantityByEntry(menuEntryID: number): number {
-  return db.prepare('SELECT SUM(Quantity) AS out FROM OrderLogItems WHERE Valid = 1 AND MenuEntryID = ?').get(menuEntryID)?.out ?? 0
+function GetOrdersTotalsByEntry(): OrdersInfoEntry[] {
+  const res = db.prepare(`SELECT
+    Name,
+    SUM(Quantity) AS NumberSold,
+    SUM(Price * Quantity) AS GrossProfit
+  FROM OrderLogItems
+  WHERE Valid = 1
+  GROUP BY Name;
+  `).all()
+  return res.map((ioe: any): OrdersInfoEntry => ({
+    menuEntryName: ioe.Name,
+    numberSold: ioe.NumberSold,
+    grossProfit: ioe.GrossProfit
+  }))
 }
 
 export function GetSequenceNumberByEntry(menuEntryName: string): number {
   return db.prepare(`SELECT COUNT(DISTINCT orderID) AS out 
                      FROM OrderLogItems
-                     INNER JOIN 
-                     OrdersLog ol ON ol.ID = OrderLogItems.OrderID
-                     WHERE Name = ? AND ol.Valid = 1`)
-     .get(menuEntryName)?.out ?? 0
+                     WHERE Name = ? AND Valid = 1`)
+    .get(menuEntryName)?.out ?? 0
 }
 
 export function ResetOrdersLog(): void {
-  const tr = db.transaction(() => {
-    db.prepare('UPDATE OrdersLog SET Valid = 0').run()
-    db.prepare('UPDATE OrderLogItems SET Valid = 0').run()
-  })
-  tr()
+  db.prepare('UPDATE OrderLogItems SET Valid = 0').run()
 }
 
 export function InsertOrdersLog(orderLogItems: di.OrderLogItem[]): void {

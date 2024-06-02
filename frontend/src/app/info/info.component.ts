@@ -1,7 +1,7 @@
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Component, ViewChild } from '@angular/core';
-import { InfoOrdersDTO } from '../interfaces/info-orders-dto';
+import { OrdersInfo } from '../interfaces/info-orders-dto';
 import { InfoService } from '../services/info.service';
 import { ConfirmDialogModel, DialogPinComponent } from '../dialog-pin/dialog-pin.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,8 +15,8 @@ import { EmojiSnackBarService } from '../classes/snack-bar-utils';
   styleUrls: ['./info.component.css']
 })
 export class InfoComponent {
-  displayedColumns: string[] = ['menuEntryName', 'quantitySold', 'totalSold', 'totalSoldPercentage', 'totalPercentage'];
-  infoOrders: InfoOrdersDTO;
+  displayedColumns: string[] = ['menuEntryName', 'grossProfit', 'numberSold'];
+  infoOrders: OrdersInfo;
   tableDataSource;
   @ViewChild(MatSort) sort: MatSort = null!;
   printerID: number = 0;
@@ -29,11 +29,11 @@ export class InfoComponent {
     private snackBar: EmojiSnackBarService,
   ) {
     this.infoOrders = {
-      infoOrderEntries: [],
-      ordersTotal: 0,
-      numOrders: 0
+      infoByEntry: [],
+      grossProfit: 0,
+      numberOfOrders: 0
     }
-    this.tableDataSource = new MatTableDataSource(this.infoOrders.infoOrderEntries)
+    this.tableDataSource = new MatTableDataSource(this.infoOrders.infoByEntry)
   }
 
   ngOnInit(): void {
@@ -86,7 +86,7 @@ export class InfoComponent {
     this.loading = true
     this.infoService.getInfoOrder().subscribe(infoOrders => {
       this.infoOrders = infoOrders
-      this.tableDataSource = new MatTableDataSource(this.infoOrders.infoOrderEntries)
+      this.tableDataSource = new MatTableDataSource(this.infoOrders.infoByEntry)
       this.loading = false
     })
   }

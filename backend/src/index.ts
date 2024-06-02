@@ -3,7 +3,6 @@ import multer from 'multer'
 import path from "path"
 import os from 'os'
 import * as db from "./dbController"
-import { GatherInfo } from "./infoController"
 import { CheckMasterPin } from "./settingsController"
 import { confirmOrder } from "./orderController"
 import * as pc from "./printerController"
@@ -70,7 +69,7 @@ app.post('/ConfirmOrder', (req: Request, res: Response) => {
 
 app.get('/ScanPrinters', async (req: Request, res: Response) => {
   let port = parseInt(req.query.port as string, 10)
-  if(isNaN(port)) 
+  if (isNaN(port))
     res.send(await pc.scanPrinters())
   else
     res.send(await pc.scanPrinters(port))
@@ -79,7 +78,7 @@ app.get('/ScanPrinters', async (req: Request, res: Response) => {
 app.post('/PokePrinter', (req: Request, res: Response) => { // TODO make it a get with 3 query params
   // TODO add master pin
   pc.pokePrinter(req.body)
-  res.send() 
+  res.send()
 })
 
 /*
@@ -183,11 +182,11 @@ app.delete('/DeletePrintCategory', (req: Request, res: Response) => {
 /*
  * INFO
  */
-app.get('/GetInfoOrders', (req: Request, res: Response) => {
-  res.send(GatherInfo())
+app.get('/GetOrdersInfo', (req: Request, res: Response) => {
+  res.send(db.GatherOrdersInfo())
 })
 
-app.delete('/ResetInfoOrders', (req: Request, res: Response) => {
+app.delete('/ResetOrdersInfo', (req: Request, res: Response) => {
   const masterPinCheck = CheckMasterPin(req.query.pin)
   if (masterPinCheck.statusCode != 200) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
@@ -196,8 +195,8 @@ app.delete('/ResetInfoOrders', (req: Request, res: Response) => {
   }
 })
 
-app.get('/PrintInfo', (req: Request, res: Response) => {
-  pc.printInfo(parseInt(req.query.printerID as string), GatherInfo())
+app.get('/PrintOrdersInfo', (req: Request, res: Response) => {
+  pc.printInfo(parseInt(req.query.printerID as string), db.GatherOrdersInfo())
   res.send()
 })
 

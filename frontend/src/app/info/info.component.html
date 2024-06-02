@@ -21,61 +21,58 @@
   <div class="mainInfo">
     <mat-card class="mainInfoCard">
       <mat-card-header>
-        <mat-card-title>{{infoOrders.numOrders}}</mat-card-title>
-        <mat-card-subtitle>Orders</mat-card-subtitle>
+        <mat-card-title class="mainInfoCardTitle">{{infoOrders.grossProfit | currency: 'EUR'}}</mat-card-title>
       </mat-card-header>
+      <mat-card-content>
+        <p>Totale Lordo</p>
+      </mat-card-content>
     </mat-card>
     <mat-card class="mainInfoCard">
       <mat-card-header>
-        <mat-card-title>{{infoOrders.ordersTotal | currency: 'EUR'}}</mat-card-title>
-        <mat-card-subtitle>Profit</mat-card-subtitle>
+        <mat-card-title class="mainInfoCardTitle">{{infoOrders.numberOfOrders}}</mat-card-title>
       </mat-card-header>
+      <mat-card-content>
+        <p>Numero Ordini</p>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="mainInfoCard">
+    <!-- TODO commented out because I'm not feeling it -->
+    <!-- <mat-card class="mainInfoCard">
       <mat-card-header>
-        <mat-card-title>{{infoOrders.ordersTotal / infoOrders.numOrders | currency: 'EUR'}}</mat-card-title>
-        <mat-card-subtitle>Av. Expense</mat-card-subtitle>
+        <mat-card-title class="mainInfoCardTitle">
+          {{ (infoOrders.numberOfOrders === 0 ?
+          0 : (infoOrders.grossProfit / infoOrders.numberOfOrders)) | currency: 'EUR'}}
+        </mat-card-title>
       </mat-card-header>
-    </mat-card>
+      <mat-card-content>
+        <p>Spesa Media</p>
+      </mat-card-content>
+    </mat-card> -->
   </div>
 
   <div class="mat-elevation-z8 table-all">
     <table mat-table [dataSource]="tableDataSource" matSort class="table-striped">
-      <!-- Position Column -->
+      <!-- Name -->
       <ng-container matColumnDef="menuEntryName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           Nome
         </th>
         <td mat-cell *matCellDef="let element"> {{element.menuEntryName}} </td>
       </ng-container>
-      <!-- Name Column -->
-      <ng-container matColumnDef="quantitySold">
+      <!-- Number Sold -->
+      <ng-container matColumnDef="numberSold">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           # Venduti
         </th>
-        <td mat-cell *matCellDef="let element"> {{element.quantitySold}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.numberSold}} </td>
       </ng-container>
-      <!-- Weight Column -->
-      <ng-container matColumnDef="totalSold">
+      <!-- Gross Profit -->
+      <ng-container matColumnDef="grossProfit">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           Lordo
         </th>
-        <td mat-cell *matCellDef="let element"> {{element.totalSold}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.grossProfit | currency: 'EUR'}} </td>
       </ng-container>
-      <!-- Symbol Column -->
-      <ng-container matColumnDef="totalSoldPercentage">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          % Venduti
-        </th>
-        <td mat-cell *matCellDef="let element"> {{element.totalSoldPercentage * 100 | number : '1.1-1'}} </td>
-      </ng-container>
-      <ng-container matColumnDef="totalPercentage">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          % Lordo
-        </th>
-        <td mat-cell *matCellDef="let element"> {{element.totalPercentage * 100 | number : '1.1-1'}} </td>
-      </ng-container>
-
+      <!-- Table Header -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>

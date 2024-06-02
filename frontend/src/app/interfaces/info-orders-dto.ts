@@ -1,15 +1,13 @@
-export interface InfoOrdersDTO
+export interface OrdersInfo
 {
-    infoOrderEntries: InfoOrderEntryDTO[],
-    ordersTotal: number,
-    numOrders: number
+    grossProfit: number,
+    numberOfOrders: number
+    infoByEntry: OrdersInfoEntry[],
 }
 
-export interface InfoOrderEntryDTO
+export interface OrdersInfoEntry
 {
     menuEntryName: string,
-    quantitySold: number,
-    totalSold: number,
-    totalSoldPercentage: number,
-    totalPercentage: number,
+    numberSold: number,
+    grossProfit: number,
 }

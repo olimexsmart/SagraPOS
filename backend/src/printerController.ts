@@ -1,5 +1,5 @@
 import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer";
-import { InfoOrderEntryDTO, InfoOrdersDTO } from "@Interfaces/info-orders-dto"
+import { OrdersInfoEntry, OrdersInfo } from "@Interfaces/info-orders-dto"
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
 import Jimp from 'jimp';
@@ -75,12 +75,7 @@ export function pokePrinter(printerToPoke: Printer) {
   printer.println(`Port: ${printerToPoke.port}`)
   printer.cut() // TODO make it nicer
   // Confirm print
-  printer.execute().then(() => {
-    console.log("Print done!")
-  }).catch((e) => {
-    // TODO this should propagate to frontend
-    console.error("Print failed:", e)
-  })
+  printer.execute()
 }
 
 export function printOrder(printerID: number, toPrint: OrderToPrint): void {
@@ -120,9 +115,9 @@ export function printOrder(printerID: number, toPrint: OrderToPrint): void {
   }
   // Order final recap // TODO configurable if wanted
   for (const [key, value] of toPrint.entries) {
-    printer.setTextSize(1, 1)
+    printer.setTextSize(0, 0)
     for (const v of value) {
-      let pad = 14 // TODO should be configurable per-printer
+      let pad = 24 // TODO should be configurable per-printer
       if (v.quantityOrdered > 10)
         pad--
       if (v.entryPrice > 10)
@@ -163,18 +158,13 @@ export function printOrder(printerID: number, toPrint: OrderToPrint): void {
     printer.println(textUnderLogo)
   printer.cut()
 
-
   // Confirm print
-  printer.execute().then(() => {
-    console.log("Print done!")
-  }).catch((e) => {
-    // TODO this should propagate to frontend
-    console.error("Print failed:", e)
+  printer.execute({
+    waitForResponse: false
   })
 }
 
-// TODO layout is very basic could be nicer to look at
-export function printInfo(printerID: number, toPrint: InfoOrdersDTO) {
+export function printInfo(printerID: number, toPrint: OrdersInfo) {
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     consolePrintInfo(toPrint)
     return
@@ -184,31 +174,27 @@ export function printInfo(printerID: number, toPrint: InfoOrdersDTO) {
   const printer = reqPrinter.printer
   // Header
   printer.alignLeft()
-  printer.setTextSize(0, 0)
+  printer.setTextSize(1, 1)
   printer.bold(true)
-  printer.println(`Numero totale ordini: ${toPrint.numOrders}`) // TODO these string should be configurable
-  printLineWithEuroSign(printer, 'Totale vendite: ', toPrint.ordersTotal.toFixed(2))
-  printLineWithEuroSign(printer, 'Spesa media: ', (toPrint.ordersTotal / toPrint.numOrders).toFixed(2))
+  printer.println(`Numero Ordini: ${toPrint.numberOfOrders}`)
+  printLineWithEuroSign(printer, 'Lordo: ', toPrint.grossProfit.toFixed(2))
+  printer.setTextSize(0, 0)
   printer.println('')
+  // Order by number sold
+  toPrint.infoByEntry.sort((a, b) => b.numberSold - a.numberSold);
   // Details of each entry
-  for (const entry of toPrint.infoOrderEntries) {
+  for (const entry of toPrint.infoByEntry) {
     printer.bold(true)
-    printer.println(entry.menuEntryName.toUpperCase())
+    printer.print(entry.menuEntryName.toUpperCase().padEnd(22))
     printer.bold(false)
-    printer.println(`Vendute: ${entry.quantitySold}`)
-    printer.println(`Percentuale vendite: ${(entry.totalPercentage * 100).toFixed(1)}%`)
-    printLineWithEuroSign(printer, 'Entrate: ', entry.totalSold.toFixed(2))
-    printer.println(`Percentuale entrate: ${(entry.totalSoldPercentage * 100).toFixed(1)}%`)
-    printer.println('')
+    printer.print(`x${entry.numberSold}`.padEnd(6))
+    printLineWithEuroSign(printer, '', entry.grossProfit.toFixed(2))
   }
   printer.cut()
 
   // Confirm print
-  printer.execute().then(() => {
-    console.log("Print done!")
-  }).catch((e) => {
-    // TODO this should propagate to frontend
-    console.error("Print failed:", e)
+  printer.execute({
+    waitForResponse: false
   })
 }
 
@@ -322,21 +308,21 @@ function consolePrintOrder(toPrint: OrderToPrint) {
   console.log(toPrint.entries)
 }
 
-function consolePrintInfo(toPrint: InfoOrdersDTO) {
+function consolePrintInfo(toPrint: OrdersInfo) {
   fakeLoading(2000)
-  console.log('Total number of orders: ' + toPrint.numOrders)
-  console.log('Total of all orders: ' + toPrint.ordersTotal)
-  console.log(toPrint.infoOrderEntries);
+  console.log('Total number of orders: ' + toPrint.numberOfOrders)
+  console.log('Total of all orders: ' + toPrint.grossProfit)
+  console.log(toPrint.infoByEntry);
 }
 
-function fakeLoading(ms: number):void {
-    // Contraption to have a two seconds fake loading for debugging
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-      if ((new Date().getTime() - start) > ms) {
-        break;
-      }
+function fakeLoading(ms: number): void {
+  // Contraption to have a two seconds fake loading for debugging
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > ms) {
+      break;
     }
+  }
 }
 
 async function scanIp(ip: string, port: number): Promise<ScanResult> {

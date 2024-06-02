@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { InfoOrdersDTO } from '../interfaces/info-orders-dto';
+import { OrdersInfo } from '../interfaces/info-orders-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -10,15 +10,15 @@ export class InfoService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  getInfoOrder(): Observable<InfoOrdersDTO> {
-    return this.http.get<InfoOrdersDTO>(this.baseUrl + `GetInfoOrders`)
+  getInfoOrder(): Observable<OrdersInfo> {
+    return this.http.get<OrdersInfo>(this.baseUrl + `GetOrdersInfo`)
   }
 
   resetInfoOrder(pin: number): Observable<any> {
-   return this.http.delete(this.baseUrl + `ResetInfoOrders?pin=${pin}`)
+   return this.http.delete(this.baseUrl + `ResetOrdersInfo?pin=${pin}`)
   }
 
   printInfo(printerID: number): Observable<any> {
-    return this.http.get(this.baseUrl + `PrintInfo?printerID=${printerID}`)
+    return this.http.get(this.baseUrl + `PrintOrdersInfo?printerID=${printerID}`)
   }
 }
