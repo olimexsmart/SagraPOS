@@ -178,4 +178,11 @@ export class SettingsPrinterComponent implements OnInit {
       error: () => this.snackBar.showError('Errore in stampa test')
     })
   }
+
+  printFakeOrder(printerID: number) {
+    this.printerService.printFakeOrder(printerID).subscribe({
+      complete: () => this.snackBar.showSuccess('Stampa test inviata'),
+      error: () => this.snackBar.showError('Errore in stampa test')
+    })
+  }
 }

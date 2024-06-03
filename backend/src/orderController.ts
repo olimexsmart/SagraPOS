@@ -53,13 +53,25 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
   }
 }
 
+// Used to test layout of prints in settings
+export function buildFakeOrder(): OrderToPrint {
+  // Get data from DB
+  const menuEntries = db.GetMenuEntries()
+  // Print maxed quantity of every item
+  const fakeOrder: OrderEntryDTO[]
+    = menuEntries.map((me) => ({ menuEntryID: me.id, quantity: maxItems }))
+  return buildOrder(fakeOrder)
+}
+
 export function confirmOrder(orderPrinted: OrderToPrint): void {
   const orderLogItems: OrderLogItem[] = []
   for (const op of orderPrinted.entries.values()) {
-    for(const pe of op){
+    for (const pe of op) {
       // Update inventory
       db.DecrementInventory(pe.id, pe.quantityOrdered)
       // Fill log entry object
+      // TODO Add printer from where it was printed from
+      // TODO Add cash money received (or leave NULL for card payments)
       orderLogItems.push({
         orderID: 0, // Will be set by DB
         name: pe.name,

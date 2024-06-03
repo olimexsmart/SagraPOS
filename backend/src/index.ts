@@ -4,7 +4,7 @@ import path from "path"
 import os from 'os'
 import * as db from "./dbController"
 import { CheckMasterPin } from "./settingsController"
-import { buildOrder, confirmOrder } from "./orderController"
+import { buildFakeOrder, buildOrder, confirmOrder } from "./orderController"
 import * as pc from "./printerController"
 import { mkdirSync, rm, writeFile } from "fs"
 
@@ -78,6 +78,17 @@ app.post('/ConfirmOrder', async (req: Request, res: Response) => {
     const printerID = parseInt(req.query.printerID as string)
     await pc.printOrder(printerID, toPrint)
     confirmOrder(toPrint)
+    res.status(201).send()
+  } catch (error) {
+    res.status(500).send()
+  }
+})
+
+app.get('/PrintFakeOrder', async (req: Request, res: Response) => {
+  const toPrint = buildFakeOrder()
+  try {
+    const printerID = parseInt(req.query.printerID as string)
+    await pc.printOrder(printerID, toPrint)
     res.status(201).send()
   } catch (error) {
     res.status(500).send()

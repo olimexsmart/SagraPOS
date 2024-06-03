@@ -33,4 +33,8 @@ export class PrinterService {
   pokePrinter(p: Printer): Observable<void> {
     return this.http.post<void>(this.baseUrl + `PokePrinter`, p)
   }
+
+  printFakeOrder(printerID: number): Observable<void> {
+    return this.http.get<void>(this.baseUrl + `PrintFakeOrder?printerID=${printerID}`)
+  }
 }
