@@ -4,7 +4,7 @@ import path from "path"
 import os from 'os'
 import * as db from "./dbController"
 import { CheckMasterPin } from "./settingsController"
-import { confirmOrder } from "./orderController"
+import { buildOrder, confirmOrder } from "./orderController"
 import * as pc from "./printerController"
 import { mkdirSync, rm, writeFile } from "fs"
 
@@ -40,7 +40,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 })
 
 /*
- * PRINTER
+ * PRINTER MANAGE
  */
 app.get('/GetPrinters', (req: Request, res: Response) => {
   res.send(db.GetPrinters())
@@ -61,12 +61,6 @@ app.delete('/DeletePrinter', (req: Request, res: Response) => {
   pc.reloadPrintersAndData()
 })
 
-app.post('/ConfirmOrder', (req: Request, res: Response) => {
-  const toPrint = confirmOrder(req.body)
-  pc.printOrder(parseInt(req.query.printerID as string), toPrint)
-  res.send()
-})
-
 app.get('/ScanPrinters', async (req: Request, res: Response) => {
   let port = parseInt(req.query.port as string, 10)
   if (isNaN(port))
@@ -75,10 +69,38 @@ app.get('/ScanPrinters', async (req: Request, res: Response) => {
     res.send(await pc.scanPrinters(port))
 })
 
-app.post('/PokePrinter', (req: Request, res: Response) => { // TODO make it a get with 3 query params
+/*
+ * PRINTER ACTUALLY PRINT STUFF
+ */
+app.post('/ConfirmOrder', async (req: Request, res: Response) => {
+  const toPrint = buildOrder(req.body)
+  try {
+    const printerID = parseInt(req.query.printerID as string)
+    await pc.printOrder(printerID, toPrint)
+    confirmOrder(toPrint)
+    res.status(201).send()
+  } catch (error) {
+    res.status(500).send()
+  }
+})
+
+app.post('/PokePrinter', async (req: Request, res: Response) => { // TODO make it a get with 3 query params?
   // TODO add master pin
-  pc.pokePrinter(req.body)
-  res.send()
+  try {
+    await pc.pokePrinter(req.body)
+    res.status(201).send();
+  } catch (error) {
+    res.status(500).send();
+  }
+})
+
+app.get('/PrintOrdersInfo', async (req: Request, res: Response) => {
+  try {
+    await pc.printInfo(parseInt(req.query.printerID as string), db.GatherOrdersInfo())
+    res.status(201).send();
+  } catch (error) {
+    res.status(500).send();
+  }
 })
 
 /*
@@ -193,11 +215,6 @@ app.delete('/ResetOrdersInfo', (req: Request, res: Response) => {
   } else {
     res.send(db.ResetOrdersLog())
   }
-})
-
-app.get('/PrintOrdersInfo', (req: Request, res: Response) => {
-  pc.printInfo(parseInt(req.query.printerID as string), db.GatherOrdersInfo())
-  res.send()
 })
 
 /*

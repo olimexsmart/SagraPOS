@@ -6,43 +6,37 @@ import { OrderLogItem } from "./dbInterfaces";
 // TODO init function that gets some setting from DB
 const maxItems = 99;
 
-export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
-  // Get complete information about each order entry
+export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
+  // Get data from DB
   const menuEntries = db.GetMenuEntries()
   const printCategories = db.GetPrintCategories()
-  let total = 0
+  // Init result
   const printEntries = new Map<string, PrintEntry[]>()
-  const orderLogItems: OrderLogItem[] = []
+  let total = 0
+  // Loop on input data
   for (const o of order) {
+    // Confirm max single item order quantity
+    if (o.quantity > maxItems)
+      throw new RangeError(`Quantity of menu entry with id ${o.menuEntryID} is over maximum allowed ${o.quantity} > ${maxItems}`)
+    // Find object loaded from DB
     const f = menuEntries.filter(x => x.id === o.menuEntryID)
     if (f === undefined)
       throw new RangeError(`Menu entry with id ${o.menuEntryID} not found`)
     const menuEntry = f[0]
-    // Max quantity check
-    if (o.quantity > maxItems)
-      throw new RangeError(`Quantity of menu entry with id ${o.menuEntryID} is over maximum allowed ${o.quantity} > ${maxItems}`)
-    // Total
-    const entryPrice = menuEntry.price * o.quantity
-    total += entryPrice
     // Sequence number of this item
     const sequence = db.GetSequenceNumberByEntry(menuEntry.name)
-    // Update inventory
-    if (menuEntry.inventory != null)  // Also checks for undefined
-      db.UpdateInventory(o.menuEntryID, menuEntry.inventory - o.quantity)
-    // Fill log entry object
-    orderLogItems.push({
-      orderID: 0, // Will be set by DB
-      name: menuEntry.name,
-      price: menuEntry.price,
-      quantity: o.quantity
-    })
+    // Total
+    const entryFinalPrice = menuEntry.price * o.quantity
+    total += entryFinalPrice
     // Fill print entry object
     const printEntry: PrintEntry = {
+      id: menuEntry.id,
       name: menuEntry.name,
       printingName: menuEntry.printingName,
       quantityOrdered: o.quantity,
       sequence: sequence,
-      entryPrice: entryPrice
+      price: menuEntry.price,
+      finalPrice: entryFinalPrice
     }
     // Add print entity to the data structure for the printer
     const printCat = printCategories.filter(x => x.id == menuEntry.printCategoryID)[0]
@@ -52,11 +46,28 @@ export function confirmOrder(order: OrderEntryDTO[]): OrderToPrint {
       printEntries.set(printCat.name, [printEntry])
     }
   }
-  // Update logs
-  db.InsertOrdersLog(orderLogItems)
   // Return to the caller that will then print
   return {
     total: total,
     entries: printEntries
   }
+}
+
+export function confirmOrder(orderPrinted: OrderToPrint): void {
+  const orderLogItems: OrderLogItem[] = []
+  for (const op of orderPrinted.entries.values()) {
+    for(const pe of op){
+      // Update inventory
+      db.DecrementInventory(pe.id, pe.quantityOrdered)
+      // Fill log entry object
+      orderLogItems.push({
+        orderID: 0, // Will be set by DB
+        name: pe.name,
+        price: pe.price,
+        quantity: pe.quantityOrdered
+      })
+    }
+  }
+  // Update logs
+  db.InsertOrdersLog(orderLogItems)
 }

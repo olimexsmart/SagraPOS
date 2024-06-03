@@ -35,18 +35,6 @@
         <p>Numero Ordini</p>
       </mat-card-content>
     </mat-card>
-    <!-- TODO commented out because I'm not feeling it -->
-    <!-- <mat-card class="mainInfoCard">
-      <mat-card-header>
-        <mat-card-title class="mainInfoCardTitle">
-          {{ (infoOrders.numberOfOrders === 0 ?
-          0 : (infoOrders.grossProfit / infoOrders.numberOfOrders)) | currency: 'EUR'}}
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Spesa Media</p>
-      </mat-card-content>
-    </mat-card> -->
   </div>
 
   <div class="mat-elevation-z8 table-all">
@@ -73,6 +61,7 @@
         <td mat-cell *matCellDef="let element"> {{element.grossProfit | currency: 'EUR'}} </td>
       </ng-container>
       <!-- Table Header -->
+      <!-- TODO make table sortable -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>

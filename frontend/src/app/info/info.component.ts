@@ -54,6 +54,7 @@ export class InfoComponent {
       this.infoService.resetInfoOrder(dialogResult.value).subscribe(
         {
           complete: () => {
+            // TODO instead keep the page updated using websockets, make it a live dashboard
             this.refreshInfo.bind(this) // Loved to know this hack by myself
             this.snackBar.showSuccess('Info cancellate OK')
             this.loading = false

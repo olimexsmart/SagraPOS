@@ -333,6 +333,14 @@ export function UpdateInventory(menuEntryID: number, newInventory: number | null
   return info.changes > 0
 }
 
+export function DecrementInventory(menuEntryID: number, decrementBy: number) {
+  db.prepare(`UPDATE MenuEntries
+    SET Inventory = Inventory - ?
+    WHERE ID = ?
+    AND Inventory IS NOT NULL
+  `).run(decrementBy, menuEntryID)
+}
+
 /*
  * ORDERS LOG
  */

@@ -9,6 +9,7 @@ import * as dns from 'dns';
 import * as os from 'os';
 
 
+
 const CONSOLE_PRINTER_ID = 100
 const PRINT_LOGO = 'PrintLogo'
 const PRINT_LOGO_HEIGHT = 'PrintLogoHeight'
@@ -30,11 +31,13 @@ export interface OrderToPrint {
 }
 
 export interface PrintEntry {
+  id: number,
   name: string,
   printingName: string | null,
   quantityOrdered: number,
   sequence: number,
-  entryPrice: number
+  finalPrice: number
+  price: number
 };
 
 export function reloadPrintersAndData() {
@@ -57,7 +60,7 @@ export function reloadPrintersAndData() {
   textUnderLogo = db.GetSettingByKey(TEXT_UNDER_LOGO)?.value ?? ""
 }
 
-export function pokePrinter(printerToPoke: Printer) {
+export async function pokePrinter(printerToPoke: Printer): Promise<void> {
   if (printerToPoke.id === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     console.log(printerToPoke);
     return
@@ -75,13 +78,12 @@ export function pokePrinter(printerToPoke: Printer) {
   printer.println(`Port: ${printerToPoke.port}`)
   printer.cut() // TODO make it nicer
   // Confirm print
-  printer.execute()
+  return confirmPrint(printer)
 }
 
-export function printOrder(printerID: number, toPrint: OrderToPrint): void {
+export async function printOrder(printerID: number, toPrint: OrderToPrint): Promise<void> {
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded special case for debugging
-    consolePrintOrder(toPrint)
-    return
+    return consolePrintOrder(toPrint)
   }
   // Get printer and connection
   const reqPrinter = getPrinterAndConnection(printerID)
@@ -120,14 +122,14 @@ export function printOrder(printerID: number, toPrint: OrderToPrint): void {
       let pad = 24 // TODO should be configurable per-printer
       if (v.quantityOrdered > 10)
         pad--
-      if (v.entryPrice > 10)
+      if (v.finalPrice > 10)
         pad--
-      if (v.entryPrice > 100)
+      if (v.finalPrice > 100)
         pad--
       printLineWithEuroSign(
         printer,
         `${v.quantityOrdered} ${v.name.toUpperCase().padEnd(pad)}`,
-        v.entryPrice.toFixed(2))
+        v.finalPrice.toFixed(2))
     }
   }
   // Order total
@@ -159,15 +161,12 @@ export function printOrder(printerID: number, toPrint: OrderToPrint): void {
   printer.cut()
 
   // Confirm print
-  printer.execute({
-    waitForResponse: false
-  })
+    return confirmPrint(printer)
 }
 
-export function printInfo(printerID: number, toPrint: OrdersInfo) {
+export function printInfo(printerID: number, toPrint: OrdersInfo) : Promise<void> {
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
-    consolePrintInfo(toPrint)
-    return
+    return consolePrintInfo(toPrint)
   }
   // Get printer and connection
   const reqPrinter = getPrinterAndConnection(printerID)
@@ -176,6 +175,14 @@ export function printInfo(printerID: number, toPrint: OrdersInfo) {
   printer.alignLeft()
   printer.setTextSize(1, 1)
   printer.bold(true)
+  printer.println(new Date().toLocaleString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour12: false
+  }))
   printer.println(`Numero Ordini: ${toPrint.numberOfOrders}`)
   printLineWithEuroSign(printer, 'Lordo: ', toPrint.grossProfit.toFixed(2))
   printer.setTextSize(0, 0)
@@ -193,9 +200,7 @@ export function printInfo(printerID: number, toPrint: OrdersInfo) {
   printer.cut()
 
   // Confirm print
-  printer.execute({
-    waitForResponse: false
-  })
+  return confirmPrint(printer)
 }
 
 export async function scanPrinters(port: number = 9100): Promise<string[]> {
@@ -244,6 +249,14 @@ interface ScanResult {
 /*
  * PRIVATE FUNCTIONS
  */
+async function confirmPrint(printer: ThermalPrinter) : Promise<void> {
+  return new Promise<void>((resolve, error) => {
+    printer.execute({
+      waitForResponse: false
+    }).then(() => resolve()).catch(() => error())
+  })
+}
+
 function getPrinterAndConnection(printerID: number): RequestedPrinter {
   // TODO distinguish different printer models
   // TODO each printer model will have its printing class
@@ -302,27 +315,31 @@ async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): P
   }
 }
 
-function consolePrintOrder(toPrint: OrderToPrint) {
-  fakeLoading(2000)
-  console.log('Total: ' + toPrint.total)
-  console.log(toPrint.entries)
+async function consolePrintOrder(toPrint: OrderToPrint): Promise<void> {
+  return new Promise((resolve) => {
+    fakeLoading(2000).then(() => { // Ensure fakeLoading returns a Promise
+      console.log('Total: ' + toPrint.total);
+      console.log(toPrint.entries);
+      resolve();
+    });
+  });
 }
 
-function consolePrintInfo(toPrint: OrdersInfo) {
-  fakeLoading(2000)
-  console.log('Total number of orders: ' + toPrint.numberOfOrders)
-  console.log('Total of all orders: ' + toPrint.grossProfit)
-  console.log(toPrint.infoByEntry);
+async function consolePrintInfo(toPrint: OrdersInfo): Promise<void> {
+  return new Promise((resolve) => {
+    fakeLoading(2000).then(() => { // Ensure fakeLoading returns a Promise
+      console.log('Total number of orders: ' + toPrint.numberOfOrders)
+      console.log('Total of all orders: ' + toPrint.grossProfit)
+      console.log(toPrint.infoByEntry);
+      resolve();
+    });
+  });
 }
 
-function fakeLoading(ms: number): void {
-  // Contraption to have a two seconds fake loading for debugging
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > ms) {
-      break;
-    }
-  }
+async function fakeLoading(duration: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
 }
 
 async function scanIp(ip: string, port: number): Promise<ScanResult> {
