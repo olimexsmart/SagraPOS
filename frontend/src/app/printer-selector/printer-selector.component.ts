@@ -12,19 +12,26 @@ export class PrinterSelectorComponent {
   printers: Printer[] = []
   selectedPrinter: Printer = initEmptyPrinter()
 
-  constructor(
-    private printerService: PrinterService
-  ) { }
+  constructor(private printerService: PrinterService) { }
 
   ngOnInit(): void {
     this.printerService.getPrinters().subscribe(printers => {
+      if (printers.length === 0)
+        return
+      // Save local reference
       this.printers = printers
       // Check if the selected printer is in data received from server
-      let s = localStorage.getItem(this.KEY)
-      if (s !== null && printers.some(x => arePrintersEqual(x, this.selectedPrinter)))
-        this.changeSelectedPrinter(JSON.parse(s) as Printer)
-      else
-        this.changeSelectedPrinter(printers[0])
+      let rawSavedPrinter = localStorage.getItem(this.KEY)
+      if (rawSavedPrinter !== null) {
+        let savedPrinter: Printer = JSON.parse(rawSavedPrinter)
+        // Check if saved printer is still in the server
+        if (printers.some(x => arePrintersEqual(x, savedPrinter))){
+          this.changeSelectedPrinter(savedPrinter)
+          return
+        }
+      }
+      // Else nothing valid is saved, select the first one
+      this.changeSelectedPrinter(printers[0])
     })
   }
 
