@@ -48,11 +48,12 @@
               <mat-chip color="accent" highlighted>{{m.name}}</mat-chip>
               <mat-chip>{{m.price | currency: 'EUR'}}</mat-chip>
               <!-- This mess because [hidden] wouldn't work -->
-              <mat-chip [ngStyle]="{'visibility': badgeCount[m.id] === null ? 'hidden' : 'visible'}"
-                [color]="badgeCount[m.id]! >= 20 ? 'primary':'warn'"
+              @if (badgeCount[m.id] !== null) {
+              <mat-chip [color]="badgeCount[m.id]! >= 20 ? 'primary':'warn'"
                 [highlighted]="badgeCount[m.id]! >= 20 ? 'false' : 'true'">
                 Inventario: {{badgeCount[m.id]}}
               </mat-chip>
+              }
               <!-- TODO configurable threshold -->
             </mat-chip-listbox>
           </mat-card-header>

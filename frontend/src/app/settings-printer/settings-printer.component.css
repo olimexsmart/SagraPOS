@@ -2,7 +2,9 @@
 
 .table-all {
     margin: 1em;
-    overflow: auto;
+    /* overflow: auto; TODO it is not scrolling on small screen in x direction */
+    padding-bottom: 4em;
+    overflow-y: auto;
 }
 
 .container {

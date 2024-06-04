@@ -165,7 +165,7 @@ export class SettingsPrinterComponent implements OnInit {
         this.loading = false
         this.scanned = true
       } else {
-        this.snackBar.showError('Nessuna spampante trovata')
+        this.snackBar.showError('Nessuna stampante trovata')
         this.loading = false
         this.scanned = true
       }

@@ -1,5 +1,5 @@
 import { CharacterSet, PrinterTypes, ThermalPrinter } from "node-thermal-printer";
-import { OrdersInfoEntry, OrdersInfo } from "@Interfaces/info-orders-dto"
+import { OrdersInfo } from "@Interfaces/info-orders-dto"
 import { Printer } from "@Interfaces/printer"
 import * as db from "./dbController";
 import Jimp from 'jimp';
@@ -103,7 +103,7 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
       printer.bold(true)
       printer.setTextSize(2, 2)
       let pad = 12 // TODO should be configurable per-printer
-      if (v.quantityOrdered > 10)
+      if (v.quantityOrdered >= 10)
         pad--
       const name = v.printingName ?? v.name
       printer.println(`${name.toUpperCase().padEnd(pad)}x${v.quantityOrdered}`)
@@ -116,20 +116,14 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
     printer.cut()
   }
   // Order final recap // TODO configurable if wanted
-  for (const [key, value] of toPrint.entries) {
-    printer.setTextSize(0, 0)
-    for (const v of value) {
-      let pad = 24 // TODO should be configurable per-printer
-      if (v.quantityOrdered > 10)
-        pad--
-      if (v.finalPrice > 10)
-        pad--
-      if (v.finalPrice > 100)
-        pad--
-      printLineWithEuroSign(
-        printer,
-        `${v.quantityOrdered} ${v.name.toUpperCase().padEnd(pad)}`,
-        v.finalPrice.toFixed(2))
+  printer.setTextSize(0, 0)
+  for (const printEntries of toPrint.entries.values()) {
+    for (const v of printEntries) {
+      printer.bold(true)
+      printer.print(v.name.toUpperCase().padEnd(22))
+      printer.bold(false)
+      printer.print(`x${v.quantityOrdered}`.padEnd(6))
+      printLineWithEuroSign(printer, '', (v.price * v.quantityOrdered).toFixed(2))
     }
   }
   // Order total
@@ -137,9 +131,9 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   printer.setTextSize(2, 3)
   printer.bold(true)
   let pad = 9 // TODO should be configurable per-printer
-  if (toPrint.total > 10)
+  if (toPrint.total >= 10)
     pad--
-  if (toPrint.total > 100)
+  if (toPrint.total >= 100)
     pad--
   const totalPrompt = "TOTALE:" // TODO text configurable in settings 
   printLineWithEuroSign(printer, totalPrompt.padEnd(pad), toPrint.total.toFixed(2))
@@ -161,10 +155,10 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   printer.cut()
 
   // Confirm print
-    return confirmPrint(printer)
+  return confirmPrint(printer)
 }
 
-export function printInfo(printerID: number, toPrint: OrdersInfo) : Promise<void> {
+export function printInfo(printerID: number, toPrint: OrdersInfo): Promise<void> {
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     return consolePrintInfo(toPrint)
   }
@@ -249,7 +243,7 @@ interface ScanResult {
 /*
  * PRIVATE FUNCTIONS
  */
-async function confirmPrint(printer: ThermalPrinter) : Promise<void> {
+async function confirmPrint(printer: ThermalPrinter): Promise<void> {
   return new Promise<void>((resolve, error) => {
     printer.execute({
       waitForResponse: false
@@ -286,7 +280,7 @@ function printLineWithEuroSign(printer: ThermalPrinter, textBefore: string, text
   printer.println(textAfter)
 }
 
-
+// TODO This could be used also in other context, move to an utils module
 async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): Promise<Buffer> {
   try {
     if (!imageBuffer || imageBuffer.length === 0) {

@@ -168,7 +168,7 @@ app.put('/UpdateImage', upload.single('image'), async (req, res) => {
   if (masterPinCheck.statusCode != 200) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
   } else {
-    if (db.UpdateImage(id, req.file!.buffer) > 0)
+    if (db.UpdateImage(id, req.file!.buffer) > 0) // TODO image should be resized to 300x300 before saving. See printerController.
       res.status(201)
   }
 })

@@ -12,6 +12,8 @@
 - [x] Better info print layout
 - [x] USB Printer
 - [x] Serial Printer
+- [ ] Printing categories should have a printing order column
+- [ ] Print menu items always in the same order (name?)
 #### Backend
 - [x] Settings to deactivate item sequence number printing
 - [x] API to copy PrintCategories from Categories, if needed to be the same
@@ -52,22 +54,27 @@
 - [x] Insert cash amount and compute remainder on total
 - [x] Main page sidenav to declutter toolbar icons
 - [x] Update to Angular v18
+- [ ] Sortable info table
+- [ ] Limit Info Table width on a wide screen
+- [ ] Order index for menu items visualization
 #### General
 - [x] Build pipeline + release on commit tag
 - [x] Test Linux packaging
 - [x] Test macOS packaging
 - [ ] License file
-- [ ] Should not be able to launch another instance (check for port 3000 in use) MARCO
+- [x] Should not be able to launch another instance (check for port 3000 in use) MARCO
 - [x] Package script should also do `npm install` on the three folders
 - [ ] Managed monorepo with nx, lerna, npm workspaces
 - [ ] Button to programmatically open dev tools from electron build
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
-- [ ] Log entries should carry prices along, because prices could change in time
+- [x] Log entries should carry prices along, because prices could change in time
 - [x] Setting an inventory value to null does not hide badge (caused by CSS)
 - [ ] macOS buggy little icon
 - [x] Broken inventory badges after Angular version bump, refactor using chip inside card
 - [x] Refresh does not works on clients (`/main` not found)
-- [ ] Recap ordine non usa il printing name
-- [ ] Failed print should not log (printer disconnected)
+- [x] Recap ordine non usa il printing name
+- [x] Failed print should not log (printer disconnected)
+- [ ] Order view does not group by print categories
+- [ ] Long orders print button convers total (ask Marco)
 

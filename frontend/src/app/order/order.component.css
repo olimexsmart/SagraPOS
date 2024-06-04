@@ -6,16 +6,15 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  padding-bottom: 5em;
+  overflow-y: auto;
 }
 
 @media(max-width: 599px) {
   .orderContainer {
     width: 100vw;
     min-width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+    padding-bottom: 0em;
   }
 }
 
@@ -37,6 +36,13 @@
 .fabStyle {
   position: fixed;
   bottom: 20px;
+}
+
+@media(max-width: 599px) {
+  .fabStyle {
+    position: relative;
+    margin-top: 2em;
+  }
 }
 
 .receiptLine {
