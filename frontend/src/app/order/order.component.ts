@@ -13,7 +13,7 @@ import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 export class OrderComponent {
 
   @Input() selectedPrinter: Printer = null!
-  @Input() categories: MenuCategory[] = [];
+  @Input() printCategories: MenuCategory[] = [];
   @Input() menu: MenuEntry[] = [];
   @Output() orderConfirmed = new EventEmitter<string>();
 
@@ -29,7 +29,7 @@ export class OrderComponent {
 
   addEntry(entry: MenuEntry): void {
     this.order.set(entry, (this.order.get(entry) ?? 0) + 1)
-    this.catPresent.set(entry.categoryID, (this.catPresent.get(entry.categoryID) ?? 0) + 1)
+    this.catPresent.set(entry.printCategoryID, (this.catPresent.get(entry.printCategoryID) ?? 0) + 1)
     this.total += entry.price
   }
 
@@ -38,7 +38,7 @@ export class OrderComponent {
     if (this.order.get(entry) === 0) {
       this.order.delete(entry)
     }
-    this.catPresent.set(entry.categoryID, (this.catPresent.get(entry.categoryID) ?? 0) - 1)
+    this.catPresent.set(entry.printCategoryID, (this.catPresent.get(entry.printCategoryID) ?? 0) - 1)
     this.total -= entry.price
   }
 

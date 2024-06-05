@@ -26,7 +26,7 @@ function initBackend() {
   // Static file serve
   app.use(express.static(path.join(__dirname, 'angular')))
   // Use JSON to exchange data in APIs
-  app.use(express.json())
+  app.use(express.json({ limit: '50mb' }));
   // Init other modules
   db.initDB(appDir)
   pc.reloadPrintersAndData()

@@ -25,7 +25,7 @@
 <mat-sidenav-container fullscreen class="sidenav-container">
   <mat-sidenav #sidenav position="end" class="sidenav-lateral" [mode]="mobileQuery.matches ? 'over' : 'side'"
     [fixedInViewport]="true" fixedTopGap="64">
-    <app-order #order [selectedPrinter]="printerSelector.getSelectedPrinter()" [categories]="categories"
+    <app-order #order [selectedPrinter]="printerSelector.getSelectedPrinter()" [printCategories]="printCategories"
       [menu]="menuEntries" (orderConfirmed)="shouldCloseOrderCheck()"></app-order>
   </mat-sidenav>
   <!-- TABS -->

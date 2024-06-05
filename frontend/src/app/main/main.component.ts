@@ -20,6 +20,7 @@ export class MainComponent {
   private mobileQueryListener: () => void;
   title = 'SagraPOS';
   categories: MenuCategory[] = []
+  printCategories: MenuCategory[] = []
   menuEntries: MenuEntry[] = []
   badgeCount: Inventory = {}
 
@@ -40,6 +41,7 @@ export class MainComponent {
 
   ngOnInit(): void {
     this.menuService.getCategories().subscribe(categories => this.categories = categories)
+    this.menuService.getPrintCategories().subscribe(printCategories => this.printCategories = printCategories)
     this.menuService.getMenuEntries().subscribe(menuEntries => this.menuEntries = menuEntries)
     this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
     setInterval(() => {

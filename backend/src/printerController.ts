@@ -48,7 +48,7 @@ export function reloadPrintersAndData() {
   }, new Map<number, Printer>())
   // Cache receipt settings
   const logoDB = db.GetSettingByKey(PRINT_LOGO)
-  if (logoDB !== null) {
+  if (logoDB !== null && logoDB.value !== null) {
     const logoHeightRaw = db.GetSettingByKey(PRINT_LOGO_HEIGHT)?.value ?? "0"
     const logoHeight = parseInt(logoHeightRaw)
     resizeImageToHeight(

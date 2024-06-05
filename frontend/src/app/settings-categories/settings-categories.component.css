@@ -1,7 +1,7 @@
 .table-all {
     margin: 1em;
     /* overflow: auto; TODO it is not scrolling on small screen in x direction */
-    padding-bottom: 4em;
+    /* padding-bottom: 4em; TODO fab covers actions on long tables */
     overflow-y: auto;
 }
 

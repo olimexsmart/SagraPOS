@@ -1,14 +1,16 @@
 <div class="orderContainer">
-  @for (c of categories; track $index) {
+  @for (c of printCategories; track $index) {
   @if((catPresent.get(c.id) ?? 0) > 0) {
   <div class="receiptCategory mat-elevation-z4">
     @for (m of menu; track $index) {
     <!-- RECEIPT SECTIONS -->
     <!-- Loop on each MenuEntry and add it if it's the right category -->
-    <div *ngIf="m.categoryID==c.id && (order.get(m) ?? 0) > 0" (click)="removeEntry(m)" class="receiptLine">
+    @if (m.printCategoryID==c.id && (order.get(m) ?? 0) > 0) {
+    <div (click)="removeEntry(m)" class="receiptLine">
       <span>{{m.name | uppercase}}</span>
       <span>x{{order.get(m) ?? 0}}</span>
     </div>
+    }
     }
   </div>
   }

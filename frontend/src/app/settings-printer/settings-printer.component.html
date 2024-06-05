@@ -28,6 +28,7 @@
         <mat-cell *matCellDef="let element"> {{element.hidden ? "Nascosta" : "Visibile"}} </mat-cell>
       </ng-container>
       <!-- Actions -->
+      <!-- TODO adjust width to not cover buttons -->
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef> Azione </mat-header-cell>
         <mat-cell *matCellDef="let element">
