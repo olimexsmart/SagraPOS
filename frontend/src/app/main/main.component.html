@@ -1,25 +1,29 @@
 <!-- TOOLBAR -->
 <mat-toolbar color="primary">
+  @if(!mobileQuery.matches) {
   <span>{{title}}</span>
+  }
   <span class="flexSpacer"></span>
   <button mat-icon-button (click)="themeService.toggleTheme()">
     <mat-icon>{{ themeService.isDarkTheme ? 'brightness_3' : 'wb_sunny' }}</mat-icon>
   </button>
+  @if(!mobileQuery.matches) {
   <button mat-icon-button [routerLink]="['/qr-code']">
     <mat-icon>qr_code</mat-icon>
   </button>
+  }
   <button mat-icon-button [routerLink]="['/settings']">
     <mat-icon>settings</mat-icon>
   </button>
-  <app-inventory-mode #inventoryMode></app-inventory-mode>
-  <app-printer-selector #printerSelector></app-printer-selector>
   <button mat-icon-button [routerLink]="['/info', printerSelector.getSelectedPrinter().id]">
     <mat-icon>info</mat-icon>
   </button>
-  <button mat-icon-button (click)="sidenav.toggle()">
+  <app-inventory-mode #inventoryMode></app-inventory-mode>
+  <app-printer-selector #printerSelector></app-printer-selector>
+  <!-- <button mat-icon-button >
     <mat-icon>receipt_long</mat-icon>
-  </button>
-  <mat-chip color="accent" highlighted>{{order.getEntriesNumber()}}</mat-chip>
+  </button> -->
+  <mat-chip color="accent" class="chip-margin" highlighted (click)="sidenav.toggle()">{{order.getEntriesNumber()}}</mat-chip>
 </mat-toolbar>
 <!-- FOOD CARDS -->
 <mat-sidenav-container fullscreen class="sidenav-container">
