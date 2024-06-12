@@ -2,7 +2,7 @@
   "name": "sagra-pos",
   "productName": "SagraPOS",
   "homepage": "https://github.com/olimexsmart/SagraPOS",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Easy to use POS application for small fairs, events, games, and obviously Italian-style sagre",
   "main": "src/index.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "artifactName": "${productName}_devBuild.${ext}",
+    "artifactName": "${productName}_${version}.${ext}",
     "directories": {
       "buildResources": "images"
     },
