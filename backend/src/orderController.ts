@@ -2,10 +2,13 @@ import { OrderEntryDTO } from "@Interfaces/order-entry-dto"
 import * as db from "./dbController";
 import { OrderToPrint, PrintEntry } from "./printerController";
 import { OrderLogItem } from "./dbInterfaces";
+import { MenuCategory } from "@Interfaces/menu-categories";
 
 // TODO init function that gets some setting from DB
 const maxItems = 99;
 
+// TODO stupidly complex because the interfaces are not connected to each other
+// nest the MenuCategory interface into the MenuEntry
 export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
   // Get data from DB
   const menuEntries = db.GetMenuEntries()
@@ -13,7 +16,8 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
   // Init result
   const printEntries = new Map<string, PrintEntry[]>()
   let total = 0
-  // Loop on input data
+  // Insert printing categories in the right order (Map object maintaing insertion order)
+  const printCategriesActual: MenuCategory[] = []
   for (const o of order) {
     // Confirm max single item order quantity
     if (o.quantity > maxItems)
@@ -22,6 +26,19 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
     const f = menuEntries.filter(x => x.id === o.menuEntryID)
     if (f === undefined)
       throw new RangeError(`Menu entry with id ${o.menuEntryID} not found`)
+    const menuEntry = f[0]
+    // Add this to the print categories actually present in this order
+    printCategriesActual.push(printCategories.filter(x => x.id == menuEntry.printCategoryID)[0])
+  }
+  // Sort the array by printing category order
+  printCategriesActual.sort((a, b) => a.ordering - b.ordering)
+  // Insert into the printing map in the correct order
+  for (const pca of printCategriesActual) {
+    printEntries.set(pca.name, [])
+  }
+  // Loop on input data
+  for (const o of order) {
+    const f = menuEntries.filter(x => x.id === o.menuEntryID)
     const menuEntry = f[0]
     // Sequence number of this item
     const sequence = db.GetSequenceNumberByEntry(menuEntry.name)
@@ -36,15 +53,17 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
       quantityOrdered: o.quantity,
       sequence: sequence,
       price: menuEntry.price,
-      finalPrice: entryFinalPrice
+      finalPrice: entryFinalPrice,
+      ordering: menuEntry.ordering
     }
-    // Add print entity to the data structure for the printer
+    // TODO another useless operation if the MenuCategory would be embedded into the MenuEntry object
     const printCat = printCategories.filter(x => x.id == menuEntry.printCategoryID)[0]
-    if (printEntries.has(printCat.name))
-      printEntries.get(printCat.name)?.push(printEntry)
-    else {
-      printEntries.set(printCat.name, [printEntry])
-    }
+    // Push this entry into the printing 
+    printEntries.get(printCat.name)?.push(printEntry)
+  }
+  // For each printing category order the entries array
+  for (const me of printEntries.values()) {
+    me.sort((a, b) => a.ordering - b.ordering)
   }
   // Return to the caller that will then print
   return {

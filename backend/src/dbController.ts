@@ -182,7 +182,7 @@ function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
 
  */
 export function GetMenuEntries(): MenuEntry[] {
-  const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory FROM MenuEntries').all();
+  const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering FROM MenuEntries').all();
   return menuEntries.map((menuEntry: any): MenuEntry => ({
     id: menuEntry.ID,
     categoryID: menuEntry.CategoryID,
@@ -190,7 +190,8 @@ export function GetMenuEntries(): MenuEntry[] {
     name: menuEntry.Name,
     printingName: menuEntry.PrintingName,
     price: menuEntry.Price,
-    inventory: menuEntry.Inventory
+    inventory: menuEntry.Inventory,
+    ordering: menuEntry.Ordering
   }));
 }
 
@@ -204,8 +205,8 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
 
 export function InsertMenuEntry(newEntry: MenuEntry): number {
   return db.prepare(
-    'INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory)'
-    + ' VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory)')
+    `INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering)
+     VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory, @ordering)'`)
     .run(newEntry).lastInsertRowid
 }
 
@@ -214,10 +215,15 @@ export function UpdateMenuEntry(updatedEntry: MenuEntry): number {
     throw new Error('UpdateMenuEntry called without a valid id');
   }
   return db.prepare(
-    'UPDATE MenuEntries SET CategoryID = @categoryID, '
-    + 'PrintCategoryID = @printCategoryID, Name = @name, '
-    + 'PrintingName = @printingName, Price = @price, Inventory = @inventory '
-    + 'WHERE ID = @id')
+    `UPDATE MenuEntries SET 
+      CategoryID = @categoryID, 
+      PrintCategoryID = @printCategoryID, 
+      Name = @name, 
+      PrintingName = @printingName,
+      Price = @price, 
+      Inventory = @inventory,
+      Ordering = @ordering
+    WHERE ID = @id`)
     .run(updatedEntry).changes;
 }
 
@@ -236,20 +242,21 @@ export function GetCategories(): MenuCategory[] {
   return menuCategories.map((menuCategory: any): MenuCategory => ({
     id: menuCategory.ID,
     name: menuCategory.Name,
+    ordering: menuCategory.Ordering,
     occurrences: GetCategoryOccurrences(menuCategory.ID)
   }));
 }
 
 export function InsertCategory(newEntry: MenuCategory): number {
-  return db.prepare('INSERT INTO Categories (Name)'
-    + ' VALUES (@name)').run(newEntry).lastInsertRowid
+  return db.prepare('INSERT INTO Categories (Name, Ordering)'
+    + ' VALUES (@name, @ordering)').run(newEntry).lastInsertRowid
 }
 
 export function UpdateCategory(updatedEntry: MenuCategory): number {
   if (!updatedEntry.id) { // TODO does this error serve any purpose?
     throw new Error('UpdateCategory called without a valid id');
   }
-  return db.prepare('UPDATE Categories SET Name = @name WHERE ID = @id')
+  return db.prepare('UPDATE Categories SET Name = @name, Ordering = @ordering WHERE ID = @id')
     .run(updatedEntry).changes;
 }
 
@@ -276,20 +283,21 @@ export function GetPrintCategories(): MenuCategory[] {
   return menuCategories.map((menuCategory: any): MenuCategory => ({
     id: menuCategory.ID,
     name: menuCategory.Name,
+    ordering: menuCategory.Ordering,
     occurrences: GetPrintCategoryOccurrences(menuCategory.ID)
   }));
 }
 
 export function InsertPrintCategory(newEntry: MenuCategory): number {
-  return db.prepare('INSERT INTO PrintCategories (Name)'
-    + ' VALUES (@name)').run(newEntry).lastInsertRowid
+  return db.prepare('INSERT INTO PrintCategories (Name, Ordering)'
+    + ' VALUES (@name, @ordering)').run(newEntry).lastInsertRowid
 }
 
 export function UpdatePrintCategory(updatedEntry: MenuCategory): number {
   if (!updatedEntry.id) { // TODO does this error serve any purpose?
     throw new Error('UpdatePrintCategory called without a valid id');
   }
-  return db.prepare('UPDATE PrintCategories SET Name = @name WHERE ID = @id')
+  return db.prepare('UPDATE PrintCategories SET Name = @name, Ordering = @ordering WHERE ID = @id')
     .run(updatedEntry).changes;
 }
 

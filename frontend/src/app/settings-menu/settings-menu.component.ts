@@ -11,13 +11,14 @@ import { map } from 'rxjs/operators';
 import { EmojiSnackBarService } from '../classes/snack-bar-utils';
 
 interface MenuEntryExplicit { // TODO make this the common interface, populate using joins
-  id: number,
-  category: MenuCategory,
+  id: number
+  category: MenuCategory
   printCategory: MenuCategory
-  name: string,
+  name: string
   printingName: string | null
-  price: number,
+  price: number
   inventory: number | null
+  ordering: number
 }
 
 @Component({
@@ -36,6 +37,7 @@ export class SettingsMenuComponent implements OnInit {
     'printCategoryName',
     'price',
     'inventory',
+    'ordering',
     'actions'
   ];
   editForm: FormGroup;
@@ -86,6 +88,7 @@ export class SettingsMenuComponent implements OnInit {
       name: [menuEntry ? menuEntry.name : '', Validators.required],
       printingName: [menuEntry ? menuEntry.printingName : ''],
       price: [menuEntry ? menuEntry.price : '', Validators.required],
+      ordering: [menuEntry ? menuEntry.ordering : 0, Validators.required],
       inventory: [menuEntry ? menuEntry.inventory : ''],
     });
   }
@@ -105,7 +108,8 @@ export class SettingsMenuComponent implements OnInit {
           name: me.name,
           printingName: me.printingName,
           price: me.price,
-          inventory: me.inventory
+          inventory: me.inventory,
+          ordering: me.ordering
         }));
         return { categories, printCategories, menuEntriesExpl };
       })

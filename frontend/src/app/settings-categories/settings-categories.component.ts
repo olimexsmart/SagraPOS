@@ -16,7 +16,7 @@ enum Mode { Categories, PrintCategories, Invalid }
 })
 export class SettingsCategoriesComponent implements OnInit {
   categories = new MatTableDataSource<MenuCategory>();
-  displayedColumns: string[] = ['name', 'occurrences', 'actions'];
+  displayedColumns: string[] = ['name', 'occurrences', 'ordering', 'actions'];
   editForm: FormGroup;
   private pin: number
   private mode: Mode
@@ -69,7 +69,8 @@ export class SettingsCategoriesComponent implements OnInit {
   initForm(category?: any): void { // TODO use interface instead of any
     this.editForm = this.fb.group({
       id: [category ? category.id : null],
-      name: [category ? category.name : '', Validators.required]
+      name: [category ? category.name : '', Validators.required],
+      ordering: [category ? category.ordering : 0, Validators.required]
     });
   }
 

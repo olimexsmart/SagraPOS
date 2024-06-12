@@ -13,10 +13,15 @@
         <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
       </ng-container>
-      <!-- Name -->
+      <!-- Occurences -->
       <ng-container matColumnDef="occurrences">
         <mat-header-cell *matHeaderCellDef> Occorrenze </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.occurrences}} </mat-cell>
+      </ng-container>
+      <!-- Ordering -->
+      <ng-container matColumnDef="ordering">
+        <mat-header-cell *matHeaderCellDef> Ordinamento </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.ordering}} </mat-cell>
       </ng-container>
       <!-- Actions -->
       <ng-container matColumnDef="actions">
@@ -50,6 +55,10 @@
       <mat-form-field appearance="fill">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Ordinamento</mat-label>
+        <input matInput type="number" formControlName="ordering">
       </mat-form-field>
     </form>
   </mat-dialog-content>

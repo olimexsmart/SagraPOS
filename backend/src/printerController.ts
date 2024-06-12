@@ -39,7 +39,8 @@ export interface PrintEntry {
   quantityOrdered: number,
   sequence: number,
   finalPrice: number
-  price: number
+  price: number,
+  ordering: number
 };
 
 export function reloadPrintersAndData() {
@@ -92,7 +93,7 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   const reqPrinter = getPrinterAndConnection(printerID)
   const printer = reqPrinter.printer
   // Order main body
-  for (const [key, value] of toPrint.entries) {
+  for (const [key, value] of toPrint.entries) { // Loop on print categories
     // Title with category name
     printer.setTextSize(0, 0)
     printer.bold(true)

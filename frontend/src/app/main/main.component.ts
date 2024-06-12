@@ -7,7 +7,6 @@ import { MenuEntry } from '../interfaces/menu-entry-dto';
 import { MenuCategory } from '../interfaces/menu-categories';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
-import { SwapDBService } from '../services/swap-db.service';
 import { ThemeService } from '../services/theme.service';
 
 @Component({
@@ -40,9 +39,9 @@ export class MainComponent {
 
 
   ngOnInit(): void {
-    this.menuService.getCategories().subscribe(categories => this.categories = categories)
-    this.menuService.getPrintCategories().subscribe(printCategories => this.printCategories = printCategories)
-    this.menuService.getMenuEntries().subscribe(menuEntries => this.menuEntries = menuEntries)
+    this.menuService.getCategories().subscribe(categories => this.categories = categories.sort((a, b) => a.ordering - b.ordering))
+    this.menuService.getPrintCategories().subscribe(printCategories => this.printCategories = printCategories.sort((a, b) => a.ordering - b.ordering))
+    this.menuService.getMenuEntries().subscribe(menuEntries => this.menuEntries = menuEntries.sort((a, b) => a.ordering - b.ordering))
     this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
     setInterval(() => {
       this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
