@@ -80,7 +80,7 @@ app.post('/ConfirmOrder', async (req: Request, res: Response) => {
     confirmOrder(toPrint)
     res.status(201).send()
   } catch (error) {
-    res.status(500).send()
+    res.status(500).send(error)
   }
 })
 
@@ -91,7 +91,7 @@ app.get('/PrintFakeOrder', async (req: Request, res: Response) => {
     await pc.printOrder(printerID, toPrint)
     res.status(201).send()
   } catch (error) {
-    res.status(500).send()
+    res.status(500).send(error)
   }
 })
 
@@ -101,7 +101,7 @@ app.post('/PokePrinter', async (req: Request, res: Response) => { // TODO make i
     await pc.pokePrinter(req.body)
     res.status(201).send();
   } catch (error) {
-    res.status(500).send();
+    res.status(500).send(error);
   }
 })
 
@@ -110,7 +110,7 @@ app.get('/PrintOrdersInfo', async (req: Request, res: Response) => {
     await pc.printInfo(parseInt(req.query.printerID as string), db.GatherOrdersInfo())
     res.status(201).send();
   } catch (error) {
-    res.status(500).send();
+    res.status(500).send(error);
   }
 })
 

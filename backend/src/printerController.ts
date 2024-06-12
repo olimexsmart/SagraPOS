@@ -15,10 +15,12 @@ const PRINT_LOGO = 'PrintLogo'
 const PRINT_LOGO_HEIGHT = 'PrintLogoHeight'
 const TEXT_OVER_LOGO = 'OverLogoText'
 const TEXT_UNDER_LOGO = 'UnderLogoText'
+const TEXT_START_RECAP = 'StartRecapText'
 let printersInfo: Map<number, Printer>
 let logo: Buffer | null
-let textOverLogo: string | null
-let textUnderLogo: string | null
+let textStartRecap: string[] | null
+let textOverLogo: string[] | null
+let textUnderLogo: string[] | null
 
 const lookup = promisify(dns.lookup);
 
@@ -56,8 +58,9 @@ export function reloadPrintersAndData() {
       logoHeight)
       .then(x => logo = x)
   }
-  textOverLogo = db.GetSettingByKey(TEXT_OVER_LOGO)?.value ?? ""
-  textUnderLogo = db.GetSettingByKey(TEXT_UNDER_LOGO)?.value ?? ""
+  textStartRecap = db.GetSettingByKey(TEXT_START_RECAP)?.value.replace('\r', '').split('\n') ?? null
+  textOverLogo = db.GetSettingByKey(TEXT_OVER_LOGO)?.value.replace('\r', '').split('\n') ?? null
+  textUnderLogo = db.GetSettingByKey(TEXT_UNDER_LOGO)?.value.replace('\r', '').split('\n') ?? null
 }
 
 export async function pokePrinter(printerToPoke: Printer): Promise<void> {
@@ -115,8 +118,16 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
     }
     printer.cut()
   }
-  // Order final recap // TODO configurable if wanted
+  // Text start recap
+  printer.bold(true)
+  printer.alignCenter()
   printer.setTextSize(0, 0)
+  if (textStartRecap != null) {
+    for (const t of textStartRecap) {
+      printer.println(t)
+    }
+  }
+  // Order final recap // TODO configurable if wanted
   for (const printEntries of toPrint.entries.values()) {
     for (const v of printEntries) {
       printer.bold(true)
@@ -142,16 +153,22 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   printer.alignCenter()
   printer.bold(true)
   printer.println("")
-  if (textOverLogo != null)
-    printer.println(textOverLogo)
+  if (textOverLogo != null) {
+    for (const t of textOverLogo) {
+      printer.println(t)
+    }
+  }
   // Logo
   if (logo != null)
     printer.printImageBuffer(logo)
   // Under logo text
   printer.bold(false)
   printer.println("")
-  if (textUnderLogo != null)
-    printer.println(textUnderLogo)
+  if (textUnderLogo != null) {
+    for (const t of textUnderLogo) {
+      printer.println(t)
+    }
+  }
   printer.cut()
 
   // Confirm print
