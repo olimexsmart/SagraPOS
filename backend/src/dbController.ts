@@ -493,8 +493,6 @@ export function GetSettingByKey(key: string): Setting | null {
 }
 
 export function SetSettingValueByKey(settingMod: Setting): number {
-  console.log(settingMod);
-
   return db.prepare(`UPDATE 
                       Settings 
                     SET 

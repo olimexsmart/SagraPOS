@@ -40,15 +40,21 @@
           {{s.category.name}}
         </mat-panel-description>
       </mat-expansion-panel-header>
-      @if(s.inputType !== 'file')
-      {
+      @switch (s.inputType) {
+      @case ('file') {
+      <!-- TODO better styling or better merge logic with DB upload button above -->
+      <input type="file" accept="image/png" (change)="onFileSelected($event, s)" />
+      }
+      @case ('textarea') {
+      <mat-form-field class="full-width">
+        <textarea rows="4" matInput [(ngModel)]="s.value"></textarea>
+      </mat-form-field>
+      }
+      @default {
       <mat-form-field class="full-width">
         <input matInput [type]="s.inputType" [(ngModel)]="s.value" />
       </mat-form-field>
       }
-      @else {
-      <!-- TODO better styling or better merge logic with DB upload button above -->
-      <input type="file" accept="image/png" (change)="onFileSelected($event, s)" />
       }
       <div class="actions-container">
         <button mat-raised-button color="primary" (click)="saveSetting(s)">Save</button>

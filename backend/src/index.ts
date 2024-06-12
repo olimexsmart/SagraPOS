@@ -143,7 +143,7 @@ app.get('/GetImage', (req: Request, res: Response) => {
     let img: Buffer = db.GetImage(id)
     if (img) {
       res.writeHead(200, {
-        'Content-Type': 'image/png',
+        'Content-Type': 'image/jpeg',
         'Content-Length': img.length
       })
       res.end(img)
@@ -164,12 +164,14 @@ app.put('/UpdateImage', upload.single('image'), async (req, res) => {
     masterPinCheck.statusCode = 400
     masterPinCheck.message = "No image uploaded"
   }
-
   if (masterPinCheck.statusCode != 200) {
     res.status(masterPinCheck.statusCode).send(masterPinCheck.message)
-  } else {
+  } else { // If every check is OK enter here
     if (db.UpdateImage(id, req.file!.buffer) > 0) // TODO image should be resized to 300x300 before saving. See printerController.
+    {
       res.status(201)
+      pc.reloadPrintersAndData()
+    }
   }
 })
 
@@ -284,6 +286,7 @@ app.get('/GetSettingByKey', (req: Request, res: Response) => {
 
 app.put('/ChangeSetting', function (req, res) {
   withPinAndBody(req, res, db.SetSettingValueByKey)
+  pc.reloadPrintersAndData()
 })
 
 app.get('/GetServerSettings', function (req, res) {

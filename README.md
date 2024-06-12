@@ -12,8 +12,8 @@
 - [x] Better info print layout
 - [x] USB Printer
 - [x] Serial Printer
-- [ ] Printing categories should have a printing order column
-- [ ] Print menu items always in the same order (name?)
+- [x] Printing categories should have a printing order column
+- [x] Print menu items always in the same order (name?)
 #### Backend
 - [x] Settings to deactivate item sequence number printing
 - [x] API to copy PrintCategories from Categories, if needed to be the same
@@ -29,9 +29,11 @@
 - [x] DB upload could also migrate from previous version. Introduce DB version in setting table
 - [ ] Split files, they are becoming too long
 - [x] WebSocket instead of polling for quantities update MARCO
-- [ ] Ensure that a printer disconnection DOES NOT log the order as succesful
+- [x] Ensure that a printer disconnection DOES NOT log the order as succesful
 - [ ] Default image if null on menu item
 - [ ] Scaricare info come CSV
+- [ ] Reset DB button (delete DB and re-init backend to start from defaults)
+- [ ] Menu entries should be return by ID as a nested object, see MenuEntryExplict. This simplifies both frontend and backend
 #### Frontend
 - [x] Spinner on order confirm (with error timeout)
 - [ ] Spinner on menu loading (can take a while)
@@ -41,7 +43,7 @@
 - [x] Number of clients connected MARCO
 - [ ] Better spacing in tablet view (kinda too crammed)
 - [ ] Remember order selection when changing screen
-- [ ] Confirm OK/NOK snackbar when performing operations (like order)
+- [x] Confirm OK/NOK snackbar when performing operations (like order)
 - [ ] Info table limit max width on large screens
 - [ ] Toggle to see all items in a unique list
 - [x] Light/Dark theme
@@ -55,8 +57,11 @@
 - [x] Main page sidenav to declutter toolbar icons
 - [x] Update to Angular v18
 - [ ] Sortable info table
-- [ ] Limit Info Table width on a wide screen
-- [ ] Order index for menu items visualization
+- [x] Limit Info Table width on a wide screen
+- [x] Order index for menu items visualization
+- [ ] Hidden status for menu items (some dishes might be only one of the event days)
+- [ ] Info page lets you select date time start/end ranges and print only the resulting selection
+- [x] Settings should also have multiline text input
 #### General
 - [x] Build pipeline + release on commit tag
 - [x] Test Linux packaging
@@ -66,6 +71,7 @@
 - [x] Package script should also do `npm install` on the three folders
 - [ ] Managed monorepo with nx, lerna, npm workspaces
 - [ ] Button to programmatically open dev tools from electron build
+- [ ] Option to log main process console output to file
 # Bugs
 - [x] Error in printing 'é' (e.g. caffé)
 - [x] Log entries should carry prices along, because prices could change in time
@@ -75,6 +81,10 @@
 - [x] Refresh does not works on clients (`/main` not found)
 - [x] Recap ordine non usa il printing name
 - [x] Failed print should not log (printer disconnected)
-- [ ] Order view does not group by print categories
+- [x] Order view does not group by print categories
 - [ ] Long orders print button convers total (ask Marco)
-
+- [ ] Check menu image loading
+- [ ] Menu entry creation doesn't load image (and inventory and printing name should be null)
+- [ ] Inventory dialog doesn't close on return key
+- [x] Restart backend after setting change
+- [ ] Test print from settings seems to fail from isolated LAN with packaged electron (cannot reproduce)
