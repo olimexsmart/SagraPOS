@@ -8,10 +8,12 @@ import { MenuEntry } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
 import { Setting, SettingCategory } from "@Interfaces/setting"
 import { OrdersInfo, OrdersInfoEntry } from '@Interfaces/info-orders-dto';
+import { dbTableInit } from './dbTableInit';
+import { SettingToInsert, defaultSettingList, insertDefaultSetting, insertDefaultSettingCategory, settingsCategories } from './dbSettingInit';
 
 
 // TODO rename columns to uniform to interfaces?
-let db: any = undefined
+let db: any = undefined // TODO why any?
 // Database path, default is user home directory (very cross-platform)
 let dbPath: string
 
@@ -32,80 +34,15 @@ export function getPathDB(): string {
 export function initDB(appDir: string): void {
   dbPath = path.join(appDir, 'SagraPOS.sqlite3')
   openDB()
-  // Categories
-  db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
-    "ID"	INTEGER,
-    "Name"	TEXT NOT NULL,
-    "Ordering"	INTEGER NOT NULL DEFAULT 0,
-    PRIMARY KEY("ID" AUTOINCREMENT)
-  )`).run()
-  // PrintCategories
-  db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
-    "ID"	INTEGER NOT NULL,
-    "Name"	TEXT NOT NULL,
-    "Ordering"	INTEGER NOT NULL DEFAULT 0,
-    PRIMARY KEY("ID" AUTOINCREMENT)
-  )`).run()
-  // MenuEntries
-  db.prepare(`CREATE TABLE IF NOT EXISTS "MenuEntries" (
-    "ID"	INTEGER,
-    "CategoryID" INTEGER NOT NULL,
-    "PrintCategoryID"	INTEGER NOT NULL,
-    "Name"	TEXT NOT NULL,
-    "PrintingName" TEXT DEFAULT NULL,
-    "Price"	REAL NOT NULL DEFAULT 0,
-    "Image"	BLOB,
-    "Inventory"	INTEGER,
-    "Ordering"	INTEGER NOT NULL DEFAULT 0,
-    FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
-    FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
-    PRIMARY KEY("ID" AUTOINCREMENT)
-  )`).run()
-  // OrderLogItems
-  db.prepare(`CREATE TABLE IF NOT EXISTS "OrderLogItems" (
-    "ID"	INTEGER,
-    "OrderID"	INTEGER NOT NULL,
-    "Name"	TEXT NOT NULL,
-    "Price"	REAL NOT NULL,
-    "Quantity"	INTEGER NOT NULL,
-    "Valid"	INTEGER NOT NULL DEFAULT 1,
-    PRIMARY KEY("ID" AUTOINCREMENT),
-    FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade
-  )`).run()
-  // OrdersLog
-  db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
-    "ID"	INTEGER,
-    "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY("ID")
-  )`).run()
-  // Printers
-  db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (
-    "ID"	INTEGER,
-    "Name"	TEXT NOT NULL,
-    "IP"	TEXT NOT NULL,
-    "Port"	INTEGER NOT NULL DEFAULT 9100,
-    "Hidden"	INTEGER NOT NULL DEFAULT 0,
-    PRIMARY KEY("ID")
-  )`).run()
-  // SettingCategories
-  db.prepare(`CREATE TABLE IF NOT EXISTS "SettingCategories" (
-    "ID"	INTEGER NOT NULL,
-    "Name"	TEXT NOT NULL,
-    PRIMARY KEY("ID" AUTOINCREMENT)
-  )`).run()
-  // Settings
-  db.prepare(`CREATE TABLE IF NOT EXISTS "Settings" (
-    "Key"	TEXT NOT NULL,
-    "Category"	INTEGER NOT NULL,
-    "InputType"	TEXT,
-    "Value"	TEXT,
-    "DisplayName"	TEXT,
-    "Description"	TEXT,
-    FOREIGN KEY("Category") REFERENCES "SettingCategories"("ID") on delete cascade,
-    PRIMARY KEY("Key")
-  )`).run()
-  // TODO initialize default settings if table is created
+  dbTableInit(db)
+  for (const sc of settingsCategories) {
+    insertDefaultSettingCategory(db, sc)
+  }
+  for (const s of defaultSettingList) {
+    insertDefaultSetting(db, s)
+  }
 }
+
 
 interface ColInfo {
   cid: number,
@@ -441,24 +378,6 @@ const settingJoinQuery = `SELECT
                           INNER JOIN 
                             SettingCategories sc ON s.Category = sc.ID
 `
-
-export function GetServerSettings(): di.ServerSettings {
-  // TODO: retrieve server settings from db
-  const s = db.prepare('SELECT Server_Url AS ServerUrl, Wifi_SSID AS WifiSsid, Wifi_password AS WifiPwd FROM "ServerSettings"').get()
-  if (s === undefined)
-    return {
-      serverUrl: null,
-      wifi: null,
-    }
-  else
-    return {
-      serverUrl: s.ServerUrl,
-      wifi: {
-        ssid: s.WifiSsid,
-        password: s.WifiPwd
-      }
-    }
-}
 
 export function GetAllSettings(): Setting[] {
   const sRaw = db.prepare(settingJoinQuery).all()

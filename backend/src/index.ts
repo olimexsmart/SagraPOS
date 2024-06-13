@@ -289,10 +289,6 @@ app.put('/ChangeSetting', function (req, res) {
   pc.reloadPrintersAndData()
 })
 
-app.get('/GetServerSettings', function (req, res) {
-  // const serverSettings = GetServerSettings()
-  res.send(db.GetServerSettings())
-})
 
 
 // TODO add pin to these two

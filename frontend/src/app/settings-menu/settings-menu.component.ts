@@ -83,13 +83,13 @@ export class SettingsMenuComponent implements OnInit {
   initForm(menuEntry?: MenuEntryExplicit): void {
     this.editForm = this.fb.group({
       id: [menuEntry ? menuEntry.id : null],
-      categoryID: [menuEntry ? menuEntry.category.id : ''],
+      categoryID: [menuEntry ? menuEntry.category.id : '', Validators.required],
       printCategoryID: [menuEntry ? menuEntry.printCategory.id : '', Validators.required],
       name: [menuEntry ? menuEntry.name : '', Validators.required],
-      printingName: [menuEntry ? menuEntry.printingName : ''],
+      printingName: [menuEntry ? menuEntry.printingName : null],
       price: [menuEntry ? menuEntry.price : '', Validators.required],
       ordering: [menuEntry ? menuEntry.ordering : 0, Validators.required],
-      inventory: [menuEntry ? menuEntry.inventory : ''],
+      inventory: [menuEntry ? menuEntry.inventory : null],
     });
   }
 
