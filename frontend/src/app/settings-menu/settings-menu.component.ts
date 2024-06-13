@@ -42,8 +42,8 @@ export class SettingsMenuComponent implements OnInit {
   ];
   editForm: FormGroup;
   private pin: number
-  selectedFile: File | null = null;
   loading: boolean = false
+  private modifingID: number = 0
 
   private subCallBacks = {
     complete: () => {
@@ -144,10 +144,6 @@ export class SettingsMenuComponent implements OnInit {
         } else {
           this.createMenuItem();
         }
-        // Check if an image was selected and upload that
-        if (this.selectedFile)
-          this.menuService.uploadImage(this.pin, this.editForm.value.id, this.selectedFile)
-            .subscribe(() => { console.log('image uploaded') });
       }
     });
   }
@@ -167,17 +163,22 @@ export class SettingsMenuComponent implements OnInit {
       .subscribe(this.subCallBacks);
   }
 
-  onFileSelected(event: Event): void {
-    // First, ensure that event.target is not null and is an HTMLInputElement
-    const element = event.target as HTMLInputElement | null;
 
-    if (element && element.files && element.files.length > 0) {
-      // Safely access the first file, since we now know there is at least one file
-      const file = element.files[0];
-      this.selectedFile = file;
-    } else {
-      // Handle the case where no file is selected, or the input element is not correct
-      this.selectedFile = null;
+  triggerFilePicker(id: number): void {
+    this.modifingID = id
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.jpg,.jpeg';
+    fileInput.onchange = this.uploadDB.bind(this);
+    fileInput.click();
+  }
+
+  private uploadDB(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Check if an image was selected and upload that
+      this.menuService.uploadImage(this.pin, this.modifingID, file)
+        .subscribe();
     }
   }
 }
