@@ -36,6 +36,14 @@ export function initDB(appDir: string): void {
   db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
     "ID"	INTEGER,
     "Name"	TEXT NOT NULL,
+    "Ordering"	INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY("ID" AUTOINCREMENT)
+  )`).run()
+  // PrintCategories
+  db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
+    "ID"	INTEGER NOT NULL,
+    "Name"	TEXT NOT NULL,
+    "Ordering"	INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`).run()
   // MenuEntries
@@ -48,6 +56,7 @@ export function initDB(appDir: string): void {
     "Price"	REAL NOT NULL DEFAULT 0,
     "Image"	BLOB,
     "Inventory"	INTEGER,
+    "Ordering"	INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
     FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
     PRIMARY KEY("ID" AUTOINCREMENT)
@@ -68,12 +77,6 @@ export function initDB(appDir: string): void {
     "ID"	INTEGER,
     "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY("ID")
-  )`).run()
-  // PrintCategories
-  db.prepare(`CREATE TABLE IF NOT EXISTS "PrintCategories" (
-    "ID"	INTEGER NOT NULL,
-    "Name"	TEXT NOT NULL,
-    PRIMARY KEY("ID" AUTOINCREMENT)
   )`).run()
   // Printers
   db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (
@@ -206,7 +209,7 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
 export function InsertMenuEntry(newEntry: MenuEntry): number {
   return db.prepare(
     `INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering)
-     VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory, @ordering)'`)
+     VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory, @ordering)`)
     .run(newEntry).lastInsertRowid
 }
 

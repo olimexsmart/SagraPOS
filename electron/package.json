@@ -2,7 +2,7 @@
   "name": "sagra-pos",
   "productName": "SagraPOS",
   "homepage": "https://github.com/olimexsmart/SagraPOS",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Easy to use POS application for small fairs, events, games, and obviously Italian-style sagre",
   "main": "src/index.js",
   "scripts": {
