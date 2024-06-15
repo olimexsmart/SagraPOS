@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as QRCode from 'qrcode';
 import { SettingsService } from '../services/settings.service';
-import { forkJoin } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
+import { WebSocketService } from '../services/web-socket.service';
+import { WebSocketMessage } from '../interfaces/web-socket-message';
 
 
 @Component({
@@ -10,16 +12,21 @@ import { forkJoin } from 'rxjs';
   templateUrl: './qr-code.component.html',
   styleUrl: './qr-code.component.css'
 })
-export class QrCodeComponent implements OnInit {
+export class QrCodeComponent implements OnInit, OnDestroy {
   serverURL: string | undefined = undefined
   wifiSSID: string | undefined = undefined
   wifiPassword: string | undefined = undefined
+  clientCounterSubscription: Subscription | undefined;
+  clientConnectionCounter: number = 0;
+
 
   urlQRCode: any;
   wifiQRCode: any;
 
   constructor(private sanitizer: DomSanitizer,
-    private settingsService: SettingsService) { }
+    private settingsService: SettingsService,
+    private webSocketService: WebSocketService
+  ) { }
 
   ngOnInit() {
     forkJoin({
@@ -42,6 +49,15 @@ export class QrCodeComponent implements OnInit {
         console.error('Error loading data', err);
       }
     })
+    this.clientCounterSubscription = this.webSocketService.onMessage().subscribe(res => {
+      this.onWebSocketMessage(res);
+    })
+  }
+
+  ngOnDestroy(): void {
+    if(this.clientCounterSubscription){
+      this.clientCounterSubscription.unsubscribe();
+    }
   }
 
   generateQRCode(data: string, type: 'wifi' | 'url') { // Nicely done here 
@@ -52,5 +68,15 @@ export class QrCodeComponent implements OnInit {
         this.urlQRCode = this.sanitizer.bypassSecurityTrustUrl(url);
       }
     });
+  }
+
+  onWebSocketMessage(res: WebSocketMessage) {
+    if (res) {
+      switch (res.type) {
+        case 'clientCount':
+          this.clientConnectionCounter = res.data;
+          break;
+      }
+    }
   }
 }

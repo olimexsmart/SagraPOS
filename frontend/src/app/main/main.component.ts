@@ -9,6 +9,8 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
 import { ThemeService } from '../services/theme.service';
 import { WebSocketService } from '../services/web-socket.service';
+import { Subscription } from 'rxjs';
+import { WebSocketMessage } from '../interfaces/web-socket-message';
 
 @Component({
   selector: 'app-main',
@@ -23,11 +25,11 @@ export class MainComponent {
   printCategories: MenuCategory[] = []
   menuEntries: MenuEntry[] = []
   badgeCount: Inventory = {}
+  inventorySubscription: Subscription | undefined;
 
   constructor(
     @Inject('BASE_URL') public baseUrl: string,
     private menuService: MenuService,
-    private inventoryService: InventoryService,
     public themeService: ThemeService,
     private webSocketService: WebSocketService,
     changeDetectorRef: ChangeDetectorRef,
@@ -45,7 +47,7 @@ export class MainComponent {
     this.menuService.getPrintCategories().subscribe(printCategories => this.printCategories = printCategories.sort((a, b) => a.ordering - b.ordering))
     this.menuService.getMenuEntries().subscribe(menuEntries => this.menuEntries = menuEntries.sort((a, b) => a.ordering - b.ordering))
 
-    this.webSocketService.onMessage().subscribe(res => {
+    this.inventorySubscription = this.webSocketService.onMessage().subscribe(res => {
       this.onWebSocketMessage(res);
     })
   }
@@ -63,14 +65,11 @@ export class MainComponent {
       this.sidenav.close()
   }
 
-  onWebSocketMessage(res: any) {
+  onWebSocketMessage(res: WebSocketMessage) {
     if (res) {
       switch (res.type) {
         case 'inventory':
           this.badgeCount = res.data;
-          break;
-        case 'clientCount':
-          // console.log(res.data); TODO
           break;
       }
     }
@@ -79,5 +78,8 @@ export class MainComponent {
   ngOnDestroy() {
     // Clean up by removing the event listener when the component is destroyed
     this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
+    if(this.inventorySubscription){
+      this.inventorySubscription.unsubscribe();
+    }
   }
 }
