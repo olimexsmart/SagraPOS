@@ -7,6 +7,8 @@ import { CheckMasterPin } from "./settingsController"
 import { buildFakeOrder, buildOrder, confirmOrder } from "./orderController"
 import * as pc from "./printerController"
 import { mkdirSync, rm, writeFile } from "fs"
+import http from "http"
+import WebSocket from "ws"
 
 
 // Express config
@@ -16,6 +18,11 @@ const port = 3000
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 const appDir = path.join(os.homedir(), '.sagraPOS')
+// Web Socket config
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+let clientCount = 0;
 
 initBackend() // TODO consider removing function
 
@@ -38,6 +45,47 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack)
   res.status(500).send('Something broke!')
 })
+
+/*
+ * Web Sockets
+ */
+const broadcastClientCount = () => {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'clientCount', data: clientCount }));
+    }
+  });
+};
+
+const broadcastInventory = () => {
+  const inventory = db.GetInventory()
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'inventory', data: inventory }));
+    }
+  });
+};
+
+wss.on('connection', (ws) => {
+  clientCount++
+  broadcastClientCount()
+  console.log(`Client connected. Total clients: ${clientCount}`)
+
+  // Send initial inventory data
+  ws.send(JSON.stringify({ type: 'inventory', data: db.GetInventory() }))
+
+  ws.on('close', () => {
+    clientCount--;
+    broadcastClientCount()
+    console.log(`Client disconnected. Total clients: ${clientCount}`)
+  })
+});
+
+// Send Inventory and Client Count every second
+setInterval(()=> {
+  broadcastClientCount()
+  broadcastInventory()
+}, 1000)
 
 /*
  * PRINTER MANAGE
@@ -330,7 +378,7 @@ app.get(['/main', '/settings/*', '/info/*'], function (req, res) {
 /*
  * SERVER START
  */
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`)
 })
 
