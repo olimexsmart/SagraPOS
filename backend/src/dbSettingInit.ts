@@ -88,6 +88,14 @@ export const defaultSettingList: SettingToInsert[] = [
     description: null
   },
   {
+    key: "PrintOrderRecap",
+    category: 1,
+    inputType: "checkbox",
+    value: "1",
+    displayName: "Ricapitolo ordine",
+    description: null
+  },
+  {
     key: "ServerURL",
     category: 3,
     inputType: "text",

@@ -16,11 +16,13 @@ const PRINT_LOGO_HEIGHT = 'PrintLogoHeight'
 const TEXT_OVER_LOGO = 'OverLogoText'
 const TEXT_UNDER_LOGO = 'UnderLogoText'
 const TEXT_START_RECAP = 'StartRecapText'
+const RECAP_ENABLED = 'PrintOrderRecap'
 let printersInfo: Map<number, Printer>
 let logo: Buffer | null
 let textStartRecap: string[] | null
 let textOverLogo: string[] | null
 let textUnderLogo: string[] | null
+let recapEnabled: boolean = false
 
 const lookup = promisify(dns.lookup);
 
@@ -40,7 +42,8 @@ export interface PrintEntry {
   sequence: number,
   finalPrice: number
   price: number,
-  ordering: number
+  ordering: number,
+  printSequenceEnable: boolean
 };
 
 export function reloadPrintersAndData() {
@@ -62,6 +65,7 @@ export function reloadPrintersAndData() {
   textStartRecap = db.GetSettingByKey(TEXT_START_RECAP)?.value.replace('\r', '').split('\n') ?? null
   textOverLogo = db.GetSettingByKey(TEXT_OVER_LOGO)?.value.replace('\r', '').split('\n') ?? null
   textUnderLogo = db.GetSettingByKey(TEXT_UNDER_LOGO)?.value.replace('\r', '').split('\n') ?? null
+  recapEnabled = db.GetSettingByKey(RECAP_ENABLED)?.value === '1'
 }
 
 export async function pokePrinter(printerToPoke: Printer): Promise<void> {
@@ -93,29 +97,30 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   const reqPrinter = getPrinterAndConnection(printerID)
   const printer = reqPrinter.printer
   // Order main body
-  for (const [key, value] of toPrint.entries) { // Loop on print categories
+  for (const [printCatName, menuItems] of toPrint.entries) { // Loop on print categories
     // Title with category name
     printer.setTextSize(0, 0)
     printer.bold(true)
     printer.alignCenter()
-    printer.println(`------ ${key.toUpperCase()} ------`)
+    printer.println(`------ ${printCatName.toUpperCase()} ------`)
     printer.println('')
     // Body with the ordered entries
     printer.alignLeft()
-    for (const v of value) {
+    for (const mi of menuItems) { // Loop on items of this printing category
       printer.println('')
       printer.bold(true)
       printer.setTextSize(2, 2)
       let pad = 12 // TODO should be configurable per-printer
-      if (v.quantityOrdered >= 10)
+      if (mi.quantityOrdered >= 10)
         pad--
-      const name = v.printingName ?? v.name
-      printer.println(`${name.toUpperCase().padEnd(pad)}x${v.quantityOrdered}`)
+      const name = mi.printingName ?? mi.name
+      printer.println(`${name.toUpperCase().padEnd(pad)}x${mi.quantityOrdered}`)
       // Prenotation number
-      // TODO make this settings-configurable so that it can be hidden
-      printer.bold(false)
-      printer.setTextSize(0, 0)
-      printer.println(`PRENOTAZIONE ${v.sequence}`)
+      if(mi.printSequenceEnable) {
+        printer.bold(false)
+        printer.setTextSize(0, 0)
+        printer.println(`PRENOTAZIONE ${mi.sequence}`)
+      }
     }
     printer.cut()
   }
@@ -128,14 +133,16 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
       printer.println(t)
     }
   }
-  // Order final recap // TODO configurable if wanted
-  for (const printEntries of toPrint.entries.values()) {
-    for (const v of printEntries) {
-      printer.bold(true)
-      printer.print(v.name.toUpperCase().padEnd(22))
-      printer.bold(false)
-      printer.print(`x${v.quantityOrdered}`.padEnd(6))
-      printLineWithEuroSign(printer, '', (v.price * v.quantityOrdered).toFixed(2))
+  // Order final recap 
+  if (recapEnabled) {
+    for (const printEntries of toPrint.entries.values()) {
+      for (const v of printEntries) {
+        printer.bold(true)
+        printer.print(v.name.toUpperCase().padEnd(22))
+        printer.bold(false)
+        printer.print(`x${v.quantityOrdered}`.padEnd(6))
+        printLineWithEuroSign(printer, '', (v.price * v.quantityOrdered).toFixed(2))
+      }
     }
   }
   // Order total

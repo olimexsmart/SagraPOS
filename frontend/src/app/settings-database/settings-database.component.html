@@ -50,6 +50,10 @@
         <textarea rows="4" matInput [(ngModel)]="s.value"></textarea>
       </mat-form-field>
       }
+      @case ('checkbox') {
+      <mat-checkbox [checked]="s.value==='1'"
+        (change)="s.value === '1' ? s.value = '0' : s.value = '1'">Attiva</mat-checkbox>
+      }
       @default {
       <mat-form-field class="full-width">
         <input matInput [type]="s.inputType" [(ngModel)]="s.value" />

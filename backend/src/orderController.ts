@@ -40,8 +40,8 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
   for (const o of order) {
     const f = menuEntries.filter(x => x.id === o.menuEntryID)
     const menuEntry = f[0]
-    // Sequence number of this item
-    const sequence = db.GetSequenceNumberByEntry(menuEntry.name)
+    // Sequence number of this item (only if active otherwise it's a waste of time)
+    const sequence = menuEntry.printSequenceEnable ? db.GetSequenceNumberByEntry(menuEntry.name) : 0
     // Total
     const entryFinalPrice = menuEntry.price * o.quantity
     total += entryFinalPrice
@@ -54,7 +54,8 @@ export function buildOrder(order: OrderEntryDTO[]): OrderToPrint {
       sequence: sequence,
       price: menuEntry.price,
       finalPrice: entryFinalPrice,
-      ordering: menuEntry.ordering
+      ordering: menuEntry.ordering,
+      printSequenceEnable: menuEntry.printSequenceEnable
     }
     // TODO another useless operation if the MenuCategory would be embedded into the MenuEntry object
     const printCat = printCategories.filter(x => x.id == menuEntry.printCategoryID)[0]
