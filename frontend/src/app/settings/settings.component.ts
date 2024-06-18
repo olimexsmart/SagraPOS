@@ -22,6 +22,7 @@ export class SettingsComponent implements OnInit {
   mobileQuery: MediaQueryList;
   private pin: number = 0
   private mobileQueryListener: () => void;
+  selectedRoute: string | null = null; // Used to toggle CSS when list item is clicked
 
   myWorkRoutes: SidenavRoute[] = [{
     isHeader: false, // TODO remove this functionality
@@ -106,6 +107,7 @@ export class SettingsComponent implements OnInit {
       }
     };
     this.router.navigate(['settings/' + route], navigationExtras);
+    this.selectedRoute = route
   }
 
   ngOnDestroy() {

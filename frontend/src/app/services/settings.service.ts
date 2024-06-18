@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { BooleanResult } from '../interfaces/boolean-result';
 import { Setting } from '../interfaces/setting';
 
@@ -25,5 +25,17 @@ export class SettingsService {
 
   saveSetting(pin: number, setting: Setting): Observable<void> {
     return this.http.put<void>(this.baseUrl + `ChangeSetting?pin=${pin}`, setting)
+  }
+
+  getLocalIP(): Observable<string | null> {
+    return this.http.get(this.baseUrl + 'GetLocalIP', { responseType: 'text' }).pipe(
+      catchError(error => {
+        if (error.status === 404) {
+          return of(null); // Return null if the response is a 404 error
+        } else {
+          throw error; // Re-throw other errors
+        }
+      })
+    );
   }
 }

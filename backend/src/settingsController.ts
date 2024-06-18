@@ -1,5 +1,6 @@
 import * as db from "./dbController";
 
+
 export interface MasterPinCheck {
   statusCode: number,
   message: string

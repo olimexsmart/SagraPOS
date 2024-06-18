@@ -23,19 +23,25 @@ export class QrCodeComponent implements OnInit {
 
   ngOnInit() {
     forkJoin({
+      getLocalIP: this.settingsService.getLocalIP(),
       serverURL: this.settingsService.getSettingByValue('ServerURL'),
       wifiSSID: this.settingsService.getSettingByValue('WiFiSSID'),
       wifiPassword: this.settingsService.getSettingByValue('WiFiPassword')
     }).subscribe({
-      next: ({ serverURL, wifiSSID, wifiPassword }) => {
+      next: ({ getLocalIP, serverURL, wifiSSID, wifiPassword }) => {
         if (wifiSSID && wifiPassword) {
           this.wifiSSID = wifiSSID.value
           this.wifiPassword = wifiPassword.value
           this.generateQRCode(`WIFI:T:WPA;S:${wifiSSID.value};P:${wifiPassword.value};;`, 'wifi');
         }
-        if (serverURL) {
+        // Fallback to DB setting if no local IP is found
+        if (serverURL.value) {
           this.serverURL = serverURL.value
-          this.generateQRCode(serverURL.value, 'url');
+        } else if (getLocalIP) {
+          this.serverURL = `http://${getLocalIP}:3000`
+        }
+        if (this.serverURL) {
+          this.generateQRCode(this.serverURL, 'url');
         }
       },
       error: (err) => {

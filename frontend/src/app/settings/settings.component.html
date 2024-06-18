@@ -14,12 +14,12 @@
   <mat-sidenav #sidenav [position]="mobileQuery.matches ? 'end' : 'start'" class="sidenav-lateral"
     [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="true" fixedTopGap="64">
     <mat-nav-list>
-      <ng-container *ngFor="let r of myWorkRoutes">
-        <mat-list-item routerLinkActive="sidenav-item-active" (click)="sidenavItemClick(r.route)">
-          <mat-icon matListItemIcon>{{ r.icon }}</mat-icon>
-          <div matListItemTitle>{{r.label}}</div>
-        </mat-list-item>
-      </ng-container>
+      @for(r of myWorkRoutes; track r){
+      <mat-list-item [ngClass]="{'sidenav-item-active': selectedRoute === r.route}" (click)="sidenavItemClick(r.route)">
+        <mat-icon matListItemIcon>{{r.icon}}</mat-icon>
+        <div matListItemTitle>{{r.label}}</div>
+      </mat-list-item>
+      }
     </mat-nav-list>
   </mat-sidenav>
   <!-- MAIN VIEW -->

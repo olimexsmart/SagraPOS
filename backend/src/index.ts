@@ -289,6 +289,26 @@ app.put('/ChangeSetting', function (req, res) {
   pc.reloadPrintersAndData()
 })
 
+// Gets the local IP of the machine for the QR code
+// Not super-duper comprehensive but should work in normal circumstances
+app.get('/GetLocalIP', (req: Request, res: Response) => {
+  const networkInterfaces = os.networkInterfaces();
+  for (const interfaceName in networkInterfaces) {
+    const networkInterface = networkInterfaces[interfaceName];
+    if (networkInterface) {
+      for (const net of networkInterface) {
+        if (net.family === 'IPv4' && !net.internal) {
+          // if (net.address.startsWith('192.168') || net.address.startsWith('10.0')) {
+          return res.send(net.address);
+          // }
+        }
+      }
+    }
+  }
+
+  res.status(404).send('No local IP address found that matches the criteria.');
+});
+
 
 
 // TODO add pin to these two
