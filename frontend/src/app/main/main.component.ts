@@ -8,6 +8,9 @@ import { MenuCategory } from '../interfaces/menu-categories';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MenuService } from '../services/menu.service';
 import { ThemeService } from '../services/theme.service';
+import { WebSocketService } from '../services/web-socket.service';
+import { Subscription } from 'rxjs';
+import { WebSocketMessage } from '../interfaces/web-socket-message';
 
 @Component({
   selector: 'app-main',
@@ -22,12 +25,13 @@ export class MainComponent {
   printCategories: MenuCategory[] = []
   menuEntries: MenuEntry[] = []
   badgeCount: Inventory = {}
+  inventorySubscription: Subscription | undefined;
 
   constructor(
     @Inject('BASE_URL') public baseUrl: string,
     private menuService: MenuService,
-    private inventoryService: InventoryService,
     public themeService: ThemeService,
+    private webSocketService: WebSocketService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -45,10 +49,10 @@ export class MainComponent {
       this.menuEntries = menuEntries
         .filter(x => !x.hidden)
         .sort((a, b) => a.ordering - b.ordering))
-    this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
-    setInterval(() => {
-      this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
-    }, 1000);
+        
+    this.inventorySubscription = this.webSocketService.onMessage().subscribe(res => {
+      this.onWebSocketMessage(res);
+    })
   }
 
   ngAfterViewInit() {
@@ -64,10 +68,21 @@ export class MainComponent {
       this.sidenav.close()
   }
 
-
+  onWebSocketMessage(res: WebSocketMessage) {
+    if (res) {
+      switch (res.type) {
+        case 'inventory':
+          this.badgeCount = res.data;
+          break;
+      }
+    }
+  }
 
   ngOnDestroy() {
     // Clean up by removing the event listener when the component is destroyed
     this.mobileQuery.removeEventListener('change', this.mobileQueryListener);
+    if(this.inventorySubscription){
+      this.inventorySubscription.unsubscribe();
+    }
   }
 }

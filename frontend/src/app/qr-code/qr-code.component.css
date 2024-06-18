@@ -16,7 +16,7 @@
     flex-direction: column;
     align-items: center;
     max-width: 52rem;
-    margin: 9rem auto auto auto;
+    margin: 6rem auto auto auto;
     padding: 1rem;
 }
 
@@ -34,4 +34,13 @@
 
 .w-100 {
     width: 100%;
+}
+
+.client-counter {
+    margin: 1.3rem auto;
+}
+
+.client-counter p {
+    font-size: 1.6em;
+    transition: transform 0.3s;
 }
