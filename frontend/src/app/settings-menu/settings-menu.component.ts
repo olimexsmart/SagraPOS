@@ -19,6 +19,8 @@ interface MenuEntryExplicit { // TODO make this the common interface, populate u
   price: number
   inventory: number | null
   ordering: number
+  hidden: boolean
+  printSequenceEnable: boolean
 }
 
 @Component({
@@ -36,7 +38,6 @@ export class SettingsMenuComponent implements OnInit {
     'categoryName',
     'printCategoryName',
     'price',
-    'inventory',
     'ordering',
     'actions'
   ];
@@ -90,6 +91,8 @@ export class SettingsMenuComponent implements OnInit {
       price: [menuEntry ? menuEntry.price : '', Validators.required],
       ordering: [menuEntry ? menuEntry.ordering : 0, Validators.required],
       inventory: [menuEntry ? menuEntry.inventory : null],
+      hidden: [menuEntry ? menuEntry.hidden : false],
+      printSequenceEnable: [menuEntry ? menuEntry.printSequenceEnable : false]
     });
   }
 
@@ -109,7 +112,9 @@ export class SettingsMenuComponent implements OnInit {
           printingName: me.printingName,
           price: me.price,
           inventory: me.inventory,
-          ordering: me.ordering
+          ordering: me.ordering,
+          hidden: me.hidden,
+          printSequenceEnable: me.printSequenceEnable
         }));
         return { categories, printCategories, menuEntriesExpl };
       })

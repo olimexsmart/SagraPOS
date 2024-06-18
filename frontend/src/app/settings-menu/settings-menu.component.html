@@ -33,11 +33,6 @@
         <mat-header-cell *matHeaderCellDef> Categoria Stampa </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.printCategory.name}} </mat-cell>
       </ng-container>
-      <!-- Inventario -->
-      <ng-container matColumnDef="inventory">
-        <mat-header-cell *matHeaderCellDef> Inventario</mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.inventory}} </mat-cell>
-      </ng-container>
       <!-- Ordering -->
       <ng-container matColumnDef="ordering">
         <mat-header-cell *matHeaderCellDef> Ordinamento </mat-header-cell>
@@ -110,6 +105,8 @@
         <mat-label>Ordinamento</mat-label>
         <input matInput type="number" formControlName="ordering">
       </mat-form-field>
+      <mat-checkbox formControlName="hidden">Nascondi</mat-checkbox>
+      <mat-checkbox formControlName="printSequenceEnable">Stampa Sequenza</mat-checkbox>
     </form>
   </mat-dialog-content>
   <mat-dialog-actions align="end">

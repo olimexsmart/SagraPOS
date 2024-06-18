@@ -30,9 +30,9 @@ export class MainComponent {
     public themeService: ThemeService,
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher) {
-      this.mobileQuery = media.matchMedia('(max-width: 600px)');
-      this.mobileQueryListener = () => changeDetectorRef.detectChanges();
-      this.mobileQuery.addEventListener('change', this.mobileQueryListener);
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this.mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addEventListener('change', this.mobileQueryListener);
   }
 
   @ViewChild('sidenav') sidenav!: MatDrawer;
@@ -41,7 +41,10 @@ export class MainComponent {
   ngOnInit(): void {
     this.menuService.getCategories().subscribe(categories => this.categories = categories.sort((a, b) => a.ordering - b.ordering))
     this.menuService.getPrintCategories().subscribe(printCategories => this.printCategories = printCategories.sort((a, b) => a.ordering - b.ordering))
-    this.menuService.getMenuEntries().subscribe(menuEntries => this.menuEntries = menuEntries.sort((a, b) => a.ordering - b.ordering))
+    this.menuService.getMenuEntries().subscribe(menuEntries =>
+      this.menuEntries = menuEntries
+        .filter(x => !x.hidden)
+        .sort((a, b) => a.ordering - b.ordering))
     this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)
     setInterval(() => {
       this.inventoryService.getQuantities().subscribe(badgeCount => this.badgeCount = badgeCount)

@@ -8,4 +8,6 @@ export interface MenuEntry {
   price: number
   inventory: number | null
   ordering: number
+  hidden: boolean
+  printSequenceEnable: boolean
 }

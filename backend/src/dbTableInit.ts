@@ -1,5 +1,3 @@
-
-
 export function dbTableInit(db: any): void {
   // Categories
   db.prepare(`CREATE TABLE IF NOT EXISTS "Categories" (
@@ -18,14 +16,16 @@ export function dbTableInit(db: any): void {
   // MenuEntries
   db.prepare(`CREATE TABLE IF NOT EXISTS "MenuEntries" (
     "ID"	INTEGER,
-    "CategoryID" INTEGER NOT NULL,
+    "CategoryID"	INTEGER NOT NULL,
     "PrintCategoryID"	INTEGER NOT NULL,
     "Name"	TEXT NOT NULL,
-    "PrintingName" TEXT DEFAULT NULL,
+    "PrintingName"	TEXT DEFAULT NULL,
     "Price"	REAL NOT NULL DEFAULT 0,
     "Image"	BLOB,
     "Inventory"	INTEGER,
     "Ordering"	INTEGER NOT NULL DEFAULT 0,
+    "Hidden"	INTEGER NOT NULL DEFAULT 0,
+    "PrintSequenceEnable"	INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY("CategoryID") REFERENCES "Categories"("ID"),
     FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
     PRIMARY KEY("ID" AUTOINCREMENT)

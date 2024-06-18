@@ -1,15 +1,14 @@
 import path from 'path';
-import os from 'os'
 import Database from 'better-sqlite3';
 import * as di from './dbInterfaces'
 import { Inventory } from "@Interfaces/inventory"
 import { Printer } from "@Interfaces/printer"
 import { MenuEntry } from "@Interfaces/menu-entry-dto"
 import { MenuCategory } from "@Interfaces/menu-categories"
-import { Setting, SettingCategory } from "@Interfaces/setting"
+import { Setting } from "@Interfaces/setting"
 import { OrdersInfo, OrdersInfoEntry } from '@Interfaces/info-orders-dto';
 import { dbTableInit } from './dbTableInit';
-import { SettingToInsert, defaultSettingList, insertDefaultSetting, insertDefaultSettingCategory, settingsCategories } from './dbSettingInit';
+import { defaultSettingList, insertDefaultSetting, insertDefaultSettingCategory, settingsCategories } from './dbSettingInit';
 
 
 // TODO rename columns to uniform to interfaces?
@@ -122,7 +121,19 @@ function getTableInfo(dbIn: any, tableName: string): ColInfo[] {
 
  */
 export function GetMenuEntries(): MenuEntry[] {
-  const menuEntries = db.prepare('SELECT ID, CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering FROM MenuEntries').all();
+  const menuEntries = db.prepare(`
+  SELECT 
+    ID, 
+    CategoryID, 
+    PrintCategoryID, 
+    Name, 
+    PrintingName, 
+    Price, 
+    Inventory, 
+    Ordering,
+    Hidden,
+    PrintSequenceEnable 
+  FROM MenuEntries`).all();
   return menuEntries.map((menuEntry: any): MenuEntry => ({
     id: menuEntry.ID,
     categoryID: menuEntry.CategoryID,
@@ -131,7 +142,9 @@ export function GetMenuEntries(): MenuEntry[] {
     printingName: menuEntry.PrintingName,
     price: menuEntry.Price,
     inventory: menuEntry.Inventory,
-    ordering: menuEntry.Ordering
+    ordering: menuEntry.Ordering,
+    hidden: menuEntry.Hidden !== 0,
+    printSequenceEnable: menuEntry.PrintSequenceEnable !== 0
   }));
 }
 
@@ -144,16 +157,26 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
 }
 
 export function InsertMenuEntry(newEntry: MenuEntry): number {
+  const entryWithConvertedBooleans = {
+    ...newEntry,
+    hidden: newEntry.hidden ? 1 : 0, 
+    printSequenceEnable: newEntry.printSequenceEnable ? 1 : 0
+  };
   return db.prepare(
-    `INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering)
-     VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory, @ordering)`)
-    .run(newEntry).lastInsertRowid
+    `INSERT INTO MenuEntries (CategoryID, PrintCategoryID, Name, PrintingName, Price, Inventory, Ordering, Hidden, PrintSequenceEnable)
+     VALUES (@categoryID, @printCategoryID, @name, @printingName, @price, @inventory, @ordering, @hidden, @printSequenceEnable)`)
+    .run(entryWithConvertedBooleans).lastInsertRowid
 }
 
 export function UpdateMenuEntry(updatedEntry: MenuEntry): number {
   if (!updatedEntry.id) {
     throw new Error('UpdateMenuEntry called without a valid id');
   }
+  const entryWithConvertedBooleans = {
+    ...updatedEntry,
+    hidden: updatedEntry.hidden ? 1 : 0, 
+    printSequenceEnable: updatedEntry.printSequenceEnable ? 1 : 0
+  };
   return db.prepare(
     `UPDATE MenuEntries SET 
       CategoryID = @categoryID, 
@@ -162,9 +185,11 @@ export function UpdateMenuEntry(updatedEntry: MenuEntry): number {
       PrintingName = @printingName,
       Price = @price, 
       Inventory = @inventory,
-      Ordering = @ordering
+      Ordering = @ordering,
+      Hidden = @hidden,
+      PrintSequenceEnable = @printSequenceEnable
     WHERE ID = @id`)
-    .run(updatedEntry).changes;
+    .run(entryWithConvertedBooleans).changes;
 }
 
 export function DeleteMenuEntry(entryId: number): number {
@@ -434,7 +459,7 @@ export function GetPrinters(): Printer[] {
     name: printer.Name,
     ip: printer.IP,
     port: printer.Port,
-    hidden: printer.Hidden === 1 // Convert integer to boolean 
+    hidden: printer.Hidden !== 0 // Convert integer to boolean 
   }))
 }
 
