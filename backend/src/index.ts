@@ -69,7 +69,7 @@ const broadcastInventory = () => {
 wss.on('connection', (ws) => {
   clientCount++
   broadcastClientCount()
-  console.log(`Client connected. Total clients: ${clientCount}`)
+  // console.log(`Client connected. Total clients: ${clientCount}`)
 
   // Send initial inventory data
   ws.send(JSON.stringify({ type: 'inventory', data: db.GetInventory() }))
@@ -77,7 +77,7 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     clientCount--;
     broadcastClientCount()
-    console.log(`Client disconnected. Total clients: ${clientCount}`)
+    // console.log(`Client disconnected. Total clients: ${clientCount}`)
   })
 });
 
