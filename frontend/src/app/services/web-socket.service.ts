@@ -9,8 +9,8 @@ import { WebSocketMessage } from '../interfaces/web-socket-message';
 export class WebSocketService {
   private socket: WebSocketSubject<WebSocketMessage>;
 
-  constructor() {
-    this.socket = webSocket('/ws');
+  constructor(@Inject('BASE_URL') private baseUrl: string) {
+    this.socket = webSocket(`${this.baseUrl.replace(/^http/, 'ws')}/ws`);
   }
 
 

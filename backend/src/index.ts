@@ -69,15 +69,11 @@ const broadcastInventory = () => {
 wss.on('connection', (ws) => {
   clientCount++
   broadcastClientCount()
-  // console.log(`Client connected. Total clients: ${clientCount}`)
-
   // Send initial inventory data
   ws.send(JSON.stringify({ type: 'inventory', data: db.GetInventory() }))
-
   ws.on('close', () => {
     clientCount--;
     broadcastClientCount()
-    // console.log(`Client disconnected. Total clients: ${clientCount}`)
   })
 });
 
@@ -346,9 +342,7 @@ app.get('/GetLocalIP', (req: Request, res: Response) => {
     if (networkInterface) {
       for (const net of networkInterface) {
         if (net.family === 'IPv4' && !net.internal) {
-          // if (net.address.startsWith('192.168') || net.address.startsWith('10.0')) {
           return res.send(net.address);
-          // }
         }
       }
     }

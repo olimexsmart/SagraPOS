@@ -93,6 +93,17 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded special case for debugging
     return consolePrintOrder(toPrint)
   }
+  // Generate a random code to allow reconstructing the complete order print
+  const orderCode = generateRandomString()
+  const dateTime = new Date().toLocaleString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour12: false
+  })
+  const orderSignature = `${orderCode} - ${dateTime}`
   // Get printer and connection
   const reqPrinter = getPrinterAndConnection(printerID)
   const printer = reqPrinter.printer
@@ -103,7 +114,7 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
     printer.bold(true)
     printer.alignCenter()
     printer.println(`------ ${printCatName.toUpperCase()} ------`)
-    printer.println('')
+    printer.println(orderSignature)
     // Body with the ordered entries
     printer.alignLeft()
     for (const mi of menuItems) { // Loop on items of this printing category
@@ -156,6 +167,11 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
     pad--
   const totalPrompt = "TOTALE:" // TODO text configurable in settings 
   printLineWithEuroSign(printer, totalPrompt.padEnd(pad), toPrint.total.toFixed(2))
+  // Order datetime
+  printer.setTextSize(0, 0)
+  printer.bold(false)
+  printer.alignCenter()
+  printer.println(orderSignature)
   // Over logo text
   printer.setTextSize(0, 0)
   printer.alignCenter()
@@ -395,4 +411,16 @@ function findLocalSubnet(): string | null {
     }
   }
   return null;
+}
+
+function generateRandomString(length: number = 5): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 }
