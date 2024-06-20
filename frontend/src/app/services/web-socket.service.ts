@@ -10,7 +10,10 @@ export class WebSocketService {
   private socket: WebSocketSubject<WebSocketMessage>;
 
   constructor(@Inject('BASE_URL') private baseUrl: string) {
-    this.socket = webSocket(`${this.baseUrl.replace(/^http/, 'ws')}/ws`);
+    if (this.baseUrl.includes('proxy')) 
+      this.socket = webSocket('/ws'); // Used in dev env
+    else
+      this.socket = webSocket(`${this.baseUrl.replace(/^http/, 'ws')}/ws`);
   }
 
 
