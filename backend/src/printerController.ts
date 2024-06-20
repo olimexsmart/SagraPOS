@@ -68,10 +68,10 @@ export function reloadPrintersAndData() {
   recapEnabled = db.GetSettingByKey(RECAP_ENABLED)?.value === '1'
 }
 
-export async function pokePrinter(printerToPoke: Printer): Promise<void> {
+export async function pokePrinter(printerToPoke: Printer): Promise<string> {
   if (printerToPoke.id === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     console.log(printerToPoke);
-    return
+    return ""
   }
   // Connect to printer using the provided ip
   let printer = new ThermalPrinter({
@@ -89,12 +89,12 @@ export async function pokePrinter(printerToPoke: Printer): Promise<void> {
   return confirmPrint(printer)
 }
 
-export async function printOrder(printerID: number, toPrint: OrderToPrint): Promise<void> {
-  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded special case for debugging
-    return consolePrintOrder(toPrint)
-  }
+export async function printOrder(printerID: number, toPrint: OrderToPrint): Promise<string> {
   // Generate a random code to allow reconstructing the complete order print
   const orderCode = generateRandomString()
+  if (printerID === CONSOLE_PRINTER_ID) { // Hard coded special case for debugging
+    return consolePrintOrder(toPrint, orderCode)
+  }
   const dateTime = new Date().toLocaleString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -127,7 +127,7 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
       const name = mi.printingName ?? mi.name
       printer.println(`${name.toUpperCase().padEnd(pad)}x${mi.quantityOrdered}`)
       // Prenotation number
-      if(mi.printSequenceEnable) {
+      if (mi.printSequenceEnable) {
         printer.bold(false)
         printer.setTextSize(0, 0)
         printer.println(`PRENOTAZIONE ${mi.sequence}`)
@@ -196,10 +196,10 @@ export async function printOrder(printerID: number, toPrint: OrderToPrint): Prom
   printer.cut()
 
   // Confirm print
-  return confirmPrint(printer)
+  return confirmPrint(printer, orderCode)
 }
 
-export function printInfo(printerID: number, toPrint: OrdersInfo): Promise<void> {
+export function printInfo(printerID: number, toPrint: OrdersInfo): Promise<string> {
   if (printerID === CONSOLE_PRINTER_ID) { // Hard coded spcial case for debugging
     return consolePrintInfo(toPrint)
   }
@@ -284,11 +284,11 @@ interface ScanResult {
 /*
  * PRIVATE FUNCTIONS
  */
-async function confirmPrint(printer: ThermalPrinter): Promise<void> {
-  return new Promise<void>((resolve, error) => {
+async function confirmPrint(printer: ThermalPrinter, orderCode: string = ""): Promise<string> {
+  return new Promise<string>((resolve, error) => {
     printer.execute({
       waitForResponse: false
-    }).then(() => resolve()).catch(() => error())
+    }).then(() => resolve(orderCode)).catch((e) => error(e))
   })
 }
 
@@ -350,23 +350,23 @@ async function resizeImageToHeight(imageBuffer: Buffer, targetHeight: number): P
   }
 }
 
-async function consolePrintOrder(toPrint: OrderToPrint): Promise<void> {
+async function consolePrintOrder(toPrint: OrderToPrint, orderCode: string): Promise<string> {
   return new Promise((resolve) => {
     fakeLoading(2000).then(() => { // Ensure fakeLoading returns a Promise
       console.log('Total: ' + toPrint.total);
       console.log(toPrint.entries);
-      resolve();
+      resolve(orderCode);
     });
   });
 }
 
-async function consolePrintInfo(toPrint: OrdersInfo): Promise<void> {
+async function consolePrintInfo(toPrint: OrdersInfo): Promise<string> {
   return new Promise((resolve) => {
     fakeLoading(2000).then(() => { // Ensure fakeLoading returns a Promise
       console.log('Total number of orders: ' + toPrint.numberOfOrders)
       console.log('Total of all orders: ' + toPrint.grossProfit)
       console.log(toPrint.infoByEntry);
-      resolve();
+      resolve("");
     });
   });
 }

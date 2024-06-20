@@ -159,7 +159,7 @@ export function UpdateImage(menuEntryID: number, newImage: Buffer): number {
 export function InsertMenuEntry(newEntry: MenuEntry): number {
   const entryWithConvertedBooleans = {
     ...newEntry,
-    hidden: newEntry.hidden ? 1 : 0, 
+    hidden: newEntry.hidden ? 1 : 0,
     printSequenceEnable: newEntry.printSequenceEnable ? 1 : 0
   };
   return db.prepare(
@@ -174,7 +174,7 @@ export function UpdateMenuEntry(updatedEntry: MenuEntry): number {
   }
   const entryWithConvertedBooleans = {
     ...updatedEntry,
-    hidden: updatedEntry.hidden ? 1 : 0, 
+    hidden: updatedEntry.hidden ? 1 : 0,
     printSequenceEnable: updatedEntry.printSequenceEnable ? 1 : 0
   };
   return db.prepare(
@@ -366,9 +366,9 @@ export function ResetOrdersLog(): void {
   db.prepare('UPDATE OrderLogItems SET Valid = 0').run()
 }
 
-export function InsertOrdersLog(orderLogItems: di.OrderLogItem[]): void {
+export function InsertOrdersLog(orderCode: string, orderLogItems: di.OrderLogItem[]): void {
   const tr = db.transaction((orderLogItems: di.OrderLogItem[]) => {
-    const info = db.prepare('INSERT INTO "OrdersLog" DEFAULT VALUES;').run()
+    const info = db.prepare('INSERT INTO OrdersLog (Code) VALUES(?);').run(orderCode)
     for (const oli of orderLogItems) {
       oli.orderID = info.lastInsertRowid
       db.prepare('INSERT INTO OrderLogItems (OrderID, Name, Price, Quantity)'

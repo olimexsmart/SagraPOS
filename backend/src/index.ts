@@ -120,11 +120,11 @@ app.post('/ConfirmOrder', async (req: Request, res: Response) => {
   const toPrint = buildOrder(req.body)
   try {
     const printerID = parseInt(req.query.printerID as string)
-    await pc.printOrder(printerID, toPrint)
-    confirmOrder(toPrint)
+    const orderCode = await pc.printOrder(printerID, toPrint)
+    confirmOrder(toPrint, orderCode)
     res.status(201).send()
-  } catch (error) {
-    res.status(500).send(error)
+  } catch (error: any) {
+    res.status(500).send(error.message)
   }
 })
 
@@ -134,8 +134,8 @@ app.get('/PrintFakeOrder', async (req: Request, res: Response) => {
     const printerID = parseInt(req.query.printerID as string)
     await pc.printOrder(printerID, toPrint)
     res.status(201).send()
-  } catch (error) {
-    res.status(500).send(error)
+  } catch (error: any) {
+    res.status(500).send(error.message)
   }
 })
 
@@ -144,8 +144,8 @@ app.post('/PokePrinter', async (req: Request, res: Response) => { // TODO make i
   try {
     await pc.pokePrinter(req.body)
     res.status(201).send();
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: any) {
+    res.status(500).send(error.message)
   }
 })
 
@@ -153,8 +153,8 @@ app.get('/PrintOrdersInfo', async (req: Request, res: Response) => {
   try {
     await pc.printInfo(parseInt(req.query.printerID as string), db.GatherOrdersInfo())
     res.status(201).send();
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: any) {
+    res.status(500).send(error.message)
   }
 })
 

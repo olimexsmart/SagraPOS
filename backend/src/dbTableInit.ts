@@ -30,6 +30,13 @@ export function dbTableInit(db: any): void {
     FOREIGN KEY("PrintCategoryID") REFERENCES "PrintCategories"("ID"),
     PRIMARY KEY("ID" AUTOINCREMENT)
   )`).run()
+  // OrdersLog
+  db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
+    "ID"	INTEGER,
+    "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "Code"	TEXT NOT NULL UNIQUE,
+    PRIMARY KEY("ID")
+  )`).run()
   // OrderLogItems
   db.prepare(`CREATE TABLE IF NOT EXISTS "OrderLogItems" (
     "ID"	INTEGER,
@@ -40,12 +47,6 @@ export function dbTableInit(db: any): void {
     "Valid"	INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY("ID" AUTOINCREMENT),
     FOREIGN KEY("OrderID") REFERENCES "OrdersLog"("ID") on delete cascade
-  )`).run()
-  // OrdersLog
-  db.prepare(`CREATE TABLE IF NOT EXISTS "OrdersLog" (
-    "ID"	INTEGER,
-    "Time"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY("ID")
   )`).run()
   // Printers
   db.prepare(`CREATE TABLE IF NOT EXISTS "Printers" (

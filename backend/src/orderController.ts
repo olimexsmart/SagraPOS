@@ -83,7 +83,7 @@ export function buildFakeOrder(): OrderToPrint {
   return buildOrder(fakeOrder)
 }
 
-export function confirmOrder(orderPrinted: OrderToPrint): void {
+export function confirmOrder(orderPrinted: OrderToPrint, orderCode: string): void {
   const orderLogItems: OrderLogItem[] = []
   for (const op of orderPrinted.entries.values()) {
     for (const pe of op) {
@@ -101,5 +101,5 @@ export function confirmOrder(orderPrinted: OrderToPrint): void {
     }
   }
   // Update logs
-  db.InsertOrdersLog(orderLogItems)
+  db.InsertOrdersLog(orderCode, orderLogItems)
 }
