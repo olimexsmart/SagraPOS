@@ -325,6 +325,13 @@ export function GatherOrdersInfo(): OrdersInfo {
   }
 }
 
+export function CheckIfOrderCodeUnique(orderCode: string) : boolean {
+  return db.prepare(`SELECT COUNT(Code) AS out
+    FROM OrdersLog
+    WHERE Code = ?;
+    `).get(orderCode).out === 0
+}
+
 function GetOrdersGrossProfit(): number {
   return db.prepare(`SELECT SUM(Price * Quantity) AS out
   FROM OrderLogItems
